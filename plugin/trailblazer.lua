@@ -13,5 +13,12 @@ end
 
 vim.g.trailblazer_loaded = 1
 
+local cfg = {
+  auto_groups = {
+    trailblazer = api.nvim_create_augroup('trailblazer', { clear = true })
+  }
+}
+
+-- User commands
 api.nvim_create_user_command("TrailblazerNewTrailMark", function() tb.new_trail_mark() end, {})
 api.nvim_create_user_command("TrailblazerTrackBack", function() tb.track_back() end, {})

@@ -30,10 +30,11 @@ local function set_defaults(opts)
           track_back = '<A-b>',
           -- open_trail_mark_list = '<A-l>',
         },
-        -- actions = {
-        --   paste_at_last_trail_mark = '<A-p>',
-        --   paste_at_all_trail_marks = '<A-P>',
-        -- },
+        actions = {
+          delete_all_trail_marks = '<A-M>',
+          paste_at_last_trail_mark = '<A-p>',
+          paste_at_all_trail_marks = '<A-P>',
+        },
       },
     },
     hl_groups = {
@@ -67,7 +68,6 @@ end
 function TrailBlazer.setup(options)
   TrailBlazer.options = set_defaults(options)
   TrailBlazer.generated.hl_groups = highlights.register(TrailBlazer.options.hl_groups)
-
   log.setup(TrailBlazer.options.lang)
   keymaps.register(TrailBlazer.options.mappings)
 end
@@ -77,21 +77,36 @@ end
 ---@param buf? number
 ---@param pos? table<number, number>
 function TrailBlazer.new_trail_mark(win, buf, pos)
-  if not TrailBlazer.is_configured() then
-    return
-  end
-
+  if not TrailBlazer.is_configured() then return end
   trails.new_trail_mark(win, buf, pos)
 end
 
 --- Track back to the last trail mark.
 ---@param buf? number
 function TrailBlazer.track_back(buf)
-  if not TrailBlazer.is_configured() then
-    return
-  end
-
+  if not TrailBlazer.is_configured() then return end
   trails.track_back(buf)
+end
+
+--- Delete all trail marks from all or a specific buffer.
+---@param buf? number
+function TrailBlazer.delete_all_trail_marks(buf)
+  if not TrailBlazer.is_configured() then return end
+  trails.delete_all_trail_marks(buf)
+end
+
+--- Paste the selected register contents at the last trail mark of all or a specific buffer.
+---@param buf? number
+function TrailBlazer.paste_at_last_trail_mark(buf)
+  if not TrailBlazer.is_configured() then return end
+  trails.paste_at_last_trail_mark(buf)
+end
+
+--- Paste the selected register contents at all trail marks of all or a specific buffer.
+---@param buf? number
+function TrailBlazer.paste_at_all_trail_marks(buf)
+  if not TrailBlazer.is_configured() then return end
+  trails.paste_at_all_trail_marks(buf)
 end
 
 --- Check if TrailBlazer is configured.
