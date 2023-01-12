@@ -26,12 +26,14 @@ local function set_defaults(opts)
     mappings = {
       nv = { -- Mode union: normal & visual mode
         motions = {
-          new_trail_mark = '<A-m>',
+          new_trail_mark = '<A-l>',
           track_back = '<A-b>',
-          -- open_trail_mark_list = '<A-l>',
+          peek_move_backward = '<A-J>',
+          peek_move_forward = '<A-K>',
+          -- open_trail_mark_list = '<A-m>',
         },
         actions = {
-          delete_all_trail_marks = '<A-M>',
+          delete_all_trail_marks = '<A-L>',
           paste_at_last_trail_mark = '<A-p>',
           paste_at_all_trail_marks = '<A-P>',
         },
@@ -86,6 +88,20 @@ end
 function TrailBlazer.track_back(buf)
   if not TrailBlazer.is_configured() then return end
   trails.track_back(buf)
+end
+
+--- Peek move forward to the next trail mark.
+---@param buf? number
+function TrailBlazer.peek_move_forward(buf)
+  if not TrailBlazer.is_configured() then return end
+  trails.peek_move_forward(buf)
+end
+
+--- Peek move backward to the last trail mark.
+---@param buf? number
+function TrailBlazer.peek_move_backward(buf)
+  if not TrailBlazer.is_configured() then return end
+  trails.peek_move_backward(buf)
 end
 
 --- Delete all trail marks from all or a specific buffer.

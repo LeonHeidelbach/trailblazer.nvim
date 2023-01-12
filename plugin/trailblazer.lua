@@ -20,10 +20,10 @@ local cfg = {
 }
 
 -- User commands
-api.nvim_create_user_command("TrailblazerNewTrailMark", function() tb.new_trail_mark() end, {})
-api.nvim_create_user_command("TrailblazerTrackBack", function() tb.track_back() end, {})
 api.nvim_create_user_command("TrailBlazerNewTrailMark", function() tb.new_trail_mark() end, {})
 api.nvim_create_user_command("TrailBlazerTrackBack", function() tb.track_back() end, {})
+api.nvim_create_user_command("TrailBlazerPeekMoveForward", function() tb.peek_move_forward() end, {})
+api.nvim_create_user_command("TrailBlazerPeekMoveBackward", function() tb.peek_move_backward() end, {})
 api.nvim_create_user_command("TrailBlazerDeleteAllTrailMarks", function() tb.delete_all_trail_marks() end, {})
 api.nvim_create_user_command("TrailBlazerPasteAtLastTrailMark", function() tb.paste_at_last_trail_mark() end, {})
 api.nvim_create_user_command("TrailBlazerPasteAtAllTrailMarks", function() tb.paste_at_all_trail_marks() end, {})

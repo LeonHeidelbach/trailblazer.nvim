@@ -15,6 +15,7 @@ Trails.config = {}
 Trails.config.ns_name = "trailblazer"
 Trails.config.ns_id = api.nvim_create_namespace(Trails.config.ns_name)
 
+Trails.trail_mark_cursor = 0
 Trails.trail_mark_stack = {}
 
 --- Add a new trail mark to the stack.
@@ -44,49 +45,7 @@ function Trails.new_trail_mark(win, buf, pos)
   })
 
   table.insert(Trails.trail_mark_stack, { win = win, buf = buf, pos = pos, mark_id = mark_id })
-end
-
---- Focus a specific window and buffer.
----@param trail_mark table
----@param ext_mark table
----@return boolean
-function Trails.focus_win_and_buf(trail_mark, ext_mark)
-  local ok
-  ok, _ = pcall(api.nvim_set_current_win, trail_mark.win)
-  if not ok then
-    api.nvim_set_current_win(0)
-  end
-
-  ok, _ = pcall(api.nvim_set_current_buf, trail_mark.buf)
-  if ok then
-    api.nvim_win_set_cursor(0, { ext_mark[1][2] + 1, ext_mark[1][3] })
-    return true
-  end
-
-  return false
-end
-
---- Return the trail mark at the given position as well as the corresponding extmark.
----@param buf? number
----@param last_mark_index? number
----@return table?
----@return table?
-function Trails.get_marks_for_trail_mark_index(buf, last_mark_index)
-  local ok, extracted_ext_mark, last_mark
-
-  while not ok do
-    if last_mark_index then
-      last_mark = Trails.trail_mark_stack[last_mark_index]
-      table.remove(Trails.trail_mark_stack, last_mark_index)
-      ok, extracted_ext_mark, _ = pcall(api.nvim_buf_get_extmarks, last_mark.buf,
-        Trails.config.ns_id, last_mark.mark_id, last_mark.mark_id, {})
-    else
-      return nil, nil
-    end
-    last_mark_index = Trails.get_newest_mark_index_for_buf(buf)
-  end
-
-  return last_mark, extracted_ext_mark
+  Trails.trail_mark_cursor = Trails.trail_mark_cursor + 1
 end
 
 --- Remove the last global or buffer local trail mark from the stack.
@@ -96,13 +55,16 @@ function Trails.track_back(buf)
   local last_mark_index = Trails.get_newest_mark_index_for_buf(buf)
 
   if last_mark_index then
-    local trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf, last_mark_index)
-    if trail_mark == nil or ext_mark == nil then
+    local trail_mark, ext_mark
+    last_mark_index, trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf, last_mark_index, true)
+    if last_mark_index == nil or trail_mark == nil or ext_mark == nil then
       return false
     end
 
     Trails.focus_win_and_buf(trail_mark, ext_mark)
     api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.ns_id, trail_mark.mark_id)
+
+    Trails.trail_mark_cursor = #Trails.trail_mark_stack
 
     return true
   end
@@ -110,42 +72,32 @@ function Trails.track_back(buf)
   return false
 end
 
---- Find the newest trail mark in the stack that belongs to the given buffer.
+--- Peek move forward to the next trail mark.
 ---@param buf? number
----@return number?
-function Trails.get_newest_mark_index_for_buf(buf)
-  if buf == nil then
-    return #Trails.trail_mark_stack > 0 and #Trails.trail_mark_stack or nil
+---@return boolean
+function Trails.peek_move_forward(buf)
+  local current_mark_index, _ = Trails.get_trail_mark_under_cursor()
+
+  if current_mark_index and current_mark_index == Trails.trail_mark_cursor then
+    Trails.trail_mark_cursor = Trails.trail_mark_cursor + 1 <= #Trails.trail_mark_stack
+        and Trails.trail_mark_cursor + 1 or #Trails.trail_mark_stack
   end
 
-  for i = #Trails.trail_mark_stack, 1, -1 do
-    if Trails.trail_mark_stack[i].buf == buf then
-      return i
-    end
-  end
-
-  return nil
+  return Trails.focus_win_and_buf_by_trail_mark_index(buf, Trails.trail_mark_cursor, false)
 end
 
---- Paste the selected register contents at a specifi trail mark.
+--- Peek move backward to the next trail mark.
 ---@param buf? number
----@param trail_mark_index number
 ---@return boolean
-function Trails.paste_at_trail_mark(buf, trail_mark_index)
-  local trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf, trail_mark_index)
-  if trail_mark == nil or ext_mark == nil then
-    return false
+function Trails.peek_move_backward(buf)
+  local current_mark_index, _ = Trails.get_trail_mark_under_cursor()
+
+  if current_mark_index and current_mark_index == Trails.trail_mark_cursor then
+    Trails.trail_mark_cursor = Trails.trail_mark_cursor > 1 and Trails.trail_mark_cursor - 1
+        or #Trails.trail_mark_stack > 0 and 1 or 0
   end
 
-  local ok = Trails.focus_win_and_buf(trail_mark, ext_mark)
-  if not ok then
-    return false
-  end
-
-  api.nvim_paste(fn.getreg(api.nvim_get_vvar("register")), false, -1)
-  api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.ns_id, trail_mark.mark_id)
-
-  return true
+  return Trails.focus_win_and_buf_by_trail_mark_index(buf, Trails.trail_mark_cursor, false)
 end
 
 --- Paste the selected register contents at the last trail mark of all or a specific buffer.
@@ -177,6 +129,31 @@ function Trails.paste_at_all_trail_marks(buf)
   end
 end
 
+--- Paste the selected register contents at a specifi trail mark.
+---@param buf? number
+---@param trail_mark_index? number
+---@return boolean
+function Trails.paste_at_trail_mark(buf, trail_mark_index)
+  local trail_mark, ext_mark
+  trail_mark_index, trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf,
+    trail_mark_index, true)
+  if trail_mark_index == nil or trail_mark == nil or ext_mark == nil then
+    return false
+  end
+
+  local ok = Trails.focus_win_and_buf(trail_mark, ext_mark)
+  if not ok then
+    return false
+  end
+
+  api.nvim_paste(fn.getreg(api.nvim_get_vvar("register")), false, -1)
+  api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.ns_id, trail_mark.mark_id)
+
+  Trails.trail_mark_cursor = #Trails.trail_mark_stack
+
+  return true
+end
+
 --- Delete all trail marks from the stack and all or a specific buffer.
 ---@param buf? number
 function Trails.delete_all_trail_marks(buf)
@@ -197,6 +174,110 @@ function Trails.delete_all_trail_marks(buf)
       return mark.buf ~= buf
     end, Trails.trail_mark_stack)
   end
+end
+
+--- Focus a specific window and buffer and set the cursor to the position of the trail mark.
+---@param trail_mark table
+---@param ext_mark table
+---@return boolean
+function Trails.focus_win_and_buf(trail_mark, ext_mark)
+  local ok
+  ok, _ = pcall(api.nvim_set_current_win, trail_mark.win)
+  if not ok then
+    api.nvim_set_current_win(0)
+  end
+
+  ok, _ = pcall(api.nvim_set_current_buf, trail_mark.buf)
+  if ok then
+    api.nvim_win_set_cursor(0, { ext_mark[1][2] + 1, ext_mark[1][3] })
+    return true
+  end
+
+  return false
+end
+
+--- Focus a specific window and buffer and set the cursor to the position of the trail mark by
+--- providing its index.
+---@param buf? any
+---@param trail_mark_index any
+---@param remove_trail_mark any
+---@return boolean
+function Trails.focus_win_and_buf_by_trail_mark_index(buf, trail_mark_index, remove_trail_mark)
+  if trail_mark_index > 0 then
+    local trail_mark, ext_mark
+    trail_mark_index, trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf,
+      trail_mark_index, remove_trail_mark)
+    if trail_mark_index == nil or trail_mark == nil or ext_mark == nil then
+      return false
+    end
+
+    Trails.focus_win_and_buf(trail_mark, ext_mark)
+
+    return true
+  end
+
+  return false
+end
+
+--- Return the trail mark and its index in the trail mark stack under the current cursor location.
+---@return number?
+---@return table?
+function Trails.get_trail_mark_under_cursor()
+  local current_cursor = api.nvim_win_get_cursor(0)
+
+  for i, trail_mark in ipairs(Trails.trail_mark_stack) do
+    if trail_mark.pos[1] == current_cursor[1] and trail_mark.pos[2] == current_cursor[2] then
+      return i, trail_mark
+    end
+  end
+
+  return nil, nil
+end
+
+--- Return the trail mark at the given position as well as the corresponding extmark.
+---@param buf? number
+---@param last_mark_index? number
+---@return number?
+---@return table?
+---@return table?
+function Trails.get_marks_for_trail_mark_index(buf, last_mark_index, remove_trail_mark)
+  local ok, extracted_ext_mark, last_mark
+
+  while #Trails.trail_mark_stack > 0 do
+    if last_mark_index then
+      last_mark = Trails.trail_mark_stack[last_mark_index]
+      ok, extracted_ext_mark, _ = pcall(api.nvim_buf_get_extmarks, last_mark.buf,
+        Trails.config.ns_id, last_mark.mark_id, last_mark.mark_id, {})
+
+      if remove_trail_mark then
+        table.remove(Trails.trail_mark_stack, last_mark_index)
+      end
+
+      if ok then break end
+    else
+      return nil, nil, nil
+    end
+    last_mark_index = Trails.get_newest_mark_index_for_buf(buf)
+  end
+
+  return last_mark_index, last_mark, extracted_ext_mark
+end
+
+--- Find the newest trail mark in the stack that belongs to the given buffer.
+---@param buf? number
+---@return number?
+function Trails.get_newest_mark_index_for_buf(buf)
+  if buf == nil then
+    return #Trails.trail_mark_stack > 0 and #Trails.trail_mark_stack or nil
+  end
+
+  for i = #Trails.trail_mark_stack, 1, -1 do
+    if Trails.trail_mark_stack[i].buf == buf then
+      return i
+    end
+  end
+
+  return nil
 end
 
 --- Reregister all trail marks on the stack. This function can be used to restore trail marks
