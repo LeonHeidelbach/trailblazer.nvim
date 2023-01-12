@@ -31,7 +31,7 @@ function Trails.new_trail_mark(win, buf, pos)
     buf = api.nvim_get_current_buf()
   end
 
-  if not pos then
+  if not pos or not pos[1] or not pos[2] then
     pos = api.nvim_win_get_cursor(0)
   end
 
@@ -160,8 +160,10 @@ function Trails.delete_all_trail_marks(buf)
   if buf == nil then
     for _, mark in ipairs(Trails.trail_mark_stack) do
       pcall(api.nvim_buf_del_extmark, mark.buf, Trails.config.ns_id, mark.mark_id)
+      Trails.trail_mark_cursor = Trails.trail_mark_cursor - 1
     end
 
+    Trails.trail_mark_cursor = Trails.trail_mark_cursor > 0 and Trails.trail_mark_cursor or 0
     Trails.trail_mark_stack = {}
   else
     local ext_marks = api.nvim_buf_get_extmarks(buf, Trails.config.ns_id, 0, -1, {})
@@ -173,6 +175,8 @@ function Trails.delete_all_trail_marks(buf)
     Trails.trail_mark_stack = vim.tbl_filter(function(mark)
       return mark.buf ~= buf
     end, Trails.trail_mark_stack)
+
+    Trails.trail_mark_cursor = #Trails.trail_mark_stack
   end
 end
 

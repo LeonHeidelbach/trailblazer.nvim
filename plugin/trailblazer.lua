@@ -20,10 +20,19 @@ local cfg = {
 }
 
 -- User commands
-api.nvim_create_user_command("TrailBlazerNewTrailMark", function() tb.new_trail_mark() end, {})
-api.nvim_create_user_command("TrailBlazerTrackBack", function() tb.track_back() end, {})
-api.nvim_create_user_command("TrailBlazerPeekMoveForward", function() tb.peek_move_forward() end, {})
-api.nvim_create_user_command("TrailBlazerPeekMoveBackward", function() tb.peek_move_backward() end, {})
-api.nvim_create_user_command("TrailBlazerDeleteAllTrailMarks", function() tb.delete_all_trail_marks() end, {})
-api.nvim_create_user_command("TrailBlazerPasteAtLastTrailMark", function() tb.paste_at_last_trail_mark() end, {})
-api.nvim_create_user_command("TrailBlazerPasteAtAllTrailMarks", function() tb.paste_at_all_trail_marks() end, {})
+api.nvim_create_user_command("TrailBlazerNewTrailMark",
+  function(args) tb.new_trail_mark(tonumber(args.fargs[1]), tonumber(args.fargs[2]),
+      { tonumber(args.fargs[3]), tonumber(args.fargs[4]) })
+  end, { nargs = "*" })
+api.nvim_create_user_command("TrailBlazerTrackBack",
+  function(args) tb.track_back(args.args) end, { nargs = "?", complete = "buffer" })
+api.nvim_create_user_command("TrailBlazerPeekMoveForward",
+  function(args) tb.peek_move_forward(args.args) end, { nargs = "?", complete = "buffer" })
+api.nvim_create_user_command("TrailBlazerPeekMoveBackward",
+  function(args) tb.peek_move_backward(args.args) end, { nargs = "?", complete = "buffer" })
+api.nvim_create_user_command("TrailBlazerDeleteAllTrailMarks",
+  function(args) tb.delete_all_trail_marks(args.args) end, { nargs = "?", complete = "buffer" })
+api.nvim_create_user_command("TrailBlazerPasteAtLastTrailMark",
+  function(args) tb.paste_at_last_trail_marks(args.args) end, { nargs = "?", complete = "buffer" })
+api.nvim_create_user_command("TrailBlazerPasteAtAllTrailMarks",
+  function(args) tb.paste_at_all_trail_marks(args.args) end, { nargs = "?", complete = "buffer" })

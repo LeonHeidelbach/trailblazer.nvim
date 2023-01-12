@@ -17,6 +17,7 @@ Log.config = {
     "en"
   },
   prefixes = {
+    info = "TrailBlazer(INFO):",
     error = "TrailBlazer(ERROR):"
   }
 }
@@ -27,6 +28,7 @@ Log.langs = {
       not_configured = "TrailBlazer is not configured. Please call `require('trailblazer').setup()` first.",
       unsupported_lang = "Unsupported language. Please use one of the following: " ..
           table.concat(Log.config.available_langs, ", "),
+      invalid_buf_name = "Invalid buffer name. The current buffer has been used instead.",
     }
   }
 }
@@ -42,6 +44,12 @@ function Log.setup(lang)
   end
 
   Log.error("unsupported_lang")
+end
+
+--- Log an info message.
+---@param name string
+function Log.info(name)
+  api.nvim_notify(Log.config.prefixes.info .. " " .. Log.current_lang[name], "info", {})
 end
 
 --- Log an error message.
