@@ -36,3 +36,10 @@ api.nvim_create_user_command("TrailBlazerPasteAtLastTrailMark",
   function(args) tb.paste_at_last_trail_marks(args.args) end, { nargs = "?", complete = "buffer" })
 api.nvim_create_user_command("TrailBlazerPasteAtAllTrailMarks",
   function(args) tb.paste_at_all_trail_marks(args.args) end, { nargs = "?", complete = "buffer" })
+
+-- Auto commands
+api.nvim_create_autocmd("BufWritePost", {
+  group = cfg.auto_groups.trailblazer,
+  pattern = "*",
+  callback = require('trailblazer.trails').reregister_trail_marks
+})

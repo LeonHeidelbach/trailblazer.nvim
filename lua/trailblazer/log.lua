@@ -29,6 +29,7 @@ Log.langs = {
       unsupported_lang = "Unsupported language. Please use one of the following: " ..
           table.concat(Log.config.available_langs, ", "),
       invalid_buf_name = "Invalid buffer name. The current buffer has been used instead.",
+      invalid_pos_for_buf_lines = "Could not retrieve buffer lines for the current cursor position."
     }
   }
 }
@@ -55,7 +56,7 @@ end
 --- Log an error message.
 ---@param name string
 function Log.error(name)
-  api.nvim_err_writeln(Log.config.prefixes.error .. " " .. Log.current_lang.errors[name])
+  error(Log.config.prefixes.error .. " " .. Log.current_lang.errors[name])
 end
 
 Log.setup(Log.config.default_lang)

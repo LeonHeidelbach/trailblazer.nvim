@@ -9,6 +9,7 @@
 
 local api = vim.api
 local fn = vim.fn
+local log = require("trailblazer.log")
 local Trails = {}
 
 Trails.config = {}
@@ -22,6 +23,7 @@ Trails.trail_mark_stack = {}
 ---@param win? number
 ---@param buf? number
 ---@param pos? table<number, number>
+---@return table?
 function Trails.new_trail_mark(win, buf, pos)
   if not win then
     win = api.nvim_get_current_win()
@@ -35,8 +37,15 @@ function Trails.new_trail_mark(win, buf, pos)
     pos = api.nvim_win_get_cursor(0)
   end
 
-  local pos_text = api.nvim_buf_get_lines(buf, pos[1] - 1, pos[1], false)[1]
-      :sub(pos[2] + 1, pos[2] + 1)
+  local pos_text = api.nvim_buf_get_lines(buf, pos[1] - 1, pos[1],
+    false)[1]
+
+  if not pos_text or not pos[1] or not pos[2] then
+    log.error("invalid_pos_for_buf_lines")
+    return nil
+  end
+
+  pos_text = pos_text:sub(pos[2] + 1, pos[2] + 1)
 
   local mark_id = api.nvim_buf_set_extmark(buf, Trails.config.ns_id, pos[1] - 1, pos[2], {
     virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMark" } },
@@ -46,6 +55,8 @@ function Trails.new_trail_mark(win, buf, pos)
 
   table.insert(Trails.trail_mark_stack, { win = win, buf = buf, pos = pos, mark_id = mark_id })
   Trails.trail_mark_cursor = Trails.trail_mark_cursor + 1
+
+  return Trails.trail_mark_stack[Trails.trail_mark_cursor]
 end
 
 --- Remove the last global or buffer local trail mark from the stack.
