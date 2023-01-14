@@ -16,7 +16,8 @@ local Helpers = {}
 ---@param input? string | number
 ---@return number?
 function Helpers.get_buf_nr(input)
-  if not input or type(input) == "number" then return input end
+  if not input then return input end
+  if type(tonumber(input)) == "number" then return tonumber(input) end
   local buf = api.nvim_call_function("bufnr", { input })
   if buf == -1 then
     log.error("invalid_buf_name")

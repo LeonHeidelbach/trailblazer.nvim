@@ -2,12 +2,12 @@
 ---@version: 1.0
 ---@license: MIT
 ---@tag init
----@mod trailblazer
+---@mod trailblazer.init
 ---@brief [[
---- This is the init module of TrailBlazer.
+--- This is the init module of TrailBlazer. It contains all API functions and is the entry point for
+--- the plugin.
 ---@brief ]]
 
--- local api = vim.api
 local log = require("trailblazer.log")
 local trails = require("trailblazer.trails")
 local highlights = require("trailblazer.highlights")
