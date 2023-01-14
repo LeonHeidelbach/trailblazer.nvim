@@ -1,0 +1,252 @@
+*trailblazer.nvim.txt*  TrailBlazer enables you to seemlessly move through important 
+		      project marks as quickly and efficiently as possible to make
+		      your workflow *blazingly fast ™*.
+
+
+                                                                       *helpers*
+==============================================================================
+                                                           *trailblazer.helpers*
+
+ This module is responsible for providing helper functions.
+
+Helpers.get_buf_nr({input?})                                *Helpers.get_buf_nr*
+     Returns the buffer number of the supplied value. If the value is a number, it is assumed to be
+     a buffer number. If the value is a string, it is assumed to be a buffer name.
+
+    Parameters: ~
+        {input?}  (string|number)  @return number?
+
+
+                                                                    *highlights*
+==============================================================================
+                                                        *trailblazer.highlights*
+
+ This module is responsible for generating and setting highlight groups used by TrailBlazer.
+
+>
+ ## Usage example
+ local hl_groups = {
+   trail_mark = {
+     name = 'TrailBlazerTrailMark',
+     def = {
+       guifg = "Black",
+       guibg = "Red",
+       gui = "bold",
+     }
+   },
+   trail_mark_2 = {
+     name = 'TrailBlazerTrailMark2',
+     def = {
+       link = 'TrailBlazerTrailMark',
+     }
+   }, ...
+ }
+ require("trailblazer.highlights").register(hl_groups)
+<
+
+Highlights.register({user_table})                          *Highlights.register*
+     Generate and register highlight groups. Returns the list of registered groups.
+
+    Parameters: ~
+        {user_table}  (table<string,table<string,string>>)  @return table<string>
+
+
+Highlights.register_hl_groups()                  *Highlights.register_hl_groups*
+
+
+                                             *Highlights.generate_group_strings*
+Highlights.generate_group_strings({hl_table})
+     Generate a list of highlight group strings from a config table.
+
+    Parameters: ~
+        {hl_table}  (table<string,table<string,string>>)  @return table<string>
+
+
+Highlights.def_to_string({name}, {def})               *Highlights.def_to_string*
+     Stringify a single highlight definition.
+
+    Parameters: ~
+        {name}  (string)
+        {def}   (table<string,string>)
+
+    Returns: ~
+        (string)
+
+
+                                                                       *keymaps*
+==============================================================================
+                                                           *trailblazer.keymaps*
+
+ This module is responsible for setting up keymaps.
+
+Keymaps.register()                                            *Keymaps.register*
+
+
+                                                                           *log*
+==============================================================================
+                                                               *trailblazer.log*
+
+ This module is responsible for logging messages in a consistent way with support for multiple
+ languages.
+
+Log.setup({lang})                                                    *Log.setup*
+     Set the current language if the specified language is supported.
+
+    Parameters: ~
+        {lang}  (string)
+
+
+Log.info({name})                                                      *Log.info*
+     Log an info message.
+
+    Parameters: ~
+        {name}  (string)
+
+
+Log.error({name})                                                    *Log.error*
+     Log an error message.
+
+    Parameters: ~
+        {name}  (string)
+
+
+                                                                          *init*
+==============================================================================
+                                                            *trailblazer.trails*
+
+ This module is responsible for managing trails.
+
+                                                         *Trails.new_trail_mark*
+Trails.new_trail_mark({win?}, {buf?}, {pos?})
+     Add a new trail mark to the stack.
+
+    Parameters: ~
+        {win?}  (number)
+        {buf?}  (number)
+        {pos?}  (table<number,number>)  @return table?
+
+
+Trails.track_back({buf?})                                    *Trails.track_back*
+     Remove the last global or buffer local trail mark from the stack.
+
+    Parameters: ~
+        {buf?}  (number)
+
+    Returns: ~
+        (boolean)
+
+
+Trails.peek_move_forward({buf?})                      *Trails.peek_move_forward*
+     Peek move forward to the next trail mark.
+
+    Parameters: ~
+        {buf?}  (number)
+
+    Returns: ~
+        (boolean)
+
+
+Trails.peek_move_backward({buf?})                    *Trails.peek_move_backward*
+     Peek move backward to the next trail mark.
+
+    Parameters: ~
+        {buf?}  (number)
+
+    Returns: ~
+        (boolean)
+
+
+Trails.paste_at_last_trail_mark({buf?})        *Trails.paste_at_last_trail_mark*
+     Paste the selected register contents at the last trail mark of all or a specific buffer.
+
+    Parameters: ~
+        {buf?}  (number)
+
+    Returns: ~
+        (boolean)
+
+
+Trails.paste_at_all_trail_marks({buf})         *Trails.paste_at_all_trail_marks*
+     Paste the selected register contents at all trail marks of all or a specific buffer.
+
+    Parameters: ~
+        {buf}  (any)
+
+
+                                                    *Trails.paste_at_trail_mark*
+Trails.paste_at_trail_mark({buf?}, {trail_mark_index?})
+     Paste the selected register contents at a specifi trail mark.
+
+    Parameters: ~
+        {buf?}               (number)
+        {trail_mark_index?}  (number)
+
+    Returns: ~
+        (boolean)
+
+
+Trails.delete_all_trail_marks({buf?})            *Trails.delete_all_trail_marks*
+     Delete all trail marks from the stack and all or a specific buffer.
+
+    Parameters: ~
+        {buf?}  (number)
+
+
+                                                      *Trails.focus_win_and_buf*
+Trails.focus_win_and_buf({trail_mark}, {ext_mark})
+     Focus a specific window and buffer and set the cursor to the position of the trail mark.
+
+    Parameters: ~
+        {trail_mark}  (table)
+        {ext_mark}    (table)
+
+    Returns: ~
+        (boolean)
+
+
+                                  *Trails.focus_win_and_buf_by_trail_mark_index*
+Trails.focus_win_and_buf_by_trail_mark_index({buf?}, {trail_mark_index}, {remove_trail_mark})
+     Focus a specific window and buffer and set the cursor to the position of the trail mark by
+     providing its index.
+
+    Parameters: ~
+        {buf?}               (any)
+        {trail_mark_index}   (any)
+        {remove_trail_mark}  (any)
+
+    Returns: ~
+        (boolean)
+
+
+Trails.get_trail_mark_under_cursor()        *Trails.get_trail_mark_under_cursor*
+     Return the trail mark and its index in the trail mark stack under the current cursor location.
+    @return number?
+    @return table?
+
+
+                                         *Trails.get_marks_for_trail_mark_index*
+Trails.get_marks_for_trail_mark_index({buf?}, {last_mark_index?})
+     Return the trail mark at the given position as well as the corresponding extmark.
+
+    Parameters: ~
+        {buf?}              (number)
+        {last_mark_index?}  (number)  @return number?
+                                      @return table?
+                                      @return table?
+
+
+                                          *Trails.get_newest_mark_index_for_buf*
+Trails.get_newest_mark_index_for_buf({buf?})
+     Find the newest trail mark in the stack that belongs to the given buffer.
+
+    Parameters: ~
+        {buf?}  (number)  @return number?
+
+
+Trails.reregister_trail_marks()                  *Trails.reregister_trail_marks*
+     Reregister all trail marks on the stack. This function can be used to restore trail marks
+     after calling `vim.lsp.formatting` which currently causes extmarks to be moved out of the
+     buffer range.
+
+
+vim:tw=78:ts=8:noet:ft=help:norl:
