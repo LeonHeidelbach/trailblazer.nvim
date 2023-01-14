@@ -6,15 +6,15 @@ TrailBlazer enables you to seemlessly move through important project marks as qu
 efficiently as possible to make your workflow *blazingly fast ™*.
 
 <figure>
-    <blockquote cite="https://www.huxley.net/bnw/four.html">
+    <blockquote>
         <p>
             TrailBlazer is the plugin we didn't deserve but most definitely need. It has
             fundamentally transformed the way I use my text editor on a daily basis. Truely a
             beautifully simple plugin of the people, by the people, for Neovim users.
         </p>
-        <figcaption style="font-size:11pt;text-align:right;">
+        <p style="font-size:11pt;text-align:right;">
             — Abraham Lincoln, <cite>November 19th 1863</cite>
-        </figcaption>
+        </p>
     </blockquote>
 </figure>
 
@@ -113,20 +113,20 @@ directly like this:
 require("trailblazer").<function_name>(<args>)
 ```
 
-| Command                            | Arguments                                                                                                      | Function                      | Description                                                                                                                                                        |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `:TrailBlazerNewTrailMark`         | `<window? number>`<br>`<buffer? string \| number>`<br>`<cursor_pos_row? number>`<br>`<cursor_pos_col? number>` | new_trail_mark(win, buf, pos) | Create a new trail mark at the current cursor position or at the specified window / buffer / position.                                                             |
-| `:TrailBlazerTrackBack`            | `<buffer? string \| number>`                                                                                   | track_back(buf)               | Move to the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                            |
-| `:TrailBlazerPeekMoveForward`      | `<buffer? string \| number`                                                                                    | peek_move_forward(buf)        | Move to the next global trail mark or the next one within the specified buffer leading up to the newest one without removing it from the trail mark stack.         |
-| `:TrailBlazerPeekMoveBackward`     | `<buffer? string \| number>`                                                                                   | peek_move_backward(buf)       | Move to the previous global trail mark or the previous one within the specified buffer leading up to the oldest one without removing it from the trail mark stack. |
-| `:TrailBlazerDeleteAllTrailMarks`  | `<buffer? string \| number>`                                                                                   | delete_all_trail_marks(buf)   | Delete all trail marks globally or within the specified buffer.                                                                                                    |
-| `:TrailBlazerPasteAtLastTrailMark` | `<buffer? string \| number>`                                                                                   | paste_at_last_trail_mark(buf) | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.     |
-| `:TrailBlazerPasteAtAllTrailMarks` | `<buffer? string \| number>`                                                                                   | paste_at_all_trail_marks(buf) | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                           |
+| Command                            | Arguments                                                                                                      | Description                                                                                                                                                        |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `:TrailBlazerNewTrailMark`         | `<window? number>`<br>`<buffer? string \| number>`<br>`<cursor_pos_row? number>`<br>`<cursor_pos_col? number>` | Create a new trail mark at the current cursor position or at the specified window / buffer / position.                                                             |
+| `:TrailBlazerTrackBack`            | `<buffer? string \| number>`                                                                                   | Move to the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                            |
+| `:TrailBlazerPeekMoveForward`      | `<buffer? string \| number`                                                                                    | Move to the next global trail mark or the next one within the specified buffer leading up to the newest one without removing it from the trail mark stack.         |
+| `:TrailBlazerPeekMoveBackward`     | `<buffer? string \| number>`                                                                                   | Move to the previous global trail mark or the previous one within the specified buffer leading up to the oldest one without removing it from the trail mark stack. |
+| `:TrailBlazerDeleteAllTrailMarks`  | `<buffer? string \| number>`                                                                                   | Delete all trail marks globally or within the specified buffer.                                                                                                    |
+| `:TrailBlazerPasteAtLastTrailMark` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.     |
+| `:TrailBlazerPasteAtAllTrailMarks` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                           |
 
 ## Documentation
 
 You can find the technical documentation for TrailBlazer under [doc/trailblazer.nvim.txt][help]. If
-you are within Neovim you can also open the documentation by running `:help trailblazer.nvim`.
+you are within Neovim you can also open the documentation by running `:help trailblazer`.
 
 ## Contributing
 
