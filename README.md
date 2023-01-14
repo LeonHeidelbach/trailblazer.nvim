@@ -5,6 +5,8 @@
 TrailBlazer enables you to seemlessly move through important project marks as quickly and
 efficiently as possible to make your workflow *blazingly fast ™*.
 
+![showcase][showcase]
+
 <figure>
     <blockquote>
         <p>
@@ -29,9 +31,9 @@ or are spread out between multiple documents but also not located at the same sp
 and takes up valuable [RAM][ram-def-wikipedia] in your brain. Thus moving between those locations
 within large projects can slow you down tremendously. TrailBlazer aims to solve this problem by
 enabling you to leave trail marks as you navigate multiple files over different windows and buffers.
-Quickly move along the trail you mark as you journey through your project and start working right
-away wherever you need to come back to a previous trail mark. You can even use several immediate
-actions on your trail marks that allow you to be even more efficient.
+Quickly move along the trail you mark as you journey through your project and start working wherever
+you left of right away whenever you need to. You can even use several immediate actions on your
+trail marks that allow you to be even more efficient.
 
 **NOTE: TrailBlazer is still in its early stages of development and there are still many features 
 to come. If you have any suggestions or find any bugs, please open an issue.**
@@ -102,7 +104,7 @@ available and set by default:
 }
 ```
 
-## User commands
+## 💻 User commands
 
 Arguments annotated with `?` can be omitted. If omitted, the current window, buffer, cursor position
 and the global trail mark stack will be used. All user commands use functions defined
@@ -123,12 +125,12 @@ require("trailblazer").<function_name>(<args>)
 | `:TrailBlazerPasteAtLastTrailMark` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.     |
 | `:TrailBlazerPasteAtAllTrailMarks` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                           |
 
-## Documentation
+## 📚 Documentation
 
 You can find the technical documentation for TrailBlazer under [doc/trailblazer.nvim.txt][help]. If
 you are within Neovim you can also open the documentation by running `:help trailblazer`.
 
-## Contributing
+## 👥 Contributing
 
 I would like to keep TrailBlazer's code base as clean and easy to read as possible. If you would
 like to contribute, please make sure to follow the following contribution guidelines and make sure
@@ -169,11 +171,12 @@ $ make prepare
 $ make test
 ```
 
-## Feedback
+## 💬 Feedback
 
 Feedback is always welcome! If you would like to leave some, please use the [GitHub
 Discussions][discussions]. Issues are reserved for bug reports and feature requests.
 
+[showcase]: ../media/TrailBlazer_Showcase.gif?raw=true
 [user_api]: lua/trailblazer/init.lua
 [ram-def-wikipedia]: https://en.wikipedia.org/wiki/Random-access_memory
 [lua]: https://www.lua.org/
