@@ -261,8 +261,11 @@ function Trails.get_marks_for_trail_mark_index(buf, last_mark_index, remove_trai
   while #Trails.trail_mark_stack > 0 do
     if last_mark_index then
       last_mark = Trails.trail_mark_stack[last_mark_index]
-      ok, extracted_ext_mark, _ = pcall(api.nvim_buf_get_extmarks, last_mark.buf,
-        Trails.config.ns_id, last_mark.mark_id, last_mark.mark_id, {})
+
+      if last_mark then
+        ok, extracted_ext_mark, _ = pcall(api.nvim_buf_get_extmarks, last_mark.buf,
+          Trails.config.ns_id, last_mark.mark_id, last_mark.mark_id, {})
+      end
 
       if remove_trail_mark then
         table.remove(Trails.trail_mark_stack, last_mark_index)
