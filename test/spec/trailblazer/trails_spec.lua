@@ -41,7 +41,8 @@ end)
 
 describe("Trails.peek_move_backward:", function()
   it("Peek move backward to the previous trail mark.", function()
-    local mark = tr.new_trail_mark()
+    local buf = vim.api.nvim_create_buf(false, false)
+    local mark = tr.new_trail_mark(nil, buf, nil)
     if not mark then error("No trail mark was created.") end
     assert.are.same(mark ~= nil, true)
     assert.are.same(mark, tr.trail_mark_stack[tr.trail_mark_cursor])
@@ -53,7 +54,8 @@ end)
 
 describe("Trails.peek_move_forward:", function()
   it("Peek move forward to the next trail mark.", function()
-    local mark = tr.new_trail_mark()
+    local buf = vim.api.nvim_create_buf(false, true)
+    local mark = tr.new_trail_mark(nil, buf, nil)
     if not mark then error("No trail mark was created.") end
     assert.are.same(mark ~= nil, true)
     assert.are.same(mark, tr.trail_mark_stack[tr.trail_mark_cursor])
