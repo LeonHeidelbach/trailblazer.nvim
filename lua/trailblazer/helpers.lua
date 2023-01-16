@@ -26,4 +26,49 @@ function Helpers.get_buf_nr(input)
   return buf
 end
 
+--- Returns the first item in the supplied table that matches the supplied predicate.
+---@param lambda function
+---@param tbl table
+---@return any?
+function Helpers.tbl_find(lambda, tbl)
+  for _, v in ipairs(tbl) do
+    if lambda(v) then
+      return v
+    end
+  end
+  return nil
+end
+
+--- Returns the index of the first item in the supplied table that matches the supplied predicate.
+---@param lambda function
+---@param tbl table
+---@return integer?
+function Helpers.tbl_indexof(lambda, tbl)
+  for i, v in ipairs(tbl) do
+    if lambda(v) then
+      return i
+    end
+  end
+  return nil
+end
+
+--- Remove duplicates from the supplied table using the supplied predicate and calling the
+--- optionally supplied action on each duplicate.
+---@param lambda function<any> @return function
+---@param tbl table
+---@param action? function
+---@return table
+function Helpers.dedupe(lambda, tbl, action)
+  local res = {}
+  for _, v in ipairs(tbl) do
+    if not lambda(v, res) then
+      table.insert(res, v)
+    elseif action then
+      action(v)
+    end
+  end
+
+  return res
+end
+
 return Helpers
