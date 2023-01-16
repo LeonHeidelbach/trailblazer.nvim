@@ -240,6 +240,8 @@ end
 ---@return table?
 function Trails.get_trail_mark_under_cursor()
   local trail_mark_index
+  local current_buffer = api.nvim_get_current_buf()
+  local current_win = api.nvim_get_current_win()
   local current_cursor = api.nvim_win_get_cursor(0)
   local ext_marks = api.nvim_buf_get_extmarks(0, Trails.config.ns_id, 0, -1, {})
 
@@ -250,7 +252,8 @@ function Trails.get_trail_mark_under_cursor()
   if current_ext_mark ~= nil then
     Trails.remove_duplicate_pos_trail_marks()
     trail_mark_index = helpers.tbl_indexof(function(trail_mark)
-      return trail_mark.mark_id == current_ext_mark[1]
+      return current_win == trail_mark.win and current_buffer == trail_mark.buf and
+          trail_mark.mark_id == current_ext_mark[1]
     end, Trails.trail_mark_stack)
   end
 
@@ -342,7 +345,7 @@ function Trails.clean_trail_mark_stack()
 
   Trails.trail_mark_stack = vim.tbl_filter(function(trail_mark)
     return helpers.tbl_find(function(ext_mark)
-      return current_buffer ~= trail_mark.win or ext_mark[1] == trail_mark.mark_id
+      return current_buffer ~= trail_mark.buf or ext_mark[1] == trail_mark.mark_id
     end, ext_marks) ~= nil
   end, Trails.trail_mark_stack)
 
