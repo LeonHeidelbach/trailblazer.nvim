@@ -26,35 +26,40 @@ Trails.trail_mark_stack = {}
 ---@param pos? table<number, number>
 ---@return table?
 function Trails.new_trail_mark(win, buf, pos)
-  if not win then
-    win = api.nvim_get_current_win()
+  local trail_mark_index, trail_mark = Trails.get_trail_mark_under_cursor(win, buf, pos)
+
+  if trail_mark_index and trail_mark then
+    api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.ns_id, trail_mark.mark_id)
+    table.remove(Trails.trail_mark_stack, trail_mark_index)
+    Trails.trail_mark_cursor = Trails.trail_mark_cursor > 1 and Trails.trail_mark_cursor - 1
+        or #Trails.trail_mark_stack > 0 and 1 or 0
+    return nil
   end
 
-  if not buf then
-    buf = api.nvim_get_current_buf()
-  end
-
-  if not pos or not pos[1] or not pos[2] then
-    pos = api.nvim_win_get_cursor(0)
-  end
-
-  local pos_text = api.nvim_buf_get_lines(buf, pos[1] - 1, pos[1],
+  local current_win = win or api.nvim_get_current_win()
+  local current_buf = buf or api.nvim_get_current_buf()
+  local current_cursor = pos or api.nvim_win_get_cursor(current_win)
+  local pos_text = api.nvim_buf_get_lines(current_buf, current_cursor[1] - 1, current_cursor[1],
     false)[1]
 
-  if not pos_text or not pos[1] or not pos[2] then
+  if not pos_text or not current_cursor[1] or not current_cursor[2] then
     log.error("invalid_pos_for_buf_lines")
     return nil
   end
 
-  pos_text = pos_text:sub(pos[2] + 1, pos[2] + 1)
+  pos_text = pos_text:sub(current_cursor[2] + 1, current_cursor[2] + 1)
 
-  local mark_id = api.nvim_buf_set_extmark(buf, Trails.config.ns_id, pos[1] - 1, pos[2], {
-    virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMark" } },
-    virt_text_pos = "overlay",
-    hl_mode = "combine",
-  })
+  local mark_id = api.nvim_buf_set_extmark(current_buf, Trails.config.ns_id, current_cursor[1] - 1,
+    current_cursor[2],
+    {
+      virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMark" } },
+      virt_text_pos = "overlay",
+      hl_mode = "combine",
+    })
 
-  table.insert(Trails.trail_mark_stack, { win = win, buf = buf, pos = pos, mark_id = mark_id })
+  table.insert(Trails.trail_mark_stack, { win = current_win, buf = current_buf,
+    pos = current_cursor, mark_id = mark_id })
+
   Trails.trail_mark_cursor = Trails.trail_mark_cursor + 1
 
   return Trails.trail_mark_stack[Trails.trail_mark_cursor]
@@ -236,14 +241,17 @@ function Trails.focus_win_and_buf_by_trail_mark_index(buf, trail_mark_index, rem
 end
 
 --- Return the trail mark and its index in the trail mark stack under the current cursor location.
+---@param win? number
+---@param buf? number
+---@param pos? table<number, number>
 ---@return number?
 ---@return table?
-function Trails.get_trail_mark_under_cursor()
+function Trails.get_trail_mark_under_cursor(win, buf, pos)
   local trail_mark_index
-  local current_buffer = api.nvim_get_current_buf()
-  local current_win = api.nvim_get_current_win()
-  local current_cursor = api.nvim_win_get_cursor(0)
-  local ext_marks = api.nvim_buf_get_extmarks(0, Trails.config.ns_id, 0, -1, {})
+  local current_win = win or api.nvim_get_current_win()
+  local current_buffer = buf or api.nvim_get_current_buf()
+  local current_cursor = pos or api.nvim_win_get_cursor(0)
+  local ext_marks = api.nvim_buf_get_extmarks(current_buffer, Trails.config.ns_id, 0, -1, {})
 
   local current_ext_mark = helpers.tbl_find(function(ext_mark)
     return ext_mark[2] + 1 == current_cursor[1] and ext_mark[3] == current_cursor[2]
@@ -262,11 +270,6 @@ function Trails.get_trail_mark_under_cursor()
     Trails.trail_mark_cursor = trail_mark_index
     Trails.reregister_trail_marks()
     return trail_mark_index, Trails.trail_mark_stack[trail_mark_index]
-  end
-
-  if Trails.clean_trail_mark_stack() > 0 then
-    Trails.reregister_trail_marks()
-    return Trails.trail_mark_cursor, Trails.trail_mark_stack[Trails.trail_mark_cursor]
   end
 
   return nil, nil
@@ -335,22 +338,6 @@ function Trails.remove_duplicate_pos_trail_marks()
   if trail_count ~= #Trails.trail_mark_stack then
     Trails.trail_mark_cursor = #Trails.trail_mark_stack - 1
   end
-end
-
---- Clean up the trail mark stack and remove all trail marks that are no longer valid.
----@return integer
-function Trails.clean_trail_mark_stack()
-  local current_buffer = api.nvim_get_current_buf()
-  local ext_marks = api.nvim_buf_get_extmarks(0, Trails.config.ns_id, 0, -1, {})
-
-  Trails.trail_mark_stack = vim.tbl_filter(function(trail_mark)
-    return helpers.tbl_find(function(ext_mark)
-      return current_buffer ~= trail_mark.buf or ext_mark[1] == trail_mark.mark_id
-    end, ext_marks) ~= nil
-  end, Trails.trail_mark_stack)
-
-  Trails.trail_mark_cursor = #Trails.trail_mark_stack
-  return Trails.trail_mark_cursor
 end
 
 --- Reregister all trail marks on the stack. This function can be used to restore trail marks
