@@ -22,7 +22,8 @@ local cfg = {
 -- User commands
 api.nvim_create_user_command("TrailBlazerNewTrailMark",
   function(args) tb.new_trail_mark(tonumber(args.fargs[1]), tonumber(args.fargs[2]),
-    { tonumber(args.fargs[3]), tonumber(args.fargs[4]) }) end, { nargs = "*" })
+      { tonumber(args.fargs[3]), tonumber(args.fargs[4]) })
+  end, { nargs = "*" })
 api.nvim_create_user_command("TrailBlazerTrackBack", function(args) tb.track_back(args.args) end,
   { nargs = "?", complete = "buffer" })
 api.nvim_create_user_command("TrailBlazerPeekMoveForward", function(args) tb.peek_move_forward(args.args) end,
@@ -37,6 +38,11 @@ api.nvim_create_user_command("TrailBlazerPasteAtAllTrailMarks", function(args) t
   , { nargs = "?", complete = "buffer" })
 
 -- Auto commands
+api.nvim_create_autocmd("BufWritePre", {
+  group = cfg.auto_groups.trailblazer,
+  pattern = "*",
+  callback = require('trailblazer.trails').update_all_trail_mark_positions
+})
 api.nvim_create_autocmd("BufWritePost", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",

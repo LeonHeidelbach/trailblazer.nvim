@@ -257,18 +257,20 @@ function Trails.get_trail_mark_under_cursor(win, buf, pos)
     return ext_mark[2] + 1 == current_cursor[1] and ext_mark[3] == current_cursor[2]
   end, ext_marks)
 
+  Trails.update_all_trail_mark_positions()
+  Trails.remove_duplicate_pos_trail_marks()
+
   if current_ext_mark ~= nil then
-    Trails.remove_duplicate_pos_trail_marks()
     trail_mark_index = helpers.tbl_indexof(function(trail_mark)
       return current_win == trail_mark.win and current_buffer == trail_mark.buf and
           trail_mark.mark_id == current_ext_mark[1]
     end, Trails.trail_mark_stack)
   end
 
+  Trails.reregister_trail_marks()
+
   if trail_mark_index ~= nil then
-    Trails.trail_mark_stack[trail_mark_index].pos = current_cursor
     Trails.trail_mark_cursor = trail_mark_index
-    Trails.reregister_trail_marks()
     return trail_mark_index, Trails.trail_mark_stack[trail_mark_index]
   end
 
@@ -337,6 +339,31 @@ function Trails.remove_duplicate_pos_trail_marks()
   end)
   if trail_count ~= #Trails.trail_mark_stack then
     Trails.trail_mark_cursor = #Trails.trail_mark_stack - 1
+  end
+end
+
+--- Update the positions of all trail marks in the stack by loading all extmarks for each loaded
+--- buffer and updating the trail mark stack.
+function Trails.update_all_trail_mark_positions()
+  local buf_list = helpers.tbl_flatmap(function(buf)
+    return { [buf] = api.nvim_buf_line_count(buf) }
+  end, vim.tbl_filter(function(buf)
+    return api.nvim_buf_is_loaded(buf)
+  end, api.nvim_list_bufs()), true)
+  local ext_marks = helpers.tbl_flatmap(function(buf)
+    return { [buf] = api.nvim_buf_get_extmarks(buf, Trails.config.ns_id, 0, -1, {}) }
+  end, vim.tbl_keys(buf_list), true)
+
+  for _, trail_mark in ipairs(Trails.trail_mark_stack) do
+    if ext_marks[trail_mark.buf] then
+      local ext_mark = helpers.tbl_find(function(ext_mark)
+        return ext_mark[1] == trail_mark.mark_id
+      end, ext_marks[trail_mark.buf])
+
+      if ext_mark ~= nil and buf_list[trail_mark.buf] > ext_mark[2] + 1 then
+        trail_mark.pos = { ext_mark[2] + 1, ext_mark[3] }
+      end
+    end
   end
 end
 

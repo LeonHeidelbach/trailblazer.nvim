@@ -26,6 +26,30 @@ function Helpers.get_buf_nr(input)
   return buf
 end
 
+--- Returns a mapped and flattended table using the supplied predicate.
+---@param lambda function
+---@param tbl table
+---@param flatten_by_key? boolean
+---@return table
+function Helpers.tbl_flatmap(lambda, tbl, flatten_by_key)
+  local result = {}
+  for _, v in ipairs(tbl) do
+    local mapped = lambda(v)
+    for k2, v2 in pairs(mapped) do
+      if flatten_by_key then
+        if result[k2] == nil then
+          result[k2] = v2
+        else
+          log.error("duplicate_key_in_flatmap")
+        end
+      else
+        table.insert(result, v2)
+      end
+    end
+  end
+  return result
+end
+
 --- Returns the first item in the supplied table that matches the supplied predicate.
 ---@param lambda function
 ---@param tbl table

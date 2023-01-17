@@ -30,6 +30,7 @@ Log.langs = {
           table.concat(Log.config.available_langs, ", "),
       invalid_buf_name = "Invalid buffer name. The current buffer has been used instead.",
       invalid_pos_for_buf_lines = "Could not retrieve buffer lines for the current cursor position."
+      duplicate_key_in_flatmap = "Duplicate key in flatmap.",
     }
   }
 }
