@@ -12,8 +12,10 @@ describe("Trails.new_trail_mark:", function()
     local win = vim.api.nvim_open_win(buf, true, { relative = "editor", width = 1, height = 1,
       row = 1, col = 1 })
     local mark = tr.new_trail_mark(win, buf, { 1, 0 })
+    if not mark then error("No trail mark was created.") end
     assert.are.same(mark ~= nil, true)
-    assert.are.same(mark, { win = win, buf = buf, pos = { 1, 0 }, mark_id = 1 })
+    assert.are.same({ win = mark.win, buf = mark.buf, pos = mark.pos, mark_id = mark.mark_id },
+      { win = win, buf = buf, pos = { 1, 0 }, mark_id = 1 })
   end)
 end)
 
@@ -23,6 +25,7 @@ describe("Trails.new_trail_mark:", function()
       local buf = vim.api.nvim_create_buf(false, true)
       vim.api.nvim_set_current_buf(buf)
       local mark = tr.new_trail_mark()
+      if not mark then error("No trail mark was created.") end
       assert.are.same(mark ~= nil, true)
       assert.are.same(mark, tr.trail_mark_stack[tr.trail_mark_cursor])
     end)
