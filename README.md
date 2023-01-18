@@ -70,6 +70,15 @@ available and set by default:
 -- Adjust these values to your liking
 {
     lang = "en",
+    trail_options = {
+        -- Available modes to cycle through. Remove any you don't need.
+        available_trail_mark_modes = { "global", "global_line_sorted", "buffer_local",
+            "buffer_local_line_sorted" },
+        -- The current / initially selected trail mark selection mode. Choose from one of the
+        -- available modes: global, global_line_sorted, buffer_local, buffer_local_line_sorted
+        current_trail_mark_mode = "global",
+        verbose_trail_mark_select = true, -- print current mode notification on mode change
+    },
     mappings = {
         nv = { -- Mode union: normal & visual mode. Can be extended by adding i, x, ...
             motions = {
@@ -82,6 +91,7 @@ available and set by default:
                 delete_all_trail_marks = '<A-L>',
                 paste_at_last_trail_mark = '<A-p>',
                 paste_at_all_trail_marks = '<A-P>',
+                set_trail_mark_select_mode = '<A-t>',
             },
         },
         -- You can also add/move any motion or action to mode specific mappings i.e.:
@@ -94,15 +104,42 @@ available and set by default:
         -- },
     },
     hl_groups = {
-        TrailBlazerTrailMark = { 
+        TrailBlazerTrailMarkGlobal = {
         -- You can add any valid highlight group attribute to this table
             guifg = "Black",
             guibg = "Red",
             gui = "bold",
         },
+        TrailBlazerTrailMarkGlobalLineSorted = {
+            guifg = "Black",
+            guibg = "LightRed",
+            gui = "bold",
+        },
+        TrailBlazerTrailMarkBufferLocal = {
+            guifg = "Black",
+            guibg = "Green",
+            gui = "bold",
+        },
+        TrailBlazerTrailMarkBufferLocalLineSorted = {
+            guifg = "Black",
+            guibg = "LightGreen",
+            gui = "bold",
+        },
     },
 }
 ```
+
+### Trail mark selection modes
+
+Trail mark selection modes allow you to switch between different modes of traversing and executing
+actions on your trail marks. Thus far you can choose between the following modes:
+
+| Mode                       | Description                                                                    |
+|----------------------------|--------------------------------------------------------------------------------|
+| `global`                   | This is the default mode. Marks are traversed globally in chronological order. |
+| `global_line_sorted`       | Marks are sorted by their buffer id and globally traversed from BOF to EOF.    |
+| `buffer_local`             | Only current buffer marks are traversed chronologically.                       |
+| `buffer_local_line_sorted` | Only current buffer marks are traversed from BOF to EOF.                       |
 
 ## 💻 User commands
 
@@ -124,6 +161,7 @@ require("trailblazer").<function_name>(<args>)
 | `:TrailBlazerDeleteAllTrailMarks`  | `<buffer? string \| number>`                                                                                   | Delete all trail marks globally or within the specified buffer.                                                                                                    |
 | `:TrailBlazerPasteAtLastTrailMark` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.     |
 | `:TrailBlazerPasteAtAllTrailMarks` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                           |
+| `:TrailBlazerTrailMarkSelectMode`  | `<mode? string>`                                                                                               | Cycle through or set the current trail mark selection mode.                                                                                                        |
 
 ## 📚 Documentation
 
@@ -136,7 +174,7 @@ I would like to keep TrailBlazer's code base as clean and easy to read as possib
 like to contribute, please make sure to follow the following contribution guidelines and make sure
 to add method documentations to your code:
 
-#### Linting
+### Linting
 
 TrailBlazer uses [LuaCheck][luacheck] to lint the code base. You will have to install [Lua][lua] as
 well as [LuaRocks][luarocks] to run and install [LuaCheck][luacheck]. To get started, simply follow
@@ -155,7 +193,7 @@ lint the code:
 $ luacheck lua/ test/spec/
 ```
 
-#### Testing
+### Testing
 
 TrailBlazer uses [busted][busted], [luassert][luassert] (through [plenary.nvim][plenary]) and
 [matcher_combinators][matcher_combinators] to define tests in the `./test/spec` directory. If you
