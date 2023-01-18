@@ -30,6 +30,7 @@ Log.langs = {
     },
     warnings = {
       invalid_trail_mark_select_mode = "Invalid trail mark select mode. Please use one of the following: ",
+      hl_group_does_not_exist = "Highlight group does not exist: ",
     },
     errors = {
       not_configured = "TrailBlazer is not configured. Please call `require('trailblazer').setup()` first.",

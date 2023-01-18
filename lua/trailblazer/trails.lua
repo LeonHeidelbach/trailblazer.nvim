@@ -18,6 +18,7 @@ Trails.config.custom = {}
 Trails.config.custom.available_trail_mark_modes = { "global", "global_line_sorted", "buffer_local",
   "buffer_local_line_sorted" }
 Trails.config.custom.current_trail_mark_mode = "global"
+Trails.config.custom.verbose_trail_mark_select = true
 Trails.config.ns_name = "trailblazer"
 Trails.config.ns_id = api.nvim_create_namespace(Trails.config.ns_name)
 
@@ -64,7 +65,8 @@ function Trails.new_trail_mark(win, buf, pos)
   local mark_id = api.nvim_buf_set_extmark(current_buf, Trails.config.ns_id, current_cursor[1] - 1,
     current_cursor[2],
     {
-      virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMark" } },
+      virt_text = { { pos_text ~= "" and pos_text or " ",
+        Trails.get_hl_group_for_current_trail_mark_select_mode() } },
       virt_text_pos = "overlay",
       hl_mode = "combine",
     })
@@ -237,9 +239,13 @@ function Trails.set_trail_mark_select_mode(mode)
     return
   end
 
+  Trails.update_all_trail_mark_positions()
+  Trails.reregister_trail_marks()
   Trails.sort_trail_mark_stack()
 
-  log.info("current_trail_mark_select_mode", Trails.config.custom.current_trail_mark_mode)
+  if Trails.config.custom.verbose_trail_mark_select then
+    log.info("current_trail_mark_select_mode", Trails.config.custom.current_trail_mark_mode)
+  end
 end
 
 --- Set the cursor to the next trail mark.
@@ -461,6 +467,24 @@ function Trails.get_relative_marks_and_cursor(buf, current_mark_index)
   return marks, cursor
 end
 
+--- Returns the corresponding highlight group for the provided or global trail mark selection mode.
+---@param mode? string
+---@return string
+function Trails.get_hl_group_for_current_trail_mark_select_mode(mode)
+  if mode == nil then
+    mode = Trails.config.custom.current_trail_mark_mode
+  end
+
+  local hl_group = "TrailBlazerTrailMark" .. string.gsub(mode, "_%l", string.upper):gsub("_", "")
+  if vim.tbl_contains(Trails.config.custom.available_trail_mark_modes, mode) then
+    return hl_group
+  end
+
+  log.warn("hl_group_does_not_exist", hl_group)
+
+  return "TrailBlazerTrailMarkGlobal"
+end
+
 --- Translate a relative cursor position within the provided marks selection to the absolute
 --- cursor position within the trail mark stack.
 ---@param marks table
@@ -538,7 +562,8 @@ function Trails.reregister_trail_marks()
 
     ok, mark.mark_id, _ = pcall(api.nvim_buf_set_extmark, mark.buf, Trails.config.ns_id,
       mark.pos[1] - 1, mark.pos[2], {
-      virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMark" } },
+      virt_text = { { pos_text ~= "" and pos_text or " ",
+        Trails.get_hl_group_for_current_trail_mark_select_mode() } },
       virt_text_pos = "overlay",
       hl_mode = "combine",
     })

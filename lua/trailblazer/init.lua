@@ -28,6 +28,7 @@ local function set_defaults(opts)
       available_trail_mark_modes = { "global", "global_line_sorted", "buffer_local",
         "buffer_local_line_sorted" }, -- available modes to cycle through
       current_trail_mark_mode = "global", -- current / initial mode
+      verbose_trail_mark_select = true, -- print current mode notification on mode change
     },
     mappings = {
       nv = { -- Mode union: normal & visual mode
@@ -47,24 +48,24 @@ local function set_defaults(opts)
       },
     },
     hl_groups = {
-      TrailBlazerTrailMark = {
+      TrailBlazerTrailMarkGlobal = {
         guifg = "Black",
         guibg = "Red",
         gui = "bold",
       },
-      TrailBlazerTrailMarkCurrentBufferMode = {
+      TrailBlazerTrailMarkGlobalLineSorted = {
+        guifg = "Black",
+        guibg = "LightRed",
+        gui = "bold",
+      },
+      TrailBlazerTrailMarkBufferLocal = {
         guifg = "Black",
         guibg = "Green",
         gui = "bold",
       },
-      TrailBlazerTrailMarkList = {
+      TrailBlazerTrailMarkBufferLocalLineSorted = {
         guifg = "Black",
-        guibg = "LightYellow",
-        gui = "bold",
-      },
-      TrailBlazerTrailMarkListCurrent = {
-        guifg = "Black",
-        guibg = "LightGray",
+        guibg = "LightGreen",
         gui = "bold",
       },
     },
