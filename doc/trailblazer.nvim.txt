@@ -2,7 +2,6 @@
 		      project marks as quickly and efficiently as possible to make
 		      your workflow *blazingly fast ™*.
 
-
                                                                        *helpers*
 ==============================================================================
                                                            *trailblazer.helpers*
@@ -15,6 +14,45 @@ Helpers.get_buf_nr({input?})                                *Helpers.get_buf_nr*
 
     Parameters: ~
         {input?}  (string|number)  @return number?
+
+
+                                                           *Helpers.tbl_flatmap*
+Helpers.tbl_flatmap({lambda}, {tbl}, {flatten_by_key?})
+     Returns a mapped and flattended table using the supplied predicate.
+
+    Parameters: ~
+        {lambda}           (function)
+        {tbl}              (table)
+        {flatten_by_key?}  (boolean)
+
+    Returns: ~
+        (table)
+
+
+Helpers.tbl_find({lambda}, {tbl})                             *Helpers.tbl_find*
+     Returns the first item in the supplied table that matches the supplied predicate.
+
+    Parameters: ~
+        {lambda}  (function)
+        {tbl}     (table)     @return any?
+
+
+Helpers.tbl_indexof({lambda}, {tbl})                       *Helpers.tbl_indexof*
+     Returns the index of the first item in the supplied table that matches the supplied predicate.
+
+    Parameters: ~
+        {lambda}  (function)
+        {tbl}     (table)     @return integer?
+
+
+Helpers.dedupe({tbl}, {action?})                                *Helpers.dedupe*
+
+    Parameters: ~
+        {tbl}      (table)
+        {action?}  (function)
+
+    Returns: ~
+        (table)
 
 
                                                                     *highlights*
@@ -96,18 +134,28 @@ Log.setup({lang})                                                    *Log.setup*
         {lang}  (string)
 
 
-Log.info({name})                                                      *Log.info*
+Log.info({name}, {additional_info?})                                  *Log.info*
      Log an info message.
 
     Parameters: ~
-        {name}  (string)
+        {name}              (string)
+        {additional_info?}  (string)
 
 
-Log.error({name})                                                    *Log.error*
+Log.warn({name}, {additional_info?})                                  *Log.warn*
+     Log a warning message.
+
+    Parameters: ~
+        {name}              (string)
+        {additional_info?}  (string)
+
+
+Log.error({name}, {additional_info?})                                *Log.error*
      Log an error message.
 
     Parameters: ~
-        {name}  (string)
+        {name}              (string)
+        {additional_info?}  (string)
 
 
                                                                           *init*
@@ -115,6 +163,13 @@ Log.error({name})                                                    *Log.error*
                                                             *trailblazer.trails*
 
  This module is responsible for managing trails.
+
+Trails.setup({options?})                                          *Trails.setup*
+     Setup the TrailBlazer trails module.
+
+    Parameters: ~
+        {options?}  (table)
+
 
                                                          *Trails.new_trail_mark*
 Trails.new_trail_mark({win?}, {buf?}, {pos?})
@@ -166,11 +221,11 @@ Trails.paste_at_last_trail_mark({buf?})        *Trails.paste_at_last_trail_mark*
         (boolean)
 
 
-Trails.paste_at_all_trail_marks({buf})         *Trails.paste_at_all_trail_marks*
+Trails.paste_at_all_trail_marks({buf?})        *Trails.paste_at_all_trail_marks*
      Paste the selected register contents at all trail marks of all or a specific buffer.
 
     Parameters: ~
-        {buf}  (any)
+        {buf?}  (number)
 
 
                                                     *Trails.paste_at_trail_mark*
@@ -192,6 +247,39 @@ Trails.delete_all_trail_marks({buf?})            *Trails.delete_all_trail_marks*
         {buf?}  (number)
 
 
+                                             *Trails.set_trail_mark_select_mode*
+Trails.set_trail_mark_select_mode({mode?})
+     Set the trail mark selection mode to the given mode or toggle between the available modes.
+
+    Parameters: ~
+        {mode?}  (string)
+
+
+                                                *Trails.set_cursor_to_next_mark*
+Trails.set_cursor_to_next_mark({buf?}, {current_mark_index?})
+     Set the cursor to the next trail mark.
+
+    Parameters: ~
+        {buf?}                 (number)
+        {current_mark_index?}  (number)
+
+
+                                            *Trails.set_cursor_to_previous_mark*
+Trails.set_cursor_to_previous_mark({buf?}, {current_mark_index?})
+     Set the cursor to the previous trail mark.
+
+    Parameters: ~
+        {buf?}                 (number)
+        {current_mark_index?}  (number)
+
+
+Trails.sort_trail_mark_stack({mode?})             *Trails.sort_trail_mark_stack*
+     Sort the trail mark stack according to the current or provided trail mark mode.
+
+    Parameters: ~
+        {mode?}  (string)
+
+
                                                       *Trails.focus_win_and_buf*
 Trails.focus_win_and_buf({trail_mark}, {ext_mark})
      Focus a specific window and buffer and set the cursor to the position of the trail mark.
@@ -205,23 +293,28 @@ Trails.focus_win_and_buf({trail_mark}, {ext_mark})
 
 
                                   *Trails.focus_win_and_buf_by_trail_mark_index*
-Trails.focus_win_and_buf_by_trail_mark_index({buf?}, {trail_mark_index}, {remove_trail_mark})
+Trails.focus_win_and_buf_by_trail_mark_index({buf?}, {trail_mark_index?}, {remove_trail_mark})
      Focus a specific window and buffer and set the cursor to the position of the trail mark by
      providing its index.
 
     Parameters: ~
-        {buf?}               (any)
-        {trail_mark_index}   (any)
-        {remove_trail_mark}  (any)
+        {buf?}               (number)
+        {trail_mark_index?}  (number)
+        {remove_trail_mark}  (boolean)
 
     Returns: ~
         (boolean)
 
 
-Trails.get_trail_mark_under_cursor()        *Trails.get_trail_mark_under_cursor*
+                                            *Trails.get_trail_mark_under_cursor*
+Trails.get_trail_mark_under_cursor({win?}, {buf?}, {pos?})
      Return the trail mark and its index in the trail mark stack under the current cursor location.
-    @return number?
-    @return table?
+
+    Parameters: ~
+        {win?}  (number)
+        {buf?}  (number)
+        {pos?}  (table<number,number>)  @return number?
+                                        @return table?
 
 
                                          *Trails.get_marks_for_trail_mark_index*
@@ -241,6 +334,60 @@ Trails.get_newest_mark_index_for_buf({buf?})
 
     Parameters: ~
         {buf?}  (number)  @return number?
+
+
+                                          *Trails.get_relative_marks_and_cursor*
+Trails.get_relative_marks_and_cursor({buf?}, {current_mark_index?})
+     Get a mark selection depending on the current mark selection mode and the corresponding
+     relative current cursor position within it.
+
+    Parameters: ~
+        {buf?}                 (number)
+        {current_mark_index?}  (number)
+
+    Returns: ~
+        (table)
+        (number)
+
+
+                        *Trails.get_hl_group_for_current_trail_mark_select_mode*
+Trails.get_hl_group_for_current_trail_mark_select_mode({mode?})
+     Returns the corresponding highlight group for the provided or global trail mark selection mode.
+
+    Parameters: ~
+        {mode?}  (string)
+
+    Returns: ~
+        (string)
+
+
+                 *Trails.translate_acutal_cursor_from_relative_marks_and_cursor*
+Trails.translate_acutal_cursor_from_relative_marks_and_cursor({marks}, {cursor})
+     Translate a relative cursor position within the provided marks selection to the absolute
+     cursor position within the trail mark stack.
+
+    Parameters: ~
+        {marks}   (table)
+        {cursor}  (number)
+
+
+                               *Trails.default_buf_for_current_mark_select_mode*
+Trails.default_buf_for_current_mark_select_mode({buf?})
+     Return the default buffer for the currently selected trail mark selection mode or the given
+     buffer if it is not nil.
+
+    Parameters: ~
+        {buf?}  (number)  @return number?
+
+
+                                       *Trails.remove_duplicate_pos_trail_marks*
+Trails.remove_duplicate_pos_trail_marks()
+     Remove duplicate trail marks from the stack.
+
+
+Trails.update_all_trail_mark_positions()*Trails.update_all_trail_mark_positions*
+     Update the positions of all trail marks in the stack by loading all extmarks for each loaded
+     buffer and updating the trail mark stack.
 
 
 Trails.reregister_trail_marks()                  *Trails.reregister_trail_marks*
