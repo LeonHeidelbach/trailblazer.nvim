@@ -46,6 +46,11 @@ local function set_defaults(opts)
         guibg = "Red",
         gui = "bold",
       },
+      TrailBlazerTrailMarkCurrentBufferMode = {
+        guifg = "Black",
+        guibg = "Green",
+        gui = "bold",
+      },
       TrailBlazerTrailMarkList = {
         guifg = "Black",
         guibg = "LightYellow",
@@ -124,6 +129,13 @@ end
 function TrailBlazer.paste_at_all_trail_marks(buf)
   if not TrailBlazer.is_configured() then return end
   trails.paste_at_all_trail_marks(helpers.get_buf_nr(buf))
+end
+
+--- Set the trail mark selection mode to the given mode or toggle between the available modes.
+---@param mode any
+function TrailBlazer.set_trail_mark_select_mode(mode)
+  if not TrailBlazer.is_configured() then return end
+  trails.set_trail_mark_select_mode(mode)
 end
 
 --- Check if TrailBlazer is configured.

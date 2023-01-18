@@ -14,6 +14,9 @@ local log = require("trailblazer.log")
 local Trails = {}
 
 Trails.config = {}
+Trails.config.available_trail_mark_modes = { "global", "global_line_sorted", "buffer_local",
+  "buffer_local_line_sorted" }
+Trails.config.current_trail_mark_mode = "global"
 Trails.config.ns_name = "trailblazer"
 Trails.config.ns_id = api.nvim_create_namespace(Trails.config.ns_name)
 
@@ -57,10 +60,17 @@ function Trails.new_trail_mark(win, buf, pos)
       hl_mode = "combine",
     })
 
-  table.insert(Trails.trail_mark_stack, { win = current_win, buf = current_buf,
-    pos = current_cursor, mark_id = mark_id })
+  local new_mark = {
+    timestamp = fn.reltimefloat(fn.reltime()),
+    win = current_win, buf = current_buf,
+    pos = current_cursor, mark_id = mark_id
+  }
 
-  Trails.trail_mark_cursor = Trails.trail_mark_cursor + 1
+  table.insert(Trails.trail_mark_stack, new_mark)
+  Trails.sort_trail_mark_stack()
+  Trails.trail_mark_cursor = helpers.tbl_indexof(function(tmp_trail_mark)
+    return tmp_trail_mark.timestamp == new_mark.timestamp
+  end, Trails.trail_mark_stack)
 
   return Trails.trail_mark_stack[Trails.trail_mark_cursor]
 end
@@ -69,11 +79,14 @@ end
 ---@param buf? number
 ---@return boolean
 function Trails.track_back(buf)
+  buf = Trails.default_buf_for_current_mark_select_mode(buf)
+
   local last_mark_index = Trails.get_newest_mark_index_for_buf(buf)
 
   if last_mark_index then
     local trail_mark, ext_mark
-    last_mark_index, trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf, last_mark_index, true)
+    last_mark_index, trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf,
+      last_mark_index, true)
     if last_mark_index == nil or trail_mark == nil or ext_mark == nil then
       return false
     end
@@ -95,10 +108,9 @@ end
 function Trails.peek_move_forward(buf)
   local current_mark_index, _ = Trails.get_trail_mark_under_cursor()
 
-  if current_mark_index and current_mark_index == Trails.trail_mark_cursor then
-    Trails.trail_mark_cursor = Trails.trail_mark_cursor + 1 <= #Trails.trail_mark_stack
-        and Trails.trail_mark_cursor + 1 or #Trails.trail_mark_stack
-  end
+  buf = Trails.default_buf_for_current_mark_select_mode(buf)
+
+  Trails.set_cursor_to_next_mark(buf, current_mark_index)
 
   return Trails.focus_win_and_buf_by_trail_mark_index(buf, Trails.trail_mark_cursor, false)
 end
@@ -109,10 +121,9 @@ end
 function Trails.peek_move_backward(buf)
   local current_mark_index, _ = Trails.get_trail_mark_under_cursor()
 
-  if current_mark_index and current_mark_index == Trails.trail_mark_cursor then
-    Trails.trail_mark_cursor = Trails.trail_mark_cursor > 1 and Trails.trail_mark_cursor - 1
-        or #Trails.trail_mark_stack > 0 and 1 or 0
-  end
+  buf = Trails.default_buf_for_current_mark_select_mode(buf)
+
+  Trails.set_cursor_to_previous_mark(buf, current_mark_index)
 
   return Trails.focus_win_and_buf_by_trail_mark_index(buf, Trails.trail_mark_cursor, false)
 end
@@ -121,6 +132,8 @@ end
 ---@param buf? number
 ---@return boolean
 function Trails.paste_at_last_trail_mark(buf)
+  buf = Trails.default_buf_for_current_mark_select_mode(buf)
+
   local last_mark_index = Trails.get_newest_mark_index_for_buf(buf)
 
   if last_mark_index then
@@ -131,7 +144,7 @@ function Trails.paste_at_last_trail_mark(buf)
 end
 
 --- Paste the selected register contents at all trail marks of all or a specific buffer.
----@param buf any
+---@param buf? number
 function Trails.paste_at_all_trail_marks(buf)
   if buf ~= nil then
     for i = #Trails.trail_mark_stack, 1, -1 do
@@ -197,6 +210,88 @@ function Trails.delete_all_trail_marks(buf)
   end
 end
 
+--- Set the trail mark selection mode to the given mode or toggle between the available modes.
+---@param mode? string
+function Trails.set_trail_mark_select_mode(mode)
+  if mode == nil then
+    Trails.config.current_trail_mark_mode = Trails.config.available_trail_mark_modes[
+        (helpers.tbl_indexof(function(available_mode)
+          return available_mode == Trails.config.current_trail_mark_mode
+        end, Trails.config.available_trail_mark_modes)) %
+            #Trails.config.available_trail_mark_modes + 1]
+  elseif vim.tbl_contains(Trails.config.available_trail_mark_modes, mode) then
+    Trails.config.current_trail_mark_mode = mode
+  else
+    log.warn("invalid_trail_mark_select_mode",
+      table.concat(Trails.config.available_trail_mark_modes, ", "))
+    return
+  end
+
+  Trails.sort_trail_mark_stack()
+
+  log.info("current_trail_mark_select_mode", Trails.config.current_trail_mark_mode)
+end
+
+--- Set the cursor to the next trail mark.
+---@param buf? number
+---@param current_mark_index? number
+function Trails.set_cursor_to_next_mark(buf, current_mark_index)
+  local marks, cursor = Trails.get_relative_marks_and_cursor(buf, current_mark_index)
+
+  if current_mark_index and current_mark_index == Trails.trail_mark_cursor then
+    cursor = cursor + 1 <= #marks and cursor + 1 or #marks
+  end
+
+  Trails.translate_acutal_cursor_from_relative_marks_and_cursor(marks, cursor)
+end
+
+--- Set the cursor to the previous trail mark.
+---@param buf? number
+---@param current_mark_index? number
+function Trails.set_cursor_to_previous_mark(buf, current_mark_index)
+  local marks, cursor = Trails.get_relative_marks_and_cursor(buf, current_mark_index)
+
+  if current_mark_index and current_mark_index == Trails.trail_mark_cursor then
+    cursor = cursor > 1 and cursor - 1 or #marks > 0 and 1 or 0
+  end
+
+  Trails.translate_acutal_cursor_from_relative_marks_and_cursor(marks, cursor)
+end
+
+--- Sort the trail mark stack according to the current or provided trail mark mode.
+---@param mode? string
+function Trails.sort_trail_mark_stack(mode)
+  if mode == nil then
+    mode = Trails.config.current_trail_mark_mode
+  end
+
+  if mode == "global" or mode == "buffer_local" then
+    table.sort(Trails.trail_mark_stack, function(a, b)
+      return a.timestamp < b.timestamp
+    end)
+  elseif mode == "global_line_sorted" then
+    table.sort(Trails.trail_mark_stack, function(a, b)
+      if a.buf == b.buf then
+        if a.pos[1] == b.pos[1] then
+          return a.pos[2] > b.pos[2]
+        else
+          return a.pos[1] > b.pos[1]
+        end
+      else
+        return a.buf < b.buf
+      end
+    end)
+  elseif mode == "buffer_local_line_sorted" then
+    table.sort(Trails.trail_mark_stack, function(a, b)
+      return a.buf < b.buf
+    end)
+
+    table.sort(Trails.trail_mark_stack, function(a, b)
+      return a.pos[1] > b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] > b.pos[2])
+    end)
+  end
+end
+
 --- Focus a specific window and buffer and set the cursor to the position of the trail mark.
 ---@param trail_mark table
 ---@param ext_mark table
@@ -221,16 +316,17 @@ end
 
 --- Focus a specific window and buffer and set the cursor to the position of the trail mark by
 --- providing its index.
----@param buf? any
----@param trail_mark_index any
----@param remove_trail_mark any
+---@param buf? number
+---@param trail_mark_index? number
+---@param remove_trail_mark boolean
 ---@return boolean
 function Trails.focus_win_and_buf_by_trail_mark_index(buf, trail_mark_index, remove_trail_mark)
   if trail_mark_index > 0 then
     local trail_mark, ext_mark
     trail_mark_index, trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf,
       trail_mark_index, remove_trail_mark)
-    if trail_mark_index == nil or trail_mark == nil or ext_mark == nil then
+    if trail_mark_index == nil or trail_mark == nil or ext_mark == nil or
+        buf and trail_mark.buf ~= buf then
       return false
     end
 
@@ -324,6 +420,58 @@ function Trails.get_newest_mark_index_for_buf(buf)
   end
 
   return nil
+end
+
+--- Get a mark selection depending on the current mark selection mode and the corresponding
+--- relative current cursor position within it.
+---@param buf? number
+---@param current_mark_index? number
+---@return table
+---@return number
+function Trails.get_relative_marks_and_cursor(buf, current_mark_index)
+  local marks
+  local cursor
+
+  if buf then
+    marks = vim.tbl_filter(function(mark)
+      return mark.buf == buf
+    end, Trails.trail_mark_stack)
+    cursor = helpers.tbl_indexof(function(mark)
+      return mark.buf == buf and Trails.trail_mark_stack[current_mark_index] and
+          Trails.trail_mark_stack[current_mark_index].mark_id == mark.mark_id
+    end, marks) or helpers.tbl_indexof(function(mark)
+      return mark.buf == buf and Trails.trail_mark_stack[Trails.trail_mark_cursor] and
+          mark.timestamp == Trails.trail_mark_stack[Trails.trail_mark_cursor].timestamp
+    end, marks) or #marks
+  else
+    marks = Trails.trail_mark_stack
+    cursor = Trails.trail_mark_cursor or #Trails.trail_mark_stack
+  end
+
+  return marks, cursor
+end
+
+--- Translate a relative cursor position within the provided marks selection to the absolute
+--- cursor position within the trail mark stack.
+---@param marks table
+---@param cursor number
+function Trails.translate_acutal_cursor_from_relative_marks_and_cursor(marks, cursor)
+  Trails.trail_mark_cursor = helpers.tbl_indexof(function(mark)
+    return marks[cursor] and mark.timestamp == marks[cursor].timestamp
+  end, Trails.trail_mark_stack) or #Trails.trail_mark_stack
+end
+
+--- Return the default buffer for the currently selected trail mark selection mode or the given
+--- buffer if it is not nil.
+---@param buf? number
+---@return number?
+function Trails.default_buf_for_current_mark_select_mode(buf)
+  if buf == nil and (Trails.config.current_trail_mark_mode == "buffer_local" or
+      Trails.config.current_trail_mark_mode == "buffer_local_line_sorted") then
+    buf = api.nvim_get_current_buf()
+  end
+
+  return buf
 end
 
 --- Remove duplicate trail marks from the stack.
