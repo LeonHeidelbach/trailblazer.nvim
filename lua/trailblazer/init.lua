@@ -48,6 +48,16 @@ local function set_defaults(opts)
       },
     },
     hl_groups = {
+      TrailBlazerTrailMarkCursor = {
+        guifg = "Black",
+        guibg = "Orange",
+        gui = "bold",
+      },
+      TrailBlazerTrailMarkNewest = {
+        guifg = "Black",
+        guibg = "LightBlue",
+        gui = "bold",
+      },
       TrailBlazerTrailMarkGlobal = {
         guifg = "Black",
         guibg = "Red",
