@@ -24,6 +24,11 @@ TrailBlazer.generated = {}
 local function set_defaults(opts)
   local defaults = {
     lang = "en",
+    trail_options = {
+      available_trail_mark_modes = { "global", "global_line_sorted", "buffer_local",
+        "buffer_local_line_sorted" }, -- available modes to cycle through
+      current_trail_mark_mode = "global", -- current / initial mode
+    },
     mappings = {
       nv = { -- Mode union: normal & visual mode
         motions = {
@@ -77,6 +82,7 @@ end
 function TrailBlazer.setup(options)
   TrailBlazer.options = set_defaults(options)
   TrailBlazer.generated.hl_groups = highlights.register(TrailBlazer.options.hl_groups)
+  trails.setup(TrailBlazer.options.trail_options)
   log.setup(TrailBlazer.options.lang)
   keymaps.register(TrailBlazer.options.mappings)
 end

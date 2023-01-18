@@ -21,7 +21,7 @@ local cfg = {
 
 -- Global functions for autocommand completions
 function GET_AVAILABLE_TRAIL_MARK_SELECTION_MODES()
-  return require("trailblazer.trails").config.available_trail_mark_modes
+  return require("trailblazer.trails").config.custom.available_trail_mark_modes
 end
 
 -- User commands

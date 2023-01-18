@@ -14,14 +14,23 @@ local log = require("trailblazer.log")
 local Trails = {}
 
 Trails.config = {}
-Trails.config.available_trail_mark_modes = { "global", "global_line_sorted", "buffer_local",
+Trails.config.custom = {}
+Trails.config.custom.available_trail_mark_modes = { "global", "global_line_sorted", "buffer_local",
   "buffer_local_line_sorted" }
-Trails.config.current_trail_mark_mode = "global"
+Trails.config.custom.current_trail_mark_mode = "global"
 Trails.config.ns_name = "trailblazer"
 Trails.config.ns_id = api.nvim_create_namespace(Trails.config.ns_name)
 
 Trails.trail_mark_cursor = 0
 Trails.trail_mark_stack = {}
+
+--- Setup the TrailBlazer trails module.
+---@param options? table
+function Trails.setup(options)
+  if options then
+    Trails.config.custom = vim.tbl_deep_extend("force", Trails.config.custom, options)
+  end
+end
 
 --- Add a new trail mark to the stack.
 ---@param win? number
@@ -214,22 +223,23 @@ end
 ---@param mode? string
 function Trails.set_trail_mark_select_mode(mode)
   if mode == nil then
-    Trails.config.current_trail_mark_mode = Trails.config.available_trail_mark_modes[
+    Trails.config.custom.current_trail_mark_mode = Trails.config.custom.available_trail_mark_modes[
         (helpers.tbl_indexof(function(available_mode)
-          return available_mode == Trails.config.current_trail_mark_mode
-        end, Trails.config.available_trail_mark_modes)) %
-            #Trails.config.available_trail_mark_modes + 1]
-  elseif vim.tbl_contains(Trails.config.available_trail_mark_modes, mode) then
-    Trails.config.current_trail_mark_mode = mode
+          return available_mode == Trails.config.custom.current_trail_mark_mode
+        end, Trails.config.custom.available_trail_mark_modes)) %
+            #Trails.config.custom.available_trail_mark_modes + 1
+        ]
+  elseif vim.tbl_contains(Trails.config.custom.available_trail_mark_modes, mode) then
+    Trails.config.custom.current_trail_mark_mode = mode
   else
     log.warn("invalid_trail_mark_select_mode",
-      table.concat(Trails.config.available_trail_mark_modes, ", "))
+      table.concat(Trails.config.custom.available_trail_mark_modes, ", "))
     return
   end
 
   Trails.sort_trail_mark_stack()
 
-  log.info("current_trail_mark_select_mode", Trails.config.current_trail_mark_mode)
+  log.info("current_trail_mark_select_mode", Trails.config.custom.current_trail_mark_mode)
 end
 
 --- Set the cursor to the next trail mark.
@@ -262,7 +272,7 @@ end
 ---@param mode? string
 function Trails.sort_trail_mark_stack(mode)
   if mode == nil then
-    mode = Trails.config.current_trail_mark_mode
+    mode = Trails.config.custom.current_trail_mark_mode
   end
 
   if mode == "global" or mode == "buffer_local" then
@@ -466,8 +476,8 @@ end
 ---@param buf? number
 ---@return number?
 function Trails.default_buf_for_current_mark_select_mode(buf)
-  if buf == nil and (Trails.config.current_trail_mark_mode == "buffer_local" or
-      Trails.config.current_trail_mark_mode == "buffer_local_line_sorted") then
+  if buf == nil and (Trails.config.custom.current_trail_mark_mode == "buffer_local" or
+      Trails.config.custom.current_trail_mark_mode == "buffer_local_line_sorted") then
     buf = api.nvim_get_current_buf()
   end
 
