@@ -37,6 +37,7 @@ local function set_defaults(opts)
           delete_all_trail_marks = '<A-L>',
           paste_at_last_trail_mark = '<A-p>',
           paste_at_all_trail_marks = '<A-P>',
+          set_trail_mark_select_mode = '<A-t>',
         },
       },
     },
