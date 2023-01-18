@@ -104,8 +104,18 @@ available and set by default:
         -- },
     },
     hl_groups = {
+        TrailBlazerTrailMarkCursor = {
+            -- You can add any valid highlight group attribute to this table
+            guifg = "Black",
+            guibg = "Orange",
+            gui = "bold",
+        },
+        TrailBlazerTrailMarkNewest = {
+            guifg = "Black",
+            guibg = "LightBlue",
+            gui = "bold",
+        },
         TrailBlazerTrailMarkGlobal = {
-        -- You can add any valid highlight group attribute to this table
             guifg = "Black",
             guibg = "Red",
             gui = "bold",
