@@ -157,6 +157,8 @@ end
 --- Paste the selected register contents at all trail marks of all or a specific buffer.
 ---@param buf? number
 function Trails.paste_at_all_trail_marks(buf)
+  buf = Trails.default_buf_for_current_mark_select_mode(buf)
+
   if buf ~= nil then
     for i = #Trails.trail_mark_stack, 1, -1 do
       if Trails.trail_mark_stack[i].buf == buf then
