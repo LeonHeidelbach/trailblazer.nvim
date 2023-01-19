@@ -76,6 +76,35 @@ function Helpers.tbl_indexof(lambda, tbl)
   return nil
 end
 
+--- Append the supplied src table to the given dst table.
+---@param tbl_dst table
+---@param tbl_src table
+function Helpers.tbl_append(tbl_dst, tbl_src)
+  for _, v in ipairs(tbl_src) do
+    table.insert(tbl_dst, v)
+  end
+end
+
+--- Prepend the supplied src table to the given dst table.
+---@param tbl_dst table
+---@param tbl_src table
+function Helpers.tbl_prepend(tbl_dst, tbl_src)
+  for _, v in ipairs(tbl_src) do
+    table.insert(tbl_dst, 1, v)
+  end
+end
+
+--- Returns a table containing the supplied table's values in reverse order.
+---@param tbl table
+---@return table
+function Helpers.tbl_reverse(tbl)
+  local result = {}
+  for i = #tbl, 1, -1 do
+    table.insert(result, tbl[i])
+  end
+  return result
+end
+
 --- Remove duplicates from the supplied table using the supplied predicate and calling the
 --- optionally supplied action on each duplicate.
 ---@param lambda function<any> @return function
@@ -91,7 +120,6 @@ function Helpers.dedupe(lambda, tbl, action)
       action(v)
     end
   end
-
   return res
 end
 
