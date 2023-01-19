@@ -26,13 +26,13 @@ local function set_defaults(opts)
     lang = "en",
     trail_options = {
       available_trail_mark_modes = { -- available modes to cycle through
-        "global",
+        "global_chron",
         "global_buf_line_sorted",
         "global_chron_buf_line_sorted",
-        "buffer_local",
+        "buffer_local_chron",
         "buffer_local_line_sorted"
       },
-      current_trail_mark_mode = "global", -- current / initial mode
+      current_trail_mark_mode = "global_chron", -- current / initial mode
       verbose_trail_mark_select = true, -- print current mode notification on mode change
     },
     mappings = {
@@ -63,7 +63,7 @@ local function set_defaults(opts)
         guibg = "LightBlue",
         gui = "bold",
       },
-      TrailBlazerTrailMarkGlobal = {
+      TrailBlazerTrailMarkGlobalChron = {
         guifg = "Black",
         guibg = "Red",
         gui = "bold",
@@ -78,7 +78,7 @@ local function set_defaults(opts)
         guibg = "Olive",
         gui = "bold",
       },
-      TrailBlazerTrailMarkBufferLocal = {
+      TrailBlazerTrailMarkBufferLocalChron = {
         guifg = "Black",
         guibg = "Green",
         gui = "bold",

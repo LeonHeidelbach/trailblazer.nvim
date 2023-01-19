@@ -16,13 +16,13 @@ local Trails = {}
 Trails.config = {}
 Trails.config.custom = {}
 Trails.config.custom.available_trail_mark_modes = {
-  "global",
+  "global_chron",
   "global_buf_line_sorted",
   "global_chron_buf_line_sorted",
-  "buffer_local",
+  "buffer_local_chron",
   "buffer_local_line_sorted"
 }
-Trails.config.custom.current_trail_mark_mode = "global"
+Trails.config.custom.current_trail_mark_mode = "global_chron"
 Trails.config.custom.verbose_trail_mark_select = true
 Trails.config.ns_name = "trailblazer"
 Trails.config.ns_id = api.nvim_create_namespace(Trails.config.ns_name)
@@ -293,7 +293,7 @@ function Trails.sort_trail_mark_stack(mode)
     mode = Trails.config.custom.current_trail_mark_mode
   end
 
-  if mode == "global" or mode == "buffer_local" then
+  if mode == "global_chron" or mode == "buffer_local_chron" then
     table.sort(Trails.trail_mark_stack, function(a, b)
       return a.timestamp < b.timestamp
     end)
@@ -526,7 +526,7 @@ end
 ---@param buf? number
 ---@return number?
 function Trails.default_buf_for_current_mark_select_mode(buf)
-  if buf == nil and (Trails.config.custom.current_trail_mark_mode == "buffer_local" or
+  if buf == nil and (Trails.config.custom.current_trail_mark_mode == "buffer_local_chron" or
       Trails.config.custom.current_trail_mark_mode == "buffer_local_line_sorted") then
     buf = api.nvim_get_current_buf()
   end
