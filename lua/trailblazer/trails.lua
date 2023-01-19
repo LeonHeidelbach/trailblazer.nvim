@@ -122,10 +122,10 @@ function Trails.track_back(buf)
   return false
 end
 
---- Peek move forward to the next trail mark.
+--- Peek move to the next trail mark if sorted chronologically or up if sorted by line.
 ---@param buf? number
 ---@return boolean
-function Trails.peek_move_forward(buf)
+function Trails.peek_move_next_up(buf)
   local current_mark_index, _ = Trails.get_trail_mark_under_cursor()
 
   buf = Trails.default_buf_for_current_mark_select_mode(buf)
@@ -135,10 +135,10 @@ function Trails.peek_move_forward(buf)
   return Trails.focus_win_and_buf_by_trail_mark_index(buf, Trails.trail_mark_cursor, false)
 end
 
---- Peek move backward to the next trail mark.
+--- Peek move to the previous trail mark if sorted chronologically or down if sorted by line.
 ---@param buf? number
 ---@return boolean
-function Trails.peek_move_backward(buf)
+function Trails.peek_move_previous_down(buf)
   local current_mark_index, _ = Trails.get_trail_mark_under_cursor()
 
   buf = Trails.default_buf_for_current_mark_select_mode(buf)
