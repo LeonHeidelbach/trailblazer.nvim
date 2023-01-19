@@ -90,8 +90,8 @@ available and set by default:
             motions = {
                 new_trail_mark = '<A-l>',
                 track_back = '<A-b>',
-                peek_move_backward = '<A-J>',
-                peek_move_forward = '<A-K>',
+                peek_move_previous_down = '<A-J>',
+                peek_move_next_up = '<A-K>',
             },
             actions = {
                 delete_all_trail_marks = '<A-L>',
