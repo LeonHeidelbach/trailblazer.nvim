@@ -15,8 +15,13 @@ local Trails = {}
 
 Trails.config = {}
 Trails.config.custom = {}
-Trails.config.custom.available_trail_mark_modes = { "global", "global_line_sorted", "buffer_local",
-  "buffer_local_line_sorted" }
+Trails.config.custom.available_trail_mark_modes = {
+  "global",
+  "global_buf_line_sorted",
+  "global_chron_buf_line_sorted",
+  "buffer_local",
+  "buffer_local_line_sorted"
+}
 Trails.config.custom.current_trail_mark_mode = "global"
 Trails.config.custom.verbose_trail_mark_select = true
 Trails.config.ns_name = "trailblazer"
@@ -292,7 +297,7 @@ function Trails.sort_trail_mark_stack(mode)
     table.sort(Trails.trail_mark_stack, function(a, b)
       return a.timestamp < b.timestamp
     end)
-  elseif mode == "global_line_sorted" then
+  elseif mode == "global_buf_line_sorted" then
     table.sort(Trails.trail_mark_stack, function(a, b)
       if a.buf == b.buf then
         if a.pos[1] == b.pos[1] then
@@ -303,6 +308,18 @@ function Trails.sort_trail_mark_stack(mode)
       else
         return a.buf < b.buf
       end
+    end)
+  elseif mode == "global_chron_buf_line_sorted" then
+    table.sort(Trails.trail_mark_stack, function(a, b)
+      return a.timestamp < b.timestamp
+    end)
+
+    table.sort(Trails.trail_mark_stack, function(a, b)
+      return a.buf < b.buf
+    end)
+
+    table.sort(Trails.trail_mark_stack, function(a, b)
+      return a.pos[1] > b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] > b.pos[2])
     end)
   elseif mode == "buffer_local_line_sorted" then
     table.sort(Trails.trail_mark_stack, function(a, b)
