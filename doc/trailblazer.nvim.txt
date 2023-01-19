@@ -117,7 +117,13 @@ Highlights.def_to_string({name}, {def})               *Highlights.def_to_string*
 
  This module is responsible for setting up keymaps.
 
-Keymaps.register()                                            *Keymaps.register*
+Keymaps.register({key_maps}, {tb_api?})                       *Keymaps.register*
+     Check if callback function exists in the TrailBlazer API and register all mappings in the
+     supplied keymap table.
+
+    Parameters: ~
+        {key_maps}  (table)
+        {tb_api?}   (table)
 
 
                                                                            *log*
@@ -191,8 +197,8 @@ Trails.track_back({buf?})                                    *Trails.track_back*
         (boolean)
 
 
-Trails.peek_move_forward({buf?})                      *Trails.peek_move_forward*
-     Peek move forward to the next trail mark.
+Trails.peek_move_next_up({buf?})                      *Trails.peek_move_next_up*
+     Peek move to the next trail mark if sorted chronologically or up if sorted by line.
 
     Parameters: ~
         {buf?}  (number)
@@ -201,8 +207,8 @@ Trails.peek_move_forward({buf?})                      *Trails.peek_move_forward*
         (boolean)
 
 
-Trails.peek_move_backward({buf?})                    *Trails.peek_move_backward*
-     Peek move backward to the next trail mark.
+Trails.peek_move_previous_down({buf?})          *Trails.peek_move_previous_down*
+     Peek move to the previous trail mark if sorted chronologically or down if sorted by line.
 
     Parameters: ~
         {buf?}  (number)
@@ -391,7 +397,7 @@ Trails.update_all_trail_mark_positions()*Trails.update_all_trail_mark_positions*
 
 
 Trails.reregister_trail_marks()                  *Trails.reregister_trail_marks*
-     Reregister all trail marks on the stack. This function can be used to restore trail marks
+     Reregister all trail marks on the stack. This function can also be used to restore trail marks
      after calling `vim.lsp.formatting` which currently causes extmarks to be moved out of the
      buffer range.
 
