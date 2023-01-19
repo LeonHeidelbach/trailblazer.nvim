@@ -29,11 +29,15 @@ Log.langs = {
       current_trail_mark_select_mode = "Current trail mark select mode: ",
     },
     warnings = {
-      invalid_trail_mark_select_mode = "Invalid trail mark select mode. Please use one of the following: ",
+      invalid_trail_mark_select_mode = "Invalid trail mark select mode. Please use one of the "
+          .. "following: ",
       hl_group_does_not_exist = "Highlight group does not exist: ",
+      invalid_trailblazer_api_callback = "Provided callback for your keymap could not be found in "
+          .. "the TrailBlazer API. Callback is -> ",
     },
     errors = {
-      not_configured = "TrailBlazer is not configured. Please call `require('trailblazer').setup()` first.",
+      not_configured = "TrailBlazer is not configured. Please call `require('trailblazer').setup()`"
+          .. " first.",
       unsupported_lang = "Unsupported language. Please use one of the following: " ..
           table.concat(Log.config.available_langs, ", "),
       invalid_buf_name = "Invalid buffer name. The current buffer has been used instead.",
