@@ -72,10 +72,16 @@ available and set by default:
     lang = "en",
     trail_options = {
         -- Available modes to cycle through. Remove any you don't need.
-        available_trail_mark_modes = { "global", "global_line_sorted", "buffer_local",
-            "buffer_local_line_sorted" },
+        available_trail_mark_modes = {
+            "global",
+            "global_buf_line_sorted",
+            "global_chron_buf_line_sorted",
+            "buffer_local",
+            "buffer_local_line_sorted"
+        },
         -- The current / initially selected trail mark selection mode. Choose from one of the
-        -- available modes: global, global_line_sorted, buffer_local, buffer_local_line_sorted
+        -- available modes: global, global_buf_line_sorted, global_chron_buf_line_sorted, buffer_local,
+        -- buffer_local_line_sorted
         current_trail_mark_mode = "global",
         verbose_trail_mark_select = true, -- print current mode notification on mode change
     },
@@ -120,9 +126,14 @@ available and set by default:
             guibg = "Red",
             gui = "bold",
         },
-        TrailBlazerTrailMarkGlobalLineSorted = {
+        TrailBlazerTrailMarkGlobalBufLineSorted = {
             guifg = "Black",
             guibg = "LightRed",
+            gui = "bold",
+        },
+        TrailBlazerTrailMarkGlobalChronBufLineSorted = {
+            guifg = "Black",
+            guibg = "Olive",
             gui = "bold",
         },
         TrailBlazerTrailMarkBufferLocal = {
@@ -144,12 +155,13 @@ available and set by default:
 Trail mark selection modes allow you to switch between different modes of traversing and executing
 actions on your trail marks. Thus far you can choose between the following modes:
 
-| Mode                       | Description                                                                    |
-|----------------------------|--------------------------------------------------------------------------------|
-| `global`                   | This is the default mode. Marks are traversed globally in chronological order. |
-| `global_line_sorted`       | Marks are sorted by their buffer id and globally traversed from BOF to EOF.    |
-| `buffer_local`             | Only current buffer marks are traversed chronologically.                       |
-| `buffer_local_line_sorted` | Only current buffer marks are traversed from BOF to EOF.                       |
+| Mode                           | Description                                                                                       |
+|--------------------------------|---------------------------------------------------------------------------------------------------|
+| `global`                       | This is the default mode. Marks are traversed globally in chronological order.                    |
+| `global_buf_line_sorted`       | Marks are sorted by their buffer id and globally traversed from BOF to EOF.                       |
+| `global_chron_buf_line_sorted` | Marks are sorted chronologically, then by their buffer id and globally traversed from BOF to EOF. |
+| `buffer_local`                 | Only current buffer marks are traversed chronologically.                                          |
+| `buffer_local_line_sorted`     | Only current buffer marks are traversed from BOF to EOF.                                          |
 
 ## 💻 User commands
 
