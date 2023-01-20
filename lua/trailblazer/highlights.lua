@@ -28,15 +28,43 @@
 ---<
 ---@brief ]]
 
+local helpers = require("trailblazer.helpers")
 local Highlights = {}
 
 --- Generate and register highlight groups. Returns the list of registered groups.
 ---@param user_table table<string, table<string, string>>
+---@param generate_inverted? boolean
 ---@return table<string>
-function Highlights.register(user_table)
+function Highlights.register(user_table, generate_inverted)
+  local hl_group_keys = vim.tbl_keys(user_table)
+
+  if generate_inverted then
+    local inverted_user_table = Highlights.invert(user_table, true)
+    local inverted_hl_groups = Highlights.generate_group_strings(inverted_user_table)
+    Highlights.register_hl_groups(inverted_hl_groups)
+    helpers.tbl_append(hl_group_keys, vim.tbl_keys(inverted_user_table))
+  end
+
   local hl_groups = Highlights.generate_group_strings(user_table)
   Highlights.register_hl_groups(hl_groups)
-  return vim.tbl_keys(user_table)
+  return hl_group_keys
+end
+
+--- Generate FG/BG inverted highlight groups.
+---@param hl_table table
+---@param remove_bg? boolean
+---@return table
+function Highlights.invert(hl_table, remove_bg)
+  local inverted = {}
+  for name, hl in pairs(hl_table) do
+    inverted[name .. "Inverted"] = {}
+    local tmp = hl.guifg
+    inverted[name .. "Inverted"].guifg = hl.guibg
+    if not remove_bg then
+      inverted[name .. "Inverted"].guibg = tmp
+    end
+  end
+  return inverted
 end
 
 --- Register highlight groups generated through `Highlights.generate_group_strings`.

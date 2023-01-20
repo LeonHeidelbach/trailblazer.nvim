@@ -26,6 +26,11 @@ Trails.config.custom.available_trail_mark_modes = {
 }
 Trails.config.custom.current_trail_mark_mode = "global_chron"
 Trails.config.custom.verbose_trail_mark_select = true
+Trails.config.custom.next_mark_symbol = "⬤"
+Trails.config.custom.previous_mark_symbol = "⬤"
+Trails.config.custom.number_line_color_enabled = true
+Trails.config.custom.symbol_line_enabled = true
+
 Trails.config.ns_name = "trailblazer"
 Trails.config.ns_id = api.nvim_create_namespace(Trails.config.ns_name)
 
@@ -83,20 +88,22 @@ function Trails.new_trail_mark(win, buf, pos)
     return tmp_trail_mark.timestamp == new_mark.timestamp
   end, Trails.trail_mark_stack)
 
-  Trails.reregister_trail_marks()
+  local mark_options = {
+    id = new_mark.mark_id,
+    virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMarkCursor" } },
+    virt_text_pos = "overlay",
+    hl_mode = "combine",
+    strict = true,
+  }
 
   local mark_id = api.nvim_buf_set_extmark(current_buf, Trails.config.ns_id, current_cursor[1] - 1,
-    current_cursor[2],
-    {
-      id = new_mark.mark_id,
-      virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMarkCursor" } },
-      virt_text_pos = "overlay",
-      hl_mode = "combine",
-    })
+    current_cursor[2], mark_options)
 
   if new_mark.mark_id ~= mark_id then
     log.error("mark_id_mismatch")
   end
+
+  Trails.reregister_trail_marks()
 
   return Trails.trail_mark_stack[Trails.trail_mark_cursor]
 end
@@ -650,8 +657,6 @@ function Trails.reregister_trail_marks()
     local pos_text = api.nvim_buf_get_lines(mark.buf, mark.pos[1] - 1, mark.pos[1], false)[1]
         :sub(mark.pos[2] + 1, mark.pos[2] + 1)
 
-    pcall(api.nvim_buf_del_extmark, mark.buf, Trails.config.ns_id, mark.mark_id)
-
     if i == last_mark_index then
       hl_group = "TrailBlazerTrailMarkNewest"
     elseif current_cursor_mark and current_cursor_mark.pos[1] == mark.pos[1]
@@ -661,13 +666,30 @@ function Trails.reregister_trail_marks()
       hl_group = Trails.get_hl_group_for_current_trail_mark_select_mode()
     end
 
-    ok, mark.mark_id, _ = pcall(api.nvim_buf_set_extmark, mark.buf, Trails.config.ns_id,
-      mark.pos[1] - 1, mark.pos[2], {
+    local mark_options = {
       id = mark.mark_id,
       virt_text = { { pos_text ~= "" and pos_text or " ", hl_group } },
       virt_text_pos = "overlay",
       hl_mode = "combine",
-    })
+      strict = true,
+    }
+
+    if Trails.config.custom.number_line_color_enabled then
+      mark_options["number_hl_group"] = hl_group .. "Inverted"
+    end
+
+    if Trails.config.custom.symbol_line_enabled and i == Trails.trail_mark_cursor + 1 then
+      mark_options["sign_text"] = Trails.config.custom.next_mark_symbol;
+      mark_options["sign_hl_group"] = "TrailBlazerTrailMarkNext";
+    elseif Trails.config.custom.symbol_line_enabled and i == Trails.trail_mark_cursor - 1 then
+      mark_options["sign_text"] = Trails.config.custom.previous_mark_symbol;
+      mark_options["sign_hl_group"] = "TrailBlazerTrailMarkPrevious";
+    end
+
+    pcall(api.nvim_buf_del_extmark, mark.buf, Trails.config.ns_id, mark.mark_id)
+
+    ok, mark.mark_id, _ = pcall(api.nvim_buf_set_extmark, mark.buf, Trails.config.ns_id,
+      mark.pos[1] - 1, mark.pos[2], mark_options)
 
     if not ok then
       table.remove(Trails.trail_mark_stack, i)

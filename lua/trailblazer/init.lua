@@ -36,6 +36,10 @@ local function set_defaults(opts)
       },
       current_trail_mark_mode = "global_chron", -- current / initial mode
       verbose_trail_mark_select = true, -- print current mode notification on mode change
+      next_mark_symbol = "⬤",
+      previous_mark_symbol = "⬤",
+      number_line_color_enabled = true,
+      symbol_line_enabled = true,
     },
     mappings = {
       nv = { -- Mode union: normal & visual mode
@@ -55,6 +59,16 @@ local function set_defaults(opts)
       },
     },
     hl_groups = {
+      TrailBlazerTrailMarkNext = {
+        guifg = "Red",
+        guibg = "none",
+        gui = "bold",
+      },
+      TrailBlazerTrailMarkPrevious = {
+        guifg = "Green",
+        guibg = "none",
+        gui = "bold",
+      },
       TrailBlazerTrailMarkCursor = {
         guifg = "Black",
         guibg = "Orange",
@@ -114,7 +128,7 @@ end
 ---@param options? table
 function TrailBlazer.setup(options)
   TrailBlazer.options = set_defaults(options)
-  TrailBlazer.generated.hl_groups = highlights.register(TrailBlazer.options.hl_groups)
+  TrailBlazer.generated.hl_groups = highlights.register(TrailBlazer.options.hl_groups, true)
   trails.setup(TrailBlazer.options.trail_options)
   log.setup(TrailBlazer.options.lang)
   keymaps.register(TrailBlazer.options.mappings, TrailBlazer)
