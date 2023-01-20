@@ -70,18 +70,10 @@ function Trails.new_trail_mark(win, buf, pos)
 
   pos_text = pos_text:sub(current_cursor[2] + 1, current_cursor[2] + 1)
 
-  local mark_id = api.nvim_buf_set_extmark(current_buf, Trails.config.ns_id, current_cursor[1] - 1,
-    current_cursor[2],
-    {
-      virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMarkCursor" } },
-      virt_text_pos = "overlay",
-      hl_mode = "combine",
-    })
-
   local new_mark = {
     timestamp = fn.reltimefloat(fn.reltime()),
     win = current_win, buf = current_buf,
-    pos = current_cursor, mark_id = mark_id
+    pos = current_cursor, mark_id = #Trails.trail_mark_stack + 1,
   }
 
   table.insert(Trails.trail_mark_stack, new_mark)
@@ -92,6 +84,19 @@ function Trails.new_trail_mark(win, buf, pos)
   end, Trails.trail_mark_stack)
 
   Trails.reregister_trail_marks()
+
+  local mark_id = api.nvim_buf_set_extmark(current_buf, Trails.config.ns_id, current_cursor[1] - 1,
+    current_cursor[2],
+    {
+      id = new_mark.mark_id,
+      virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMarkCursor" } },
+      virt_text_pos = "overlay",
+      hl_mode = "combine",
+    })
+
+  if new_mark.mark_id ~= mark_id then
+    log.error("mark_id_mismatch")
+  end
 
   return Trails.trail_mark_stack[Trails.trail_mark_cursor]
 end
@@ -658,6 +663,7 @@ function Trails.reregister_trail_marks()
 
     ok, mark.mark_id, _ = pcall(api.nvim_buf_set_extmark, mark.buf, Trails.config.ns_id,
       mark.pos[1] - 1, mark.pos[2], {
+      id = mark.mark_id,
       virt_text = { { pos_text ~= "" and pos_text or " ", hl_group } },
       virt_text_pos = "overlay",
       hl_mode = "combine",
