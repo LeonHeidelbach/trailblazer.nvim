@@ -76,11 +76,14 @@ available and set by default:
             "global_chron",
             "global_buf_line_sorted",
             "global_chron_buf_line_sorted",
+            "global_chron_buf_switch_group_chron",
+            "global_chron_buf_switch_group_line_sorted",
             "buffer_local_chron",
             "buffer_local_line_sorted"
         },
         -- The current / initially selected trail mark selection mode. Choose from one of the
         -- available modes: global_chron, global_buf_line_sorted, global_chron_buf_line_sorted,
+        -- global_chron_buf_switch_group_chron, global_chron_buf_switch_group_line_sorted,
         -- buffer_local_chron, buffer_local_line_sorted
         current_trail_mark_mode = "global_chron",
         verbose_trail_mark_select = true, -- print current mode notification on mode change
@@ -136,6 +139,16 @@ available and set by default:
             guibg = "Olive",
             gui = "bold",
         },
+        TrailBlazerTrailMarkGlobalChronBufSwitchGroupChron = {
+            guifg = "Black",
+            guibg = "VioletRed",
+            gui = "bold",
+        },
+        TrailBlazerTrailMarkGlobalChronBufSwitchGroupLineSorted = {
+            guifg = "Black",
+            guibg = "MediumSpringGreen",
+            gui = "bold",
+        },
         TrailBlazerTrailMarkBufferLocalChron = {
             guifg = "Black",
             guibg = "Green",
@@ -153,15 +166,18 @@ available and set by default:
 ### Trail mark selection modes
 
 Trail mark selection modes allow you to switch between different modes of traversing and executing
-actions on your trail marks. Thus far you can choose between the following modes:
+actions on your trail marks. Add the ones you would like to use to your configuration table. By
+default all modes are enabled. Thus far you can choose between the following modes:
 
-| Mode                           | Description                                                                                       |
-|--------------------------------|---------------------------------------------------------------------------------------------------|
-| `global_chron`                 | This is the default mode. Marks are traversed globally in chronological order.                    |
-| `global_buf_line_sorted`       | Marks are sorted by their buffer id and globally traversed from BOF to EOF.                       |
-| `global_chron_buf_line_sorted` | Marks are sorted chronologically, then by their buffer id and globally traversed from BOF to EOF. |
-| `buffer_local_chron`           | Only current buffer marks are traversed chronologically.                                          |
-| `buffer_local_line_sorted`     | Only current buffer marks are traversed from BOF to EOF.                                          |
+| Mode                                        | Description                                                                                                                                                                         |
+|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `global_chron`                              | This is the default mode. Marks are traversed globally in chronological order.                                                                                                      |
+| `global_buf_line_sorted`                    | Marks are sorted by their buffer id and globally traversed from BOF to EOF.                                                                                                         |
+| `global_chron_buf_line_sorted`              | Marks are sorted chronologically, then by their buffer id and globally traversed from BOF to EOF.                                                                                   |
+| `global_chron_buf_switch_group_chron`       | Marks are sorted chronologically, then by their buffer id and grouped by buffer switch events. Each group switch event is then traversed in chronological order.                    |
+| `global_chron_buf_switch_group_line_sorted` | Marks are sorted chronologically, then by their buffer id and grouped by buffer switch events. Each group switch event is then sorted from BOF to EOF within the respective buffer. |
+| `buffer_local_chron`                        | Only current buffer marks are traversed chronologically.                                                                                                                            |
+| `buffer_local_line_sorted`                  | Only current buffer marks are traversed from BOF to EOF.                                                                                                                            |
 
 ## 💻 User commands
 
