@@ -29,6 +29,8 @@ local function set_defaults(opts)
         "global_chron",
         "global_buf_line_sorted",
         "global_chron_buf_line_sorted",
+        "global_chron_buf_switch_group_chron",
+        "global_chron_buf_switch_group_line_sorted",
         "buffer_local_chron",
         "buffer_local_line_sorted"
       },
@@ -76,6 +78,16 @@ local function set_defaults(opts)
       TrailBlazerTrailMarkGlobalChronBufLineSorted = {
         guifg = "Black",
         guibg = "Olive",
+        gui = "bold",
+      },
+      TrailBlazerTrailMarkGlobalChronBufSwitchGroupChron = {
+        guifg = "Black",
+        guibg = "VioletRed",
+        gui = "bold",
+      },
+      TrailBlazerTrailMarkGlobalChronBufSwitchGroupLineSorted = {
+        guifg = "Black",
+        guibg = "MediumSpringGreen",
         gui = "bold",
       },
       TrailBlazerTrailMarkBufferLocalChron = {

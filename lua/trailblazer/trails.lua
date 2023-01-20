@@ -19,6 +19,8 @@ Trails.config.custom.available_trail_mark_modes = {
   "global_chron",
   "global_buf_line_sorted",
   "global_chron_buf_line_sorted",
+  "global_chron_buf_switch_group_chron",
+  "global_chron_buf_switch_group_line_sorted",
   "buffer_local_chron",
   "buffer_local_line_sorted"
 }
@@ -321,6 +323,58 @@ function Trails.sort_trail_mark_stack(mode)
     table.sort(Trails.trail_mark_stack, function(a, b)
       return a.pos[1] > b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] > b.pos[2])
     end)
+  elseif mode == "global_chron_buf_switch_group_chron" or
+      mode == "global_chron_buf_switch_group_line_sorted" then
+    local new_trail_mark_stack = {}
+    local ordered_trail_mark_subsets = {}
+    local current_subset = {}
+    local current_buf = -1
+
+    local function sort_current_subset_and_insert()
+      table.sort(current_subset, function(a, b)
+        return a.pos[1] > b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] > b.pos[2])
+      end)
+      if mode == "global_chron_buf_switch_group_chron" then
+        table.insert(ordered_trail_mark_subsets, 1, current_subset)
+      elseif mode == "global_chron_buf_switch_group_line_sorted" then
+        table.insert(ordered_trail_mark_subsets, current_subset)
+      end
+      current_subset = {}
+    end
+
+    table.sort(Trails.trail_mark_stack, function(a, b)
+      return a.timestamp < b.timestamp
+    end)
+
+    for _, mark in ipairs(Trails.trail_mark_stack) do
+      if current_buf ~= mark.buf then
+        if current_buf > -1 then
+          sort_current_subset_and_insert()
+        end
+        current_buf = mark.buf
+      end
+      table.insert(current_subset, mark)
+    end
+
+    if #current_subset > 0 then
+      sort_current_subset_and_insert()
+    end
+
+    if mode == "global_chron_buf_switch_group_line_sorted" then
+      table.sort(ordered_trail_mark_subsets, function(a, b)
+        if a[1].buf == b[1].buf then
+          return a[1].pos[1] > b[1].pos[1] or (a[1].pos[1] == b[1].pos[1]
+              and a[1].pos[2] > b[1].pos[2])
+        end
+        return false
+      end)
+    end
+
+    for _, subset in ipairs(ordered_trail_mark_subsets) do
+      helpers.tbl_append(new_trail_mark_stack, subset)
+    end
+
+    Trails.trail_mark_stack = new_trail_mark_stack
   elseif mode == "buffer_local_line_sorted" then
     table.sort(Trails.trail_mark_stack, function(a, b)
       return a.buf < b.buf
