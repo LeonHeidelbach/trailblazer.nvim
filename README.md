@@ -87,6 +87,10 @@ available and set by default:
         -- buffer_local_chron, buffer_local_line_sorted
         current_trail_mark_mode = "global_chron",
         verbose_trail_mark_select = true, -- print current mode notification on mode change
+        next_mark_symbol = "⬤",
+        previous_mark_symbol = "⬤",
+        number_line_color_enabled = true,
+        symbol_line_enabled = true,
     },
     mappings = {
         nv = { -- Mode union: normal & visual mode. Can be extended by adding i, x, ...
@@ -113,8 +117,18 @@ available and set by default:
         -- },
     },
     hl_groups = {
-        TrailBlazerTrailMarkCursor = {
+        TrailBlazerTrailMarkNext = {
             -- You can add any valid highlight group attribute to this table
+            guifg = "Red",
+            guibg = "none",
+            gui = "bold",
+        },
+        TrailBlazerTrailMarkPrevious = {
+            guifg = "Green",
+            guibg = "none",
+            gui = "bold",
+        },
+        TrailBlazerTrailMarkCursor = {
             guifg = "Black",
             guibg = "Orange",
             gui = "bold",
