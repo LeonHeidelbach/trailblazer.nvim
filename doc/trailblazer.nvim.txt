@@ -45,6 +45,33 @@ Helpers.tbl_indexof({lambda}, {tbl})                       *Helpers.tbl_indexof*
         {tbl}     (table)     @return integer?
 
 
+Helpers.tbl_append({tbl_dst}, {tbl_src})                    *Helpers.tbl_append*
+     Append the supplied src table to the given dst table.
+
+    Parameters: ~
+        {tbl_dst}  (table)
+        {tbl_src}  (table)
+
+
+                                                           *Helpers.tbl_prepend*
+Helpers.tbl_prepend({tbl_dst}, {tbl_src})
+     Prepend the supplied src table to the given dst table.
+
+    Parameters: ~
+        {tbl_dst}  (table)
+        {tbl_src}  (table)
+
+
+Helpers.tbl_reverse({tbl})                                 *Helpers.tbl_reverse*
+     Returns a table containing the supplied table's values in reverse order.
+
+    Parameters: ~
+        {tbl}  (table)
+
+    Returns: ~
+        (table)
+
+
 Helpers.dedupe({tbl}, {action?})                                *Helpers.dedupe*
 
     Parameters: ~
@@ -82,11 +109,25 @@ Helpers.dedupe({tbl}, {action?})                                *Helpers.dedupe*
  require("trailblazer.highlights").register(hl_groups)
 <
 
-Highlights.register({user_table})                          *Highlights.register*
+                                                           *Highlights.register*
+Highlights.register({user_table}, {generate_inverted?})
      Generate and register highlight groups. Returns the list of registered groups.
 
     Parameters: ~
-        {user_table}  (table<string,table<string,string>>)  @return table<string>
+        {user_table}          (table<string,table<string,string>>)
+        {generate_inverted?}  (boolean)                             @return table<string>
+
+
+                                                             *Highlights.invert*
+Highlights.invert({hl_table}, {remove_bg?})
+     Generate FG/BG inverted highlight groups.
+
+    Parameters: ~
+        {hl_table}    (table)
+        {remove_bg?}  (boolean)
+
+    Returns: ~
+        (table)
 
 
 Highlights.register_hl_groups()                  *Highlights.register_hl_groups*
