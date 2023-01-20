@@ -17,7 +17,7 @@ describe("Trails.new_trail_mark:", function()
     local mark = tr.new_trail_mark(win, buf, { 1, 0 })
     if not mark then error("No trail mark was created.") end
     assert.are.same(true, mark ~= nil)
-    assert.are.same({ win = win, buf = buf, pos = { 1, 0 }, mark_id = 2 },
+    assert.are.same({ win = win, buf = buf, pos = { 1, 0 }, mark_id = 1 },
       { win = mark.win, buf = mark.buf, pos = mark.pos, mark_id = mark.mark_id })
   end)
 end)
