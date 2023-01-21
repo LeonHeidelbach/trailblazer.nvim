@@ -516,17 +516,17 @@ end
 ---@param buf? number
 ---@return number?
 function Trails.get_newest_mark_index_for_buf(buf)
-  if buf == nil then
-    return #Trails.trail_mark_stack > 0 and #Trails.trail_mark_stack or nil
-  end
+  local max_time = 0
+  local newest_mark_index = nil
 
-  for i = #Trails.trail_mark_stack, 1, -1 do
-    if Trails.trail_mark_stack[i].buf == buf then
-      return i
+  for i, trail_mark in ipairs(Trails.trail_mark_stack) do
+    if (not buf or trail_mark.buf == buf) and trail_mark.timestamp > max_time then
+      max_time = trail_mark.timestamp
+      newest_mark_index = i
     end
   end
 
-  return nil
+  return newest_mark_index
 end
 
 --- Get a mark selection depending on the current mark selection mode and the corresponding
