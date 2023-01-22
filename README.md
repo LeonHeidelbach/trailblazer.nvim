@@ -87,10 +87,10 @@ available and set by default:
         -- buffer_local_chron, buffer_local_line_sorted
         current_trail_mark_mode = "global_chron",
         verbose_trail_mark_select = true, -- print current mode notification on mode change
-        newest_mark_symbol = "⬤",
-        current_cursor_symbol = "⬤",
-        next_mark_symbol = "⬤",
-        previous_mark_symbol = "⬤",
+        newest_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
+        current_cursor_symbol = "⬤", -- disable this mark symbol by setting its value to ""
+        next_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
+        previous_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         number_line_color_enabled = true,
         symbol_line_enabled = true,
     },
@@ -195,6 +195,18 @@ default all modes are enabled. Thus far you can choose between the following mod
 | `buffer_local_chron`                        | Only current buffer marks are traversed chronologically.                                                                                                                            |
 | `buffer_local_line_sorted`                  | Only current buffer marks are traversed from BOF to EOF.                                                                                                                            |
 
+### Mark symbols
+
+Mark symbols allow you to see at a glance which of your marks is the newest, where the current mark
+cursor is located and which mark is the next or previous to be traversed from the current mark
+cursor position. As soon as multiple mark symbols would be displayed in the same line, only the last
+one will be shown as well as the total number of mark symbols within that line that. You can set all
+mark symbols to any **one** character you like. If you set it to more than one character, the second
+one will be cut off as soon as multiple marks are displayed in the same line and the number of marks
+will be shown as the first character instead. There can only be **two** characters displayed in the
+symbol line at all times. If you set any mark symbol to an empty string (i.e. `""`), it will be
+disabled. All mark symbols can be styled through their respective highlight groups. 
+
 ## 💻 User commands
 
 Arguments annotated with `?` can be omitted. If omitted, the current window, buffer, cursor position
@@ -206,16 +218,16 @@ directly like this:
 require("trailblazer").<function_name>(<args>)
 ```
 
-| Command                            | Arguments                                                                                                      | Description                                                                                                                                                        |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `:TrailBlazerNewTrailMark`         | `<window? number>`<br>`<buffer? string \| number>`<br>`<cursor_pos_row? number>`<br>`<cursor_pos_col? number>` | Create a new / toggle existing trail mark at the current cursor position or at the specified window / buffer / position.                                           |
-| `:TrailBlazerTrackBack`            | `<buffer? string \| number>`                                                                                   | Move to the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                            |
-| `:TrailBlazerPeekMoveForward`      | `<buffer? string \| number`                                                                                    | Move to the next global trail mark or the next one within the specified buffer leading up to the newest one without removing it from the trail mark stack.         |
-| `:TrailBlazerPeekMoveBackward`     | `<buffer? string \| number>`                                                                                   | Move to the previous global trail mark or the previous one within the specified buffer leading up to the oldest one without removing it from the trail mark stack. |
-| `:TrailBlazerDeleteAllTrailMarks`  | `<buffer? string \| number>`                                                                                   | Delete all trail marks globally or within the specified buffer.                                                                                                    |
-| `:TrailBlazerPasteAtLastTrailMark` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.     |
-| `:TrailBlazerPasteAtAllTrailMarks` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                           |
-| `:TrailBlazerTrailMarkSelectMode`  | `<mode? string>`                                                                                               | Cycle through or set the current trail mark selection mode.                                                                                                        |
+| Command                            | Arguments                                                                                                      | Description                                                                                                                                                                                                                                            |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `:TrailBlazerNewTrailMark`         | `<window? number>`<br>`<buffer? string \| number>`<br>`<cursor_pos_row? number>`<br>`<cursor_pos_col? number>` | Create a new / toggle existing trail mark at the current cursor position or at the specified window / buffer / position.                                                                                                                               |
+| `:TrailBlazerTrackBack`            | `<buffer? string \| number>`                                                                                   | Move to the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                                                                |
+| `:TrailBlazerPeekMovePreviousUp`   | `<buffer? string \| number`                                                                                    | Move to the previous global trail mark or the previous one within the specified buffer leading up to the oldest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor up. |
+| `:TrailBlazerPeekMoveNextDown`     | `<buffer? string \| number>`                                                                                   | Move to the next global trail mark or the next one within the specified buffer leading up to the newest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor down.       |
+| `:TrailBlazerDeleteAllTrailMarks`  | `<buffer? string \| number>`                                                                                   | Delete all trail marks globally or within the specified buffer.                                                                                                                                                                                        |
+| `:TrailBlazerPasteAtLastTrailMark` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                         |
+| `:TrailBlazerPasteAtAllTrailMarks` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                                                                                                               |
+| `:TrailBlazerTrailMarkSelectMode`  | `<mode? string>`                                                                                               | Cycle through or set the current trail mark selection mode.                                                                                                                                                                                            |
 
 ## 📚 Documentation
 
