@@ -36,6 +36,8 @@ local function set_defaults(opts)
       },
       current_trail_mark_mode = "global_chron", -- current / initial mode
       verbose_trail_mark_select = true, -- print current mode notification on mode change
+      newest_mark_symbol = "⬤",
+      cursor_mark_symbol = "⬤",
       next_mark_symbol = "⬤",
       previous_mark_symbol = "⬤",
       number_line_color_enabled = true,
@@ -60,12 +62,12 @@ local function set_defaults(opts)
     },
     hl_groups = {
       TrailBlazerTrailMarkNext = {
-        guifg = "Red",
+        guifg = "Green",
         guibg = "none",
         gui = "bold",
       },
       TrailBlazerTrailMarkPrevious = {
-        guifg = "Green",
+        guifg = "Red",
         guibg = "none",
         gui = "bold",
       },

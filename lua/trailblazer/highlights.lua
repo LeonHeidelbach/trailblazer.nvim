@@ -50,12 +50,21 @@ function Highlights.register(user_table, generate_inverted)
   return hl_group_keys
 end
 
+--- Register highlight groups generated through `Highlights.generate_group_strings`.
+---@param hl_groups table<string>
+function Highlights.register_hl_groups(hl_groups)
+  for _, hl_group in ipairs(hl_groups) do
+    vim.cmd(hl_group)
+  end
+end
+
 --- Generate FG/BG inverted highlight groups.
 ---@param hl_table table
 ---@param remove_bg? boolean
 ---@return table
 function Highlights.invert(hl_table, remove_bg)
   local inverted = {}
+
   for name, hl in pairs(hl_table) do
     inverted[name .. "Inverted"] = {}
     local tmp = hl.guifg
@@ -64,15 +73,8 @@ function Highlights.invert(hl_table, remove_bg)
       inverted[name .. "Inverted"].guibg = tmp
     end
   end
-  return inverted
-end
 
---- Register highlight groups generated through `Highlights.generate_group_strings`.
----@param hl_groups table<string>
-function Highlights.register_hl_groups(hl_groups)
-  for _, hl_group in ipairs(hl_groups) do
-    vim.cmd(hl_group)
-  end
+  return inverted
 end
 
 --- Generate a list of highlight group strings from a config table.

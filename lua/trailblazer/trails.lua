@@ -26,13 +26,16 @@ Trails.config.custom.available_trail_mark_modes = {
 }
 Trails.config.custom.current_trail_mark_mode = "global_chron"
 Trails.config.custom.verbose_trail_mark_select = true
+Trails.config.custom.newest_mark_symbol = "⬤"
+Trails.config.custom.cursor_mark_symbol = "⬤"
 Trails.config.custom.next_mark_symbol = "⬤"
 Trails.config.custom.previous_mark_symbol = "⬤"
 Trails.config.custom.number_line_color_enabled = true
 Trails.config.custom.symbol_line_enabled = true
 
 Trails.config.ns_name = "trailblazer"
-Trails.config.ns_id = api.nvim_create_namespace(Trails.config.ns_name)
+Trails.config.ucid = 0
+Trails.config.nsid = api.nvim_create_namespace(Trails.config.ns_name)
 
 Trails.trail_mark_cursor = 0
 Trails.trail_mark_stack = {}
@@ -54,10 +57,19 @@ function Trails.new_trail_mark(win, buf, pos)
   local trail_mark_index, trail_mark = Trails.get_trail_mark_under_cursor(win, buf, pos)
 
   if trail_mark_index and trail_mark then
-    api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.ns_id, trail_mark.mark_id)
+    api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.nsid, trail_mark.mark_id)
     table.remove(Trails.trail_mark_stack, trail_mark_index)
-    Trails.trail_mark_cursor = Trails.trail_mark_cursor > 1 and Trails.trail_mark_cursor - 1
-        or #Trails.trail_mark_stack > 0 and 1 or 0
+
+    local newest_mark_index, oldest_mark_index = Trails.get_newest_and_oldest_mark_index_for_buf(
+      buf)
+
+    if trail_mark_index <= Trails.trail_mark_cursor and Trails.trail_mark_cursor
+        >= oldest_mark_index and Trails.trail_mark_cursor <= newest_mark_index then
+      Trails.trail_mark_cursor = Trails.trail_mark_cursor - 1
+    elseif Trails.trail_mark_cursor - 1 <= oldest_mark_index then
+      Trails.trail_mark_cursor = oldest_mark_index
+    end
+
     Trails.reregister_trail_marks()
     return nil
   end
@@ -73,36 +85,17 @@ function Trails.new_trail_mark(win, buf, pos)
     return nil
   end
 
-  pos_text = pos_text:sub(current_cursor[2] + 1, current_cursor[2] + 1)
-
   local new_mark = {
     timestamp = fn.reltimefloat(fn.reltime()),
     win = current_win, buf = current_buf,
-    pos = current_cursor, mark_id = #Trails.trail_mark_stack + 1,
+    pos = current_cursor, mark_id = Trails.config.ucid + 1,
   }
 
   table.insert(Trails.trail_mark_stack, new_mark)
+
+  Trails.config.ucid = Trails.config.ucid + 1
   Trails.sort_trail_mark_stack()
-
-  Trails.trail_mark_cursor = helpers.tbl_indexof(function(tmp_trail_mark)
-    return tmp_trail_mark.timestamp == new_mark.timestamp
-  end, Trails.trail_mark_stack)
-
-  local mark_options = {
-    id = new_mark.mark_id,
-    virt_text = { { pos_text ~= "" and pos_text or " ", "TrailBlazerTrailMarkCursor" } },
-    virt_text_pos = "overlay",
-    hl_mode = "combine",
-    strict = true,
-  }
-
-  local mark_id = api.nvim_buf_set_extmark(current_buf, Trails.config.ns_id, current_cursor[1] - 1,
-    current_cursor[2], mark_options)
-
-  if new_mark.mark_id ~= mark_id then
-    log.error("mark_id_mismatch")
-  end
-
+  Trails.trail_mark_cursor, _ = Trails.get_newest_and_oldest_mark_index_for_buf(buf)
   Trails.reregister_trail_marks()
 
   return Trails.trail_mark_stack[Trails.trail_mark_cursor]
@@ -114,20 +107,20 @@ end
 function Trails.track_back(buf)
   buf = Trails.default_buf_for_current_mark_select_mode(buf)
 
-  local last_mark_index = Trails.get_newest_mark_index_for_buf(buf)
+  local newest_mark_index, _ = Trails.get_newest_and_oldest_mark_index_for_buf(buf)
 
-  if last_mark_index then
+  if newest_mark_index then
     local trail_mark, ext_mark
-    last_mark_index, trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf,
-      last_mark_index, true)
-    if last_mark_index == nil or trail_mark == nil or ext_mark == nil then
+    newest_mark_index, trail_mark, ext_mark = Trails.get_marks_for_trail_mark_index(buf,
+      newest_mark_index, true)
+    if newest_mark_index == nil or trail_mark == nil or ext_mark == nil then
       return false
     end
 
     Trails.focus_win_and_buf(trail_mark, ext_mark)
-    api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.ns_id, trail_mark.mark_id)
+    api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.nsid, trail_mark.mark_id)
 
-    Trails.trail_mark_cursor = #Trails.trail_mark_stack
+    Trails.trail_mark_cursor, _ = Trails.get_newest_and_oldest_mark_index_for_buf(buf)
     Trails.reregister_trail_marks()
 
     return true
@@ -168,10 +161,10 @@ end
 function Trails.paste_at_last_trail_mark(buf)
   buf = Trails.default_buf_for_current_mark_select_mode(buf)
 
-  local last_mark_index = Trails.get_newest_mark_index_for_buf(buf)
+  local newest_mark_index, _ = Trails.get_newest_and_oldest_mark_index_for_buf(buf)
 
-  if last_mark_index then
-    return Trails.paste_at_trail_mark(buf, last_mark_index)
+  if newest_mark_index then
+    return Trails.paste_at_trail_mark(buf, newest_mark_index)
   end
 
   return false
@@ -213,7 +206,7 @@ function Trails.paste_at_trail_mark(buf, trail_mark_index)
   end
 
   api.nvim_paste(fn.getreg(api.nvim_get_vvar("register")), false, -1)
-  api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.ns_id, trail_mark.mark_id)
+  api.nvim_buf_del_extmark(trail_mark.buf, Trails.config.nsid, trail_mark.mark_id)
 
   Trails.trail_mark_cursor = #Trails.trail_mark_stack
   Trails.reregister_trail_marks()
@@ -226,17 +219,18 @@ end
 function Trails.delete_all_trail_marks(buf)
   if buf == nil then
     for _, mark in ipairs(Trails.trail_mark_stack) do
-      pcall(api.nvim_buf_del_extmark, mark.buf, Trails.config.ns_id, mark.mark_id)
+      pcall(api.nvim_buf_del_extmark, mark.buf, Trails.config.nsid, mark.mark_id)
       Trails.trail_mark_cursor = Trails.trail_mark_cursor - 1
     end
 
     Trails.trail_mark_cursor = Trails.trail_mark_cursor > 0 and Trails.trail_mark_cursor or 0
     Trails.trail_mark_stack = {}
+    Trails.config.ucid = 0
   else
-    local ext_marks = api.nvim_buf_get_extmarks(buf, Trails.config.ns_id, 0, -1, {})
+    local ext_marks = api.nvim_buf_get_extmarks(buf, Trails.config.nsid, 0, -1, {})
 
     for _, ext_mark in ipairs(ext_marks) do
-      pcall(api.nvim_buf_del_extmark, buf, Trails.config.ns_id, ext_mark[1])
+      pcall(api.nvim_buf_del_extmark, buf, Trails.config.nsid, ext_mark[1])
     end
 
     Trails.trail_mark_stack = vim.tbl_filter(function(mark)
@@ -284,7 +278,7 @@ function Trails.set_cursor_to_next_mark(buf, current_mark_index)
     cursor = cursor + 1 <= #marks and cursor + 1 or #marks
   end
 
-  Trails.translate_acutal_cursor_from_relative_marks_and_cursor(marks, cursor)
+  Trails.translate_actual_cursor_from_relative_marks_and_cursor(buf, marks, cursor)
 end
 
 --- Set the cursor to the previous trail mark.
@@ -297,7 +291,7 @@ function Trails.set_cursor_to_previous_mark(buf, current_mark_index)
     cursor = cursor > 1 and cursor - 1 or #marks > 0 and 1 or 0
   end
 
-  Trails.translate_acutal_cursor_from_relative_marks_and_cursor(marks, cursor)
+  Trails.translate_actual_cursor_from_relative_marks_and_cursor(buf, marks, cursor)
 end
 
 --- Sort the trail mark stack according to the current or provided trail mark mode.
@@ -307,7 +301,7 @@ function Trails.sort_trail_mark_stack(mode)
     mode = Trails.config.custom.current_trail_mark_mode
   end
 
-  if mode == "global_chron" or mode == "buffer_local_chron" then
+  if mode == "global_chron" then
     table.sort(Trails.trail_mark_stack, function(a, b)
       return a.timestamp < b.timestamp
     end)
@@ -387,13 +381,21 @@ function Trails.sort_trail_mark_stack(mode)
     end
 
     Trails.trail_mark_stack = new_trail_mark_stack
+  elseif mode == "buffer_local_chron" then
+    table.sort(Trails.trail_mark_stack, function(a, b)
+      if a.buf == b.buf then
+        return a.timestamp < b.timestamp
+      else
+        return a.buf < b.buf
+      end
+    end)
   elseif mode == "buffer_local_line_sorted" then
     table.sort(Trails.trail_mark_stack, function(a, b)
-      return a.buf < b.buf
-    end)
-
-    table.sort(Trails.trail_mark_stack, function(a, b)
-      return a.pos[1] > b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] > b.pos[2])
+      if a.buf == b.buf then
+        return a.pos[1] > b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] > b.pos[2])
+      else
+        return a.buf < b.buf
+      end
     end)
   end
 end
@@ -453,7 +455,7 @@ function Trails.get_trail_mark_under_cursor(win, buf, pos)
   local current_win = win or api.nvim_get_current_win()
   local current_buffer = buf or api.nvim_get_current_buf()
   local current_cursor = pos or api.nvim_win_get_cursor(0)
-  local ext_marks = api.nvim_buf_get_extmarks(current_buffer, Trails.config.ns_id, 0, -1, {})
+  local ext_marks = api.nvim_buf_get_extmarks(current_buffer, Trails.config.nsid, 0, -1, {})
 
   local current_ext_mark = helpers.tbl_find(function(ext_mark)
     return ext_mark[2] + 1 == current_cursor[1] and ext_mark[3] == current_cursor[2]
@@ -470,7 +472,10 @@ function Trails.get_trail_mark_under_cursor(win, buf, pos)
   end
 
   if trail_mark_index ~= nil then
-    Trails.trail_mark_cursor = trail_mark_index
+    if Trails.trail_mark_cursor > #Trails.trail_mark_stack then
+      Trails.trail_mark_cursor = trail_mark_index
+    end
+
     Trails.reregister_trail_marks()
     return trail_mark_index, Trails.trail_mark_stack[trail_mark_index]
   end
@@ -482,51 +487,61 @@ end
 
 --- Return the trail mark at the given position as well as the corresponding extmark.
 ---@param buf? number
----@param last_mark_index? number
+---@param newest_mark_index? number
 ---@return number?
 ---@return table?
 ---@return table?
-function Trails.get_marks_for_trail_mark_index(buf, last_mark_index, remove_trail_mark)
+function Trails.get_marks_for_trail_mark_index(buf, newest_mark_index, remove_trail_mark)
   local ok, extracted_ext_mark, last_mark
 
   while #Trails.trail_mark_stack > 0 do
-    if last_mark_index then
-      last_mark = Trails.trail_mark_stack[last_mark_index]
+    if newest_mark_index then
+      last_mark = Trails.trail_mark_stack[newest_mark_index]
 
       if last_mark then
         ok, extracted_ext_mark, _ = pcall(api.nvim_buf_get_extmarks, last_mark.buf,
-          Trails.config.ns_id, last_mark.mark_id, last_mark.mark_id, {})
+          Trails.config.nsid, last_mark.mark_id, last_mark.mark_id, {})
       end
 
       if remove_trail_mark then
-        table.remove(Trails.trail_mark_stack, last_mark_index)
+        table.remove(Trails.trail_mark_stack, newest_mark_index)
       end
 
       if ok then break end
     else
       return nil, nil, nil
     end
-    last_mark_index = Trails.get_newest_mark_index_for_buf(buf)
+    newest_mark_index, _ = Trails.get_newest_and_oldest_mark_index_for_buf(buf)
   end
 
-  return last_mark_index, last_mark, extracted_ext_mark
+  return newest_mark_index, last_mark, extracted_ext_mark
 end
 
---- Find the newest trail mark in the stack that belongs to the given buffer.
+--- Find the newest and oldest trail mark in the stack that belongs to the given buffer.
 ---@param buf? number
 ---@return number?
-function Trails.get_newest_mark_index_for_buf(buf)
+---@return number?
+function Trails.get_newest_and_oldest_mark_index_for_buf(buf)
   local max_time = 0
+  local min_time = math.huge
   local newest_mark_index = nil
+  local oldest_mark_index = nil
 
   for i, trail_mark in ipairs(Trails.trail_mark_stack) do
-    if (not buf or trail_mark.buf == buf) and trail_mark.timestamp > max_time then
-      max_time = trail_mark.timestamp
-      newest_mark_index = i
+    if (not buf or trail_mark.buf == buf) then
+      if trail_mark.timestamp > max_time then
+        max_time = trail_mark.timestamp
+        newest_mark_index = i
+      end
+
+      if trail_mark.timestamp < min_time then
+        min_time = trail_mark.timestamp
+        oldest_mark_index = i
+      end
     end
   end
 
-  return newest_mark_index
+  return newest_mark_index or #Trails.trail_mark_stack, oldest_mark_index or 0
 end
 
 --- Get a mark selection depending on the current mark selection mode and the corresponding
@@ -577,12 +592,15 @@ end
 
 --- Translate a relative cursor position within the provided marks selection to the absolute
 --- cursor position within the trail mark stack.
+---@param buf? number
 ---@param marks table
 ---@param cursor number
-function Trails.translate_acutal_cursor_from_relative_marks_and_cursor(marks, cursor)
+function Trails.translate_actual_cursor_from_relative_marks_and_cursor(buf, marks, cursor)
+  local newest_mark_index, _ = Trails.get_newest_and_oldest_mark_index_for_buf(buf)
+
   Trails.trail_mark_cursor = helpers.tbl_indexof(function(mark)
     return marks[cursor] and mark.timestamp == marks[cursor].timestamp
-  end, Trails.trail_mark_stack) or #Trails.trail_mark_stack
+  end, Trails.trail_mark_stack) or newest_mark_index
 
   Trails.reregister_trail_marks()
 end
@@ -609,7 +627,7 @@ function Trails.remove_duplicate_pos_trail_marks()
           item.pos[1] == dedupe_item.pos[1] and item.pos[2] == dedupe_item.pos[2]
     end, dedupe_tbl) ~= nil
   end, Trails.trail_mark_stack, function(item)
-    api.nvim_buf_del_extmark(item.buf, Trails.config.ns_id, item.mark_id)
+    api.nvim_buf_del_extmark(item.buf, Trails.config.nsid, item.mark_id)
   end)
   if trail_count ~= #Trails.trail_mark_stack then
     Trails.trail_mark_cursor = #Trails.trail_mark_stack - 1
@@ -625,7 +643,7 @@ function Trails.update_all_trail_mark_positions()
     return api.nvim_buf_is_loaded(buf)
   end, api.nvim_list_bufs()), true)
   local ext_marks = helpers.tbl_flatmap(function(buf)
-    return { [buf] = api.nvim_buf_get_extmarks(buf, Trails.config.ns_id, 0, -1, {}) }
+    return { [buf] = api.nvim_buf_get_extmarks(buf, Trails.config.nsid, 0, -1, {}) }
   end, vim.tbl_keys(buf_list), true)
 
   for _, trail_mark in ipairs(Trails.trail_mark_stack) do
@@ -648,16 +666,25 @@ function Trails.reregister_trail_marks()
   if #Trails.trail_mark_stack <= 0 then return end
 
   local ok, hl_group
-  local last_mark_index = Trails.get_newest_mark_index_for_buf(
+  local newest_mark_index, _ = Trails.get_newest_and_oldest_mark_index_for_buf(
     Trails.default_buf_for_current_mark_select_mode(nil))
   local current_cursor_mark = Trails.trail_mark_stack[Trails.trail_mark_cursor] or
       Trails.trail_mark_stack[#Trails.trail_mark_stack]
+  local special_marks = {}
 
   for i, mark in ipairs(Trails.trail_mark_stack) do
     local pos_text = api.nvim_buf_get_lines(mark.buf, mark.pos[1] - 1, mark.pos[1], false)[1]
         :sub(mark.pos[2] + 1, mark.pos[2] + 1)
 
-    if i == last_mark_index then
+    local mark_options = {
+      id = mark.mark_id,
+      virt_text_pos = "overlay",
+      hl_mode = "combine",
+      strict = true,
+      priority = i,
+    }
+
+    if i == newest_mark_index then
       hl_group = "TrailBlazerTrailMarkNewest"
     elseif current_cursor_mark and current_cursor_mark.pos[1] == mark.pos[1]
         and current_cursor_mark.pos[2] == mark.pos[2] then
@@ -666,29 +693,56 @@ function Trails.reregister_trail_marks()
       hl_group = Trails.get_hl_group_for_current_trail_mark_select_mode()
     end
 
-    local mark_options = {
-      id = mark.mark_id,
-      virt_text = { { pos_text ~= "" and pos_text or " ", hl_group } },
-      virt_text_pos = "overlay",
-      hl_mode = "combine",
-      strict = true,
-    }
-
     if Trails.config.custom.number_line_color_enabled then
       mark_options["number_hl_group"] = hl_group .. "Inverted"
     end
 
-    if Trails.config.custom.symbol_line_enabled and i == Trails.trail_mark_cursor + 1 then
-      mark_options["sign_text"] = Trails.config.custom.next_mark_symbol;
-      mark_options["sign_hl_group"] = "TrailBlazerTrailMarkNext";
-    elseif Trails.config.custom.symbol_line_enabled and i == Trails.trail_mark_cursor - 1 then
-      mark_options["sign_text"] = Trails.config.custom.previous_mark_symbol;
-      mark_options["sign_hl_group"] = "TrailBlazerTrailMarkPrevious";
+    if Trails.config.custom.symbol_line_enabled then
+      if special_marks[mark.buf] == nil then
+        special_marks[mark.buf] = {}
+      end
+
+      if i == Trails.trail_mark_cursor + 1 then
+        mark_options["sign_text"] = Trails.config.custom.next_mark_symbol
+        mark_options["sign_hl_group"] = "TrailBlazerTrailMarkNext"
+        table.insert(special_marks[mark.buf], mark.pos[1])
+      elseif i == Trails.trail_mark_cursor - 1 then
+        mark_options["sign_text"] = Trails.config.custom.previous_mark_symbol
+        mark_options["sign_hl_group"] = "TrailBlazerTrailMarkPrevious"
+        table.insert(special_marks[mark.buf], mark.pos[1])
+      end
+
+      if i == newest_mark_index then
+        mark_options["sign_text"] = Trails.config.custom.newest_mark_symbol
+        mark_options["sign_hl_group"] = hl_group .. "Inverted"
+        table.insert(special_marks[mark.buf], mark.pos[1])
+      end
+
+      if current_cursor_mark and current_cursor_mark.pos[1] == mark.pos[1]
+          and current_cursor_mark.pos[2] == mark.pos[2] then
+        mark_options["sign_text"] = Trails.config.custom.cursor_mark_symbol
+        mark_options["sign_hl_group"] = hl_group .. "Inverted"
+        table.insert(special_marks[mark.buf], mark.pos[1])
+      end
+
+      if mark_options["sign_text"] and mark_options["sign_text"] ~= "" then
+        local count = helpers.tbl_count(function(a) return a == mark.pos[1] end,
+          special_marks[mark.buf])
+
+        if count > 1 then
+          mark_options["sign_text"] = helpers.sub(tostring(count) .. mark_options["sign_text"],
+            1, 2)
+        end
+
+        special_marks[mark.buf] = special_marks[mark.buf]
+      end
     end
 
-    pcall(api.nvim_buf_del_extmark, mark.buf, Trails.config.ns_id, mark.mark_id)
+    mark_options["virt_text"] = { { pos_text ~= "" and pos_text or " ", hl_group } }
 
-    ok, mark.mark_id, _ = pcall(api.nvim_buf_set_extmark, mark.buf, Trails.config.ns_id,
+    pcall(api.nvim_buf_del_extmark, mark.buf, Trails.config.nsid, mark.mark_id)
+
+    ok, mark.mark_id = pcall(api.nvim_buf_set_extmark, mark.buf, Trails.config.nsid,
       mark.pos[1] - 1, mark.pos[2], mark_options)
 
     if not ok then
