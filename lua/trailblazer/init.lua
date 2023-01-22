@@ -142,56 +142,56 @@ end
 ---@param pos? table<number, number>
 function TrailBlazer.new_trail_mark(win, buf, pos)
   if not TrailBlazer.is_configured() then return end
-  trails.new_trail_mark(win, helpers.get_buf_nr(buf), pos)
+  trails.actions.new_trail_mark(win, helpers.get_buf_nr(buf), pos)
 end
 
 --- Track back to the last trail mark.
 ---@param buf? number | string
 function TrailBlazer.track_back(buf)
   if not TrailBlazer.is_configured() then return end
-  trails.track_back(helpers.get_buf_nr(buf))
+  trails.actions.track_back(helpers.get_buf_nr(buf))
 end
 
 --- Peek move to the previous trail mark if sorted chronologically or up if sorted by line.
 ---@param buf? number | string
 function TrailBlazer.peek_move_previous_up(buf)
   if not TrailBlazer.is_configured() then return end
-  trails.peek_move_previous_up(helpers.get_buf_nr(buf))
+  trails.motions.peek_move_previous_up(helpers.get_buf_nr(buf))
 end
 
 --- Peek move to the next trail mark if sorted chronologically or down if sorted by line.
 ---@param buf? number | string
 function TrailBlazer.peek_move_next_down(buf)
   if not TrailBlazer.is_configured() then return end
-  trails.peek_move_next_down(helpers.get_buf_nr(buf))
+  trails.motions.peek_move_next_down(helpers.get_buf_nr(buf))
 end
 
 --- Delete all trail marks from all or a specific buffer.
 ---@param buf? number | string
 function TrailBlazer.delete_all_trail_marks(buf)
   if not TrailBlazer.is_configured() then return end
-  trails.delete_all_trail_marks(helpers.get_buf_nr(buf))
+  trails.actions.delete_all_trail_marks(helpers.get_buf_nr(buf))
 end
 
 --- Paste the selected register contents at the last trail mark of all or a specific buffer.
 ---@param buf? number | string
 function TrailBlazer.paste_at_last_trail_mark(buf)
   if not TrailBlazer.is_configured() then return end
-  trails.paste_at_last_trail_mark(helpers.get_buf_nr(buf))
+  trails.actions.paste_at_last_trail_mark(helpers.get_buf_nr(buf))
 end
 
 --- Paste the selected register contents at all trail marks of all or a specific buffer.
 ---@param buf? number | string
 function TrailBlazer.paste_at_all_trail_marks(buf)
   if not TrailBlazer.is_configured() then return end
-  trails.paste_at_all_trail_marks(helpers.get_buf_nr(buf))
+  trails.actions.paste_at_all_trail_marks(helpers.get_buf_nr(buf))
 end
 
 --- Set the trail mark selection mode to the given mode or toggle between the available modes.
 ---@param mode any
 function TrailBlazer.set_trail_mark_select_mode(mode)
   if not TrailBlazer.is_configured() then return end
-  trails.set_trail_mark_select_mode(mode)
+  trails.actions.set_trail_mark_select_mode(mode)
 end
 
 --- Check if TrailBlazer is configured.
@@ -205,5 +205,3 @@ function TrailBlazer.is_configured()
 end
 
 return TrailBlazer
-
--- TODO: Trail mark preview on top and bottom of buffer with marks that are out of view (Preview the next x jumps)
