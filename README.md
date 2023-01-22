@@ -91,6 +91,7 @@ available and set by default:
         current_cursor_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         next_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         previous_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
+        multiple_mark_symbol_counters_enabled = true,
         number_line_color_enabled = true,
         symbol_line_enabled = true,
     },
@@ -203,9 +204,10 @@ cursor position. As soon as multiple mark symbols would be displayed in the same
 one will be shown as well as the total number of mark symbols within that line that. You can set all
 mark symbols to any **one** character you like. If you set it to more than one character, the second
 one will be cut off as soon as multiple marks are displayed in the same line and the number of marks
-will be shown as the first character instead. There can only be **two** characters displayed in the
-symbol line at all times. If you set any mark symbol to an empty string (i.e. `""`), it will be
-disabled. All mark symbols can be styled through their respective highlight groups. 
+will be shown as the first character if `multiple_mark_symbol_counters_enabled = true`. There can
+only be **two** characters displayed in the symbol line at all times. If you set any mark symbol to
+an empty string (i.e. `""`), it will be disabled. All mark symbols can be styled through their
+respective highlight groups. 
 
 ## 💻 User commands
 
