@@ -72,6 +72,17 @@ Helpers.tbl_reverse({tbl})                                 *Helpers.tbl_reverse*
         (table)
 
 
+Helpers.tbl_count({lambda}, {tbl})                           *Helpers.tbl_count*
+     Returns the number of items that match the supplied predicate.
+
+    Parameters: ~
+        {lambda}  (function)
+        {tbl}     (table)
+
+    Returns: ~
+        (integer)
+
+
 Helpers.dedupe({tbl}, {action?})                                *Helpers.dedupe*
 
     Parameters: ~
@@ -80,6 +91,19 @@ Helpers.dedupe({tbl}, {action?})                                *Helpers.dedupe*
 
     Returns: ~
         (table)
+
+
+Helpers.sub({s}, {i}, {j})                                         *Helpers.sub*
+     Returns the substring of s that starts at `i` and continues until `j` taking unicode and utf-8
+     double length chars into account.
+
+    Parameters: ~
+        {s}  (string)
+        {i}  (number)
+        {j}  (number)
+
+    Returns: ~
+        (string)
 
 
                                                                     *highlights*
@@ -118,6 +142,9 @@ Highlights.register({user_table}, {generate_inverted?})
         {generate_inverted?}  (boolean)                             @return table<string>
 
 
+Highlights.register_hl_groups()                  *Highlights.register_hl_groups*
+
+
                                                              *Highlights.invert*
 Highlights.invert({hl_table}, {remove_bg?})
      Generate FG/BG inverted highlight groups.
@@ -128,9 +155,6 @@ Highlights.invert({hl_table}, {remove_bg?})
 
     Returns: ~
         (table)
-
-
-Highlights.register_hl_groups()                  *Highlights.register_hl_groups*
 
 
                                              *Highlights.generate_group_strings*
@@ -238,8 +262,8 @@ Trails.track_back({buf?})                                    *Trails.track_back*
         (boolean)
 
 
-Trails.peek_move_next_up({buf?})                      *Trails.peek_move_next_up*
-     Peek move to the next trail mark if sorted chronologically or up if sorted by line.
+Trails.peek_move_previous_up({buf?})              *Trails.peek_move_previous_up*
+     Peek move to the previous trail mark if sorted chronologically or up if sorted by line.
 
     Parameters: ~
         {buf?}  (number)
@@ -248,8 +272,8 @@ Trails.peek_move_next_up({buf?})                      *Trails.peek_move_next_up*
         (boolean)
 
 
-Trails.peek_move_previous_down({buf?})          *Trails.peek_move_previous_down*
-     Peek move to the previous trail mark if sorted chronologically or down if sorted by line.
+Trails.peek_move_next_down({buf?})                  *Trails.peek_move_next_down*
+     Peek move to the next trail mark if sorted chronologically or down if sorted by line.
 
     Parameters: ~
         {buf?}  (number)
@@ -302,18 +326,18 @@ Trails.set_trail_mark_select_mode({mode?})
         {mode?}  (string)
 
 
-                                                *Trails.set_cursor_to_next_mark*
-Trails.set_cursor_to_next_mark({buf?}, {current_mark_index?})
-     Set the cursor to the next trail mark.
+                                            *Trails.set_cursor_to_previous_mark*
+Trails.set_cursor_to_previous_mark({buf?}, {current_mark_index?})
+     Set the cursor to the previous trail mark.
 
     Parameters: ~
         {buf?}                 (number)
         {current_mark_index?}  (number)
 
 
-                                            *Trails.set_cursor_to_previous_mark*
-Trails.set_cursor_to_previous_mark({buf?}, {current_mark_index?})
-     Set the cursor to the previous trail mark.
+                                                *Trails.set_cursor_to_next_mark*
+Trails.set_cursor_to_next_mark({buf?}, {current_mark_index?})
+     Set the cursor to the next trail mark.
 
     Parameters: ~
         {buf?}                 (number)
@@ -365,22 +389,23 @@ Trails.get_trail_mark_under_cursor({win?}, {buf?}, {pos?})
 
 
                                          *Trails.get_marks_for_trail_mark_index*
-Trails.get_marks_for_trail_mark_index({buf?}, {last_mark_index?})
+Trails.get_marks_for_trail_mark_index({buf?}, {newest_mark_index?})
      Return the trail mark at the given position as well as the corresponding extmark.
 
     Parameters: ~
-        {buf?}              (number)
-        {last_mark_index?}  (number)  @return number?
-                                      @return table?
-                                      @return table?
+        {buf?}                (number)
+        {newest_mark_index?}  (number)  @return number?
+                                        @return table?
+                                        @return table?
 
 
-                                          *Trails.get_newest_mark_index_for_buf*
-Trails.get_newest_mark_index_for_buf({buf?})
-     Find the newest trail mark in the stack that belongs to the given buffer.
+                               *Trails.get_newest_and_oldest_mark_index_for_buf*
+Trails.get_newest_and_oldest_mark_index_for_buf({buf?})
+     Find the newest and oldest trail mark in the stack that belongs to the given buffer.
 
     Parameters: ~
         {buf?}  (number)  @return number?
+                          @return number?
 
 
                                           *Trails.get_relative_marks_and_cursor*
@@ -408,12 +433,13 @@ Trails.get_hl_group_for_current_trail_mark_select_mode({mode?})
         (string)
 
 
-                 *Trails.translate_acutal_cursor_from_relative_marks_and_cursor*
-Trails.translate_acutal_cursor_from_relative_marks_and_cursor({marks}, {cursor})
+                 *Trails.translate_actual_cursor_from_relative_marks_and_cursor*
+Trails.translate_actual_cursor_from_relative_marks_and_cursor({buf?}, {marks}, {cursor})
      Translate a relative cursor position within the provided marks selection to the absolute
      cursor position within the trail mark stack.
 
     Parameters: ~
+        {buf?}    (number)
         {marks}   (table)
         {cursor}  (number)
 
