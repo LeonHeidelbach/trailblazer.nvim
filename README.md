@@ -88,7 +88,7 @@ available and set by default:
         current_trail_mark_mode = "global_chron",
         verbose_trail_mark_select = true, -- print current mode notification on mode change
         newest_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
-        current_cursor_symbol = "⬤", -- disable this mark symbol by setting its value to ""
+        cursor_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         next_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         previous_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         multiple_mark_symbol_counters_enabled = true,
