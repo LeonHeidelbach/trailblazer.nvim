@@ -501,7 +501,8 @@ function Common.reregister_trail_marks()
         table.insert(special_marks[mark.buf], mark.pos[1])
       end
 
-      if mark_options["sign_text"] and mark_options["sign_text"] ~= "" then
+      if config.custom.multiple_mark_symbol_counters_enabled and mark_options["sign_text"]
+          and mark_options["sign_text"] ~= "" then
         local count = helpers.tbl_count(function(a) return a == mark.pos[1] end,
           special_marks[mark.buf])
 

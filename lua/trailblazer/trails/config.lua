@@ -26,6 +26,7 @@ Config.custom.newest_mark_symbol = "⬤"
 Config.custom.cursor_mark_symbol = "⬤"
 Config.custom.next_mark_symbol = "⬤"
 Config.custom.previous_mark_symbol = "⬤"
+Config.custom.multiple_mark_symbol_counters_enabled = true
 Config.custom.number_line_color_enabled = true
 Config.custom.symbol_line_enabled = true
 

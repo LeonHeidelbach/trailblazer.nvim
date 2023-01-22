@@ -40,6 +40,7 @@ local function set_defaults(opts)
       cursor_mark_symbol = "⬤",
       next_mark_symbol = "⬤",
       previous_mark_symbol = "⬤",
+      multiple_mark_symbol_counters_enabled = true,
       number_line_color_enabled = true,
       symbol_line_enabled = true,
     },
