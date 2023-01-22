@@ -105,6 +105,20 @@ function Helpers.tbl_reverse(tbl)
   return result
 end
 
+--- Returns the number of items that match the supplied predicate.
+---@param lambda function
+---@param tbl table
+---@return integer
+function Helpers.tbl_count(lambda, tbl)
+  local counter = 0
+  for _, v in ipairs(tbl) do
+    if lambda(v) then
+      counter = counter + 1
+    end
+  end
+  return counter
+end
+
 --- Remove duplicates from the supplied table using the supplied predicate and calling the
 --- optionally supplied action on each duplicate.
 ---@param lambda function<any> @return function
@@ -121,6 +135,29 @@ function Helpers.dedupe(lambda, tbl, action)
     end
   end
   return res
+end
+
+--- Returns the substring of s that starts at `i` and continues until `j` taking unicode and utf-8
+--- double length chars into account.
+---@param s string
+---@param i number
+---@param j number
+---@return string
+function Helpers.sub(s, i, j)
+  local length = vim.str_utfindex(s)
+
+  if i < 0 then i = i + length + 1 end
+  if (j and j < 0) then j = j + length + 1 end
+
+  local u = (i > 0) and i or 1
+  local v = (j and j <= length) and j or length
+
+  if (u > v) then return "" end
+
+  local str = vim.str_byteindex(s, u - 1)
+  local e = vim.str_byteindex(s, v)
+
+  return s:sub(str + 1, e)
 end
 
 return Helpers
