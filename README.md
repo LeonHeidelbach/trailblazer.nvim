@@ -87,6 +87,8 @@ available and set by default:
         -- buffer_local_chron, buffer_local_line_sorted
         current_trail_mark_mode = "global_chron",
         verbose_trail_mark_select = true, -- print current mode notification on mode change
+        newest_mark_symbol = "⬤",
+        current_cursor_symbol = "⬤",
         next_mark_symbol = "⬤",
         previous_mark_symbol = "⬤",
         number_line_color_enabled = true,
@@ -119,12 +121,12 @@ available and set by default:
     hl_groups = {
         TrailBlazerTrailMarkNext = {
             -- You can add any valid highlight group attribute to this table
-            guifg = "Red",
+            guifg = "Green",
             guibg = "none",
             gui = "bold",
         },
         TrailBlazerTrailMarkPrevious = {
-            guifg = "Green",
+            guifg = "Red",
             guibg = "none",
             gui = "bold",
         },
