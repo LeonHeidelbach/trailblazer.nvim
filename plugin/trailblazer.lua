@@ -33,12 +33,12 @@ api.nvim_create_user_command("TrailBlazerNewTrailMark",
 api.nvim_create_user_command("TrailBlazerTrackBack", function(args) tb.track_back(args.args) end,
   { nargs = "?", complete = "buffer" })
 
-api.nvim_create_user_command("TrailBlazerPeekMoveForward", function(args)
-  tb.peek_move_next_up(args.args)
+api.nvim_create_user_command("TrailBlazerPeekMovePreviousUp", function(args)
+  tb.peek_move_previous_up(args.args)
 end, { nargs = "?", complete = "buffer" })
 
-api.nvim_create_user_command("TrailBlazerPeekMoveBackward", function(args)
-  tb.peek_move_previous_down(args.args)
+api.nvim_create_user_command("TrailBlazerPeekMoveNextDown", function(args)
+  tb.peek_move_next_down(args.args)
 end, { nargs = "?", complete = "buffer" })
 
 api.nvim_create_user_command("TrailBlazerDeleteAllTrailMarks", function(args)

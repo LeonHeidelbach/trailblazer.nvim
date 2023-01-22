@@ -48,8 +48,8 @@ local function set_defaults(opts)
         motions = {
           new_trail_mark = '<A-l>',
           track_back = '<A-b>',
-          peek_move_previous_down = '<A-J>',
-          peek_move_next_up = '<A-K>',
+          peek_move_next_down = '<A-J>',
+          peek_move_previous_up = '<A-K>',
           -- open_trail_mark_list = '<A-m>',
         },
         actions = {
@@ -152,18 +152,18 @@ function TrailBlazer.track_back(buf)
   trails.track_back(helpers.get_buf_nr(buf))
 end
 
---- Peek move to the next trail mark if sorted chronologically or up if sorted by line.
+--- Peek move to the previous trail mark if sorted chronologically or up if sorted by line.
 ---@param buf? number | string
-function TrailBlazer.peek_move_next_up(buf)
+function TrailBlazer.peek_move_previous_up(buf)
   if not TrailBlazer.is_configured() then return end
-  trails.peek_move_next_up(helpers.get_buf_nr(buf))
+  trails.peek_move_previous_up(helpers.get_buf_nr(buf))
 end
 
---- Peek move to the previous trail mark if sorted chronologically or down if sorted by line.
+--- Peek move to the next trail mark if sorted chronologically or down if sorted by line.
 ---@param buf? number | string
-function TrailBlazer.peek_move_previous_down(buf)
+function TrailBlazer.peek_move_next_down(buf)
   if not TrailBlazer.is_configured() then return end
-  trails.peek_move_previous_down(helpers.get_buf_nr(buf))
+  trails.peek_move_next_down(helpers.get_buf_nr(buf))
 end
 
 --- Delete all trail marks from all or a specific buffer.

@@ -129,28 +129,28 @@ function Trails.track_back(buf)
   return false
 end
 
---- Peek move to the next trail mark if sorted chronologically or up if sorted by line.
+--- Peek move to the previous trail mark if sorted chronologically or up if sorted by line.
 ---@param buf? number
 ---@return boolean
-function Trails.peek_move_next_up(buf)
-  local current_mark_index, _ = Trails.get_trail_mark_under_cursor()
-
-  buf = Trails.default_buf_for_current_mark_select_mode(buf)
-
-  Trails.set_cursor_to_next_mark(buf, current_mark_index)
-
-  return Trails.focus_win_and_buf_by_trail_mark_index(buf, Trails.trail_mark_cursor, false)
-end
-
---- Peek move to the previous trail mark if sorted chronologically or down if sorted by line.
----@param buf? number
----@return boolean
-function Trails.peek_move_previous_down(buf)
+function Trails.peek_move_previous_up(buf)
   local current_mark_index, _ = Trails.get_trail_mark_under_cursor()
 
   buf = Trails.default_buf_for_current_mark_select_mode(buf)
 
   Trails.set_cursor_to_previous_mark(buf, current_mark_index)
+
+  return Trails.focus_win_and_buf_by_trail_mark_index(buf, Trails.trail_mark_cursor, false)
+end
+
+--- Peek move to the next trail mark if sorted chronologically or down if sorted by line.
+---@param buf? number
+---@return boolean
+function Trails.peek_move_next_down(buf)
+  local current_mark_index, _ = Trails.get_trail_mark_under_cursor()
+
+  buf = Trails.default_buf_for_current_mark_select_mode(buf)
+
+  Trails.set_cursor_to_next_mark(buf, current_mark_index)
 
   return Trails.focus_win_and_buf_by_trail_mark_index(buf, Trails.trail_mark_cursor, false)
 end
@@ -268,19 +268,6 @@ function Trails.set_trail_mark_select_mode(mode)
   end
 end
 
---- Set the cursor to the next trail mark.
----@param buf? number
----@param current_mark_index? number
-function Trails.set_cursor_to_next_mark(buf, current_mark_index)
-  local marks, cursor = Trails.get_relative_marks_and_cursor(buf, current_mark_index)
-
-  if current_mark_index and current_mark_index == Trails.trail_mark_cursor then
-    cursor = cursor + 1 <= #marks and cursor + 1 or #marks
-  end
-
-  Trails.translate_actual_cursor_from_relative_marks_and_cursor(buf, marks, cursor)
-end
-
 --- Set the cursor to the previous trail mark.
 ---@param buf? number
 ---@param current_mark_index? number
@@ -289,6 +276,19 @@ function Trails.set_cursor_to_previous_mark(buf, current_mark_index)
 
   if current_mark_index and current_mark_index == Trails.trail_mark_cursor then
     cursor = cursor > 1 and cursor - 1 or #marks > 0 and 1 or 0
+  end
+
+  Trails.translate_actual_cursor_from_relative_marks_and_cursor(buf, marks, cursor)
+end
+
+--- Set the cursor to the next trail mark.
+---@param buf? number
+---@param current_mark_index? number
+function Trails.set_cursor_to_next_mark(buf, current_mark_index)
+  local marks, cursor = Trails.get_relative_marks_and_cursor(buf, current_mark_index)
+
+  if current_mark_index and current_mark_index == Trails.trail_mark_cursor then
+    cursor = cursor + 1 <= #marks and cursor + 1 or #marks
   end
 
   Trails.translate_actual_cursor_from_relative_marks_and_cursor(buf, marks, cursor)
@@ -309,9 +309,9 @@ function Trails.sort_trail_mark_stack(mode)
     table.sort(Trails.trail_mark_stack, function(a, b)
       if a.buf == b.buf then
         if a.pos[1] == b.pos[1] then
-          return a.pos[2] > b.pos[2]
+          return a.pos[2] < b.pos[2]
         else
-          return a.pos[1] > b.pos[1]
+          return a.pos[1] < b.pos[1]
         end
       else
         return a.buf < b.buf
@@ -327,7 +327,7 @@ function Trails.sort_trail_mark_stack(mode)
     end)
 
     table.sort(Trails.trail_mark_stack, function(a, b)
-      return a.pos[1] > b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] > b.pos[2])
+      return a.pos[1] < b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] < b.pos[2])
     end)
   elseif mode == "global_chron_buf_switch_group_chron" or
       mode == "global_chron_buf_switch_group_line_sorted" then
@@ -338,7 +338,7 @@ function Trails.sort_trail_mark_stack(mode)
 
     local function sort_current_subset_and_insert()
       table.sort(current_subset, function(a, b)
-        return a.pos[1] > b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] > b.pos[2])
+        return a.pos[1] < b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] < b.pos[2])
       end)
       if mode == "global_chron_buf_switch_group_chron" then
         table.insert(ordered_trail_mark_subsets, 1, current_subset)
@@ -349,7 +349,7 @@ function Trails.sort_trail_mark_stack(mode)
     end
 
     table.sort(Trails.trail_mark_stack, function(a, b)
-      return a.timestamp < b.timestamp
+      return a.timestamp > b.timestamp
     end)
 
     for _, mark in ipairs(Trails.trail_mark_stack) do
@@ -369,8 +369,8 @@ function Trails.sort_trail_mark_stack(mode)
     if mode == "global_chron_buf_switch_group_line_sorted" then
       table.sort(ordered_trail_mark_subsets, function(a, b)
         if a[1].buf == b[1].buf then
-          return a[1].pos[1] > b[1].pos[1] or (a[1].pos[1] == b[1].pos[1]
-              and a[1].pos[2] > b[1].pos[2])
+          return a[1].pos[1] < b[1].pos[1] or (a[1].pos[1] == b[1].pos[1]
+              and a[1].pos[2] < b[1].pos[2])
         end
         return false
       end)
@@ -392,7 +392,7 @@ function Trails.sort_trail_mark_stack(mode)
   elseif mode == "buffer_local_line_sorted" then
     table.sort(Trails.trail_mark_stack, function(a, b)
       if a.buf == b.buf then
-        return a.pos[1] > b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] > b.pos[2])
+        return a.pos[1] < b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] < b.pos[2])
       else
         return a.buf < b.buf
       end
@@ -739,8 +739,6 @@ function Trails.reregister_trail_marks()
     end
 
     mark_options["virt_text"] = { { pos_text ~= "" and pos_text or " ", hl_group } }
-
-    pcall(api.nvim_buf_del_extmark, mark.buf, Trails.config.nsid, mark.mark_id)
 
     ok, mark.mark_id = pcall(api.nvim_buf_set_extmark, mark.buf, Trails.config.nsid,
       mark.pos[1] - 1, mark.pos[2], mark_options)
