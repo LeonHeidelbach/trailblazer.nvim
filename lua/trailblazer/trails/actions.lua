@@ -53,8 +53,7 @@ function Actions.new_trail_mark(win, buf, pos)
     return nil
   end
 
-  local pos_text = api.nvim_buf_get_lines(current_buf, current_cursor[1] - 1, current_cursor[1],
-    false)[1]
+  local pos_text = helpers.get_utf8_char_under_cursor(current_buf, current_cursor)
 
   if not pos_text then
     log.error("invalid_pos_for_buf_lines")

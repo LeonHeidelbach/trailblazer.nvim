@@ -160,4 +160,43 @@ function Helpers.sub(s, i, j)
   return s:sub(str + 1, e)
 end
 
+--- Returns the character under provided cursor position. This function will return the correct
+--- character as long as it has a maximum width of 4 bytes as per the utf-8 standard.
+---@param buf number
+---@param cursor table
+---@return string
+function Helpers.get_utf8_char_under_cursor(buf, cursor)
+  local line = api.nvim_buf_get_lines(buf, cursor[1] - 1, cursor[1], false)[1]
+  local col = vim.str_utfindex(line:sub(1, cursor[2])) + 1
+
+  local char = ""
+  local i = 1
+
+  while i <= #line do
+    local byte = line:byte(i)
+
+    if byte >= 240 then
+      char = line:sub(i, i + 3)
+      i = i + 4
+    elseif byte >= 225 then
+      char = line:sub(i, i + 2)
+      i = i + 3
+    elseif byte >= 192 then
+      char = line:sub(i, i + 1)
+      i = i + 2
+    else
+      char = line:sub(i, i)
+      i = i + 1
+    end
+
+    if col == 1 then
+      return char
+    end
+
+    col = col - 1
+  end
+
+  return ""
+end
+
 return Helpers
