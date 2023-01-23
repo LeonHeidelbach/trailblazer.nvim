@@ -169,7 +169,7 @@ function Helpers.get_utf8_char_under_cursor(buf, cursor)
   local line = api.nvim_buf_get_lines(buf, cursor[1] - 1, cursor[1], false)[1]
   local col = vim.str_utfindex(line:sub(1, cursor[2])) + 1
 
-  local char = ""
+  local char
   local i = 1
 
   while i <= #line do
