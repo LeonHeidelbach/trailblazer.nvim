@@ -106,14 +106,14 @@ Helpers.sub({s}, {i}, {j})                                         *Helpers.sub*
         (string)
 
 
-                                            *Helpers.get_utf8_char_under_cursor*
-Helpers.get_utf8_char_under_cursor({buf}, {cursor})
-     Returns the character under provided cursor position. This function will return the correct
-     character as long as it has a maximum width of 4 bytes as per the utf-8 standard.
+                                              *Helpers.buf_get_utf8_char_at_pos*
+Helpers.buf_get_utf8_char_at_pos({buf}, {pos})
+     Returns the character at the provided position. This function will return the correct value as
+     long as the character has a maximum width of 4 bytes as per the utf-8 standard.
 
     Parameters: ~
-        {buf}     (number)
-        {cursor}  (table)
+        {buf}  (number)
+        {pos}  (table<number,number>)
 
     Returns: ~
         (string)

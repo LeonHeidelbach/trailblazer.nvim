@@ -53,7 +53,7 @@ function Actions.new_trail_mark(win, buf, pos)
     return nil
   end
 
-  local pos_text = helpers.get_utf8_char_under_cursor(current_buf, current_cursor)
+  local pos_text = helpers.buf_get_utf8_char_at_pos(current_buf, current_cursor)
 
   if not pos_text then
     log.error("invalid_pos_for_buf_lines")

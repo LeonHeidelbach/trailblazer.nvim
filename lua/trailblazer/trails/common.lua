@@ -449,7 +449,7 @@ function Common.reregister_trail_marks()
   local special_marks = {}
 
   for i, mark in ipairs(Common.trail_mark_stack) do
-    local pos_text = helpers.get_utf8_char_under_cursor(mark.buf, mark.pos)
+    local pos_text = helpers.buf_get_utf8_char_at_pos(mark.buf, mark.pos)
 
     local mark_options = {
       id = mark.mark_id,
