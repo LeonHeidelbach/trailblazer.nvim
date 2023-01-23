@@ -44,11 +44,19 @@ function Actions.new_trail_mark(win, buf, pos)
 
   local current_win = win or api.nvim_get_current_win()
   local current_buf = buf or api.nvim_get_current_buf()
-  local current_cursor = pos or api.nvim_win_get_cursor(current_win)
+  local current_cursor = (not pos or vim.tbl_isempty(pos)) and
+      api.nvim_win_get_cursor(current_win) or pos
+
+  if not current_win or not current_buf or not current_cursor or not current_cursor[1]
+      or not current_cursor[2] then
+    log.error("invalid_pos_for_new_trail_mark")
+    return nil
+  end
+
   local pos_text = api.nvim_buf_get_lines(current_buf, current_cursor[1] - 1, current_cursor[1],
     false)[1]
 
-  if not pos_text or not current_cursor[1] or not current_cursor[2] then
+  if not pos_text then
     log.error("invalid_pos_for_buf_lines")
     return nil
   end
