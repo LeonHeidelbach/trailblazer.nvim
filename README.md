@@ -29,20 +29,20 @@ to come. If you have any suggestions or find any bugs, please open an issue.**
 ## Contents
 
 * [TrailBlazer](#trailblazer.nvim-⛺🌳)
-    * [❓ Why Does TrailBlazer Exist?](#❓-why-does-trailblazer-exist%3F)
-    * [🔥 How To Properly Blaze The Trail](#🔥-how-to-properly-blaze-the-trail)
-    * [🔨 Requirements](#🔨-requirements)
-    * [📦 Installation](#📦-installation)
-    * [⚙️ Configuration](#⚙️-configuration)
+    * [❓ Why Does TrailBlazer Exist?](#-why-does-trailblazer-exist)
+    * [🔥 How To Properly Blaze The Trail](#-how-to-properly-blaze-the-trail)
+    * [🔨 Requirements](#-requirements)
+    * [📦 Installation](#-installation)
+    * [⚙️ Configuration](#%EF%B8%8F-configuration)
         * [Trail Mark Selection Modes](#trail-mark-selection-modes)
         * [Trail Mark Symbols](#trail-mark-symbols)
             * [Multiple Mark Symbol Counters](#multiple-mark-symbol-counters)
-    * [💻 User commands](#💻-user-commands)
-    * [📚 Documentation](#📚-documentation)
-    * [👥 Contributing](#👥-contributing)
+    * [💻 User commands](#-user-commands)
+    * [📚 Documentation](#-documentation)
+    * [👥 Contributing](#-contributing)
         * [Linting](#linting)
         * [Testing](#testing)
-    * [💬 Feedback](#💬-feedback)
+    * [💬 Feedback](#-feedback)
 
 ## ❓ Why Does TrailBlazer Exist?
 
