@@ -5,8 +5,6 @@
 TrailBlazer enables you to seemlessly move through important project marks as quickly and
 efficiently as possible to make your workflow *blazingly fast ™*.
 
-![showcase][showcase]
-
 <figure>
     <blockquote>
         <p>
@@ -17,11 +15,36 @@ efficiently as possible to make your workflow *blazingly fast ™*.
         <p style="font-size:11pt;text-align:right;">
             — Abraham Lincoln, <cite>November 19th 1863</cite>
         </p>
-    </blockquote>
+        </blockquote>
 </figure>
 
 Do not blindly believe any quote on the internet, even though the one above is most certainly
 accurate.
+
+![showcase][showcase]
+
+**NOTE: TrailBlazer is still in its early stages of development and there are still many features
+to come. If you have any suggestions or find any bugs, please open an issue.**
+
+## Contents
+
+* [TrailBlazer](#trailblazer.nvim-⛺🌳)
+    * [❓ Why Does TrailBlazer Exist?](#❓-why-does-trailblazer-exist%3F)
+    * [🔥 How To Properly Blaze The Trail](#🔥-how-to-properly-blaze-the-trail)
+    * [🔨 Requirements](#🔨-requirements)
+    * [📦 Installation](#📦-installation)
+    * [⚙️ Configuration](#⚙️-configuration)
+        * [Trail Mark Selection Modes](#trail-mark-selection-modes)
+        * [Trail Mark Symbols](#trail-mark-symbols)
+            * [Multiple Mark Symbol Counters](#multiple-mark-symbol-counters)
+    * [💻 User commands](#💻-user-commands)
+    * [📚 Documentation](#📚-documentation)
+    * [👥 Contributing](#👥-contributing)
+        * [Linting](#linting)
+        * [Testing](#testing)
+    * [💬 Feedback](#💬-feedback)
+
+## ❓ Why Does TrailBlazer Exist?
 
 Navigating back and forth between multiple very specific points of interest in one or more files
 spread over several windows can be a rather difficult task. Most of the time those spots are either
@@ -35,8 +58,23 @@ Quickly move along the trail you mark as you journey through your project and st
 you left of right away whenever you need to. You can even use several immediate actions on your
 trail marks that allow you to be even more efficient.
 
-**NOTE: TrailBlazer is still in its early stages of development and there are still many features 
-to come. If you have any suggestions or find any bugs, please open an issue.**
+## 🔥 How To Properly Blaze The Trail
+
+You could just use TrailBlazer trail marks as you would normal Neovim marks, but with a few
+optimalizations to make your workflow more efficient. The real power of this plugin however, lies
+within its ability to quickly create and consume trail marks from the stack as you edit your code.
+This enables you to quickly "bookmark" where you are right now, naviagte to wherever you need to and
+come back by simply popping the last mark off the stack using the "track back" feature. This is
+especially useful when you need to quickly jump to a specific location in a different file or window
+and return afterwards without the need for a permanent mark. The length of these short lived trails
+is completely up to you and you can even go back to an ealier mark, do whatever you need to do and
+track back to your "bookmarked" location from there. The "track back" feature always brings you back
+to the last mark you left and consumes it from the stack. As a common use case for a feature like
+this is to quickly copy and paste something from one spot to another, TrailBlazer gives you several
+builtin stack actions like "paste at the newest trail mark" to quickly paste whatever contents you
+yanked into any Neovim register at the last trail mark and consume it. You can also do the same
+thing for all trail marks by using the "paste at all trail marks" action. As TrailBlazer continues
+to be developed, more actions will be added to enable you to be even more efficient.
 
 ## 🔨 Requirements
 
@@ -196,18 +234,47 @@ default all modes are enabled. Thus far you can choose between the following mod
 | `buffer_local_chron`                        | Only current buffer marks are traversed chronologically.                                                                                                                            |
 | `buffer_local_line_sorted`                  | Only current buffer marks are traversed from BOF to EOF.                                                                                                                            |
 
-### Mark symbols
+### Trail Mark symbols
+
+There are a total of four different mark symbols in TrailBlazer that can be customized to your
+liking:
+
+1. The „Newest Mark“ symbol
+2. The „Current Cursor“ symbol
+3. The „Next Mark“ symbol
+4. The „Previous Mark“ symbol
 
 Mark symbols allow you to see at a glance which of your marks is the newest, where the current mark
-cursor is located and which mark is the next or previous to be traversed from the current mark
-cursor position. As soon as multiple mark symbols would be displayed in the same line, only the last
-one will be shown as well as the total number of mark symbols within that line that. You can set all
-mark symbols to any **one** character you like. If you set it to more than one character, the second
-one will be cut off as soon as multiple marks are displayed in the same line and the number of marks
-will be shown as the first character if `multiple_mark_symbol_counters_enabled = true`. There can
-only be **two** characters displayed in the symbol line at all times. If you set any mark symbol to
-an empty string (i.e. `""`), it will be disabled. All mark symbols can be styled through their
-respective highlight groups. 
+cursor is located and which mark is the next or previous to be traversed from the current cursor
+position within the trail mark stack. As soon as multiple mark symbols would be displayed in the
+same line of the sign column, only the last one in the stack, depending on the current sorting of
+the stack, will be shown. You can set all mark symbols to any **one** or **two** characters you
+like. There can only be a maximum of **two** characters displayed in the sign column at all times,
+which is a limitation of the Neovim API. If you set any mark symbol to an empty string (i.e. `""`),
+it will be disabled. All mark symbols can be styled through their respective highlight groups.
+
+#### Multiple Mark Symbol Counters
+
+This section is dedicated to the configuration table setting `multiple_mark_symbol_counters_enabled`
+which might be a bit confusing at the beginning. As explained in the section above, there are four
+types of mark symbols. As soon as there would be multiple mark symbols shown in the same sign column
+of a line, with this setting enabled only the last one in the stack will be shown, but now the
+number of mark symbols that are currently located within that line will be shown as the leading
+character in the sign column. This will give you a better notion of where the different mark symbols
+are roughly located even if they are not currently visible in the sign column. With four possible
+symbols that can be displayed in the sign column, the highest possible number that will be shown
+next to your mark symbol is `4`, if all of the above mark symbols are located on the same line.
+
+##### Let's give you an example of how this works:
+
+As soon as you create a new trail mark it will by default have two of the above symbols, the „Newest
+Mark“ symbol and the „Current Cursor“ symbol set to the same line, so you will have the number `2`
+visible next to your mark symbol. If you now place a new mark right next to the first one, we
+already have three of the possible symbols in the same line as the "Previous Mark" symbol would now
+be added to the line changing the displayed number to `3`. If you now add a third mark to the same
+line and peek move back to the trail mark before, we have the maximum number of four symbols in the
+same line as now the "Next Mark" symbol would also be added to the sign column changing the
+displayed number to `4`.
 
 ## 💻 User commands
 
