@@ -1,7 +1,7 @@
 ---@author: Leon Heidelbach 22.01.2023
 ---@version: 1.0
 ---@license: MIT
----@tag init
+---@tag trails.actions
 ---@mod trailblazer.trails.actions
 ---@brief [[
 --- This module is responsible for managing TrailBlazer trail actions.

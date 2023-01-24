@@ -1,7 +1,7 @@
 ---@author: Leon Heidelbach 22.01.2023
 ---@version: 1.0
 ---@license: MIT
----@tag init
+---@tag trails.config
 ---@mod trailblazer.trails.config
 ---@brief [[
 --- This module is responsible for managing the configuration of TrailBlazer trails.

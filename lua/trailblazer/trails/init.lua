@@ -1,7 +1,7 @@
 ---@author: Leon Heidelbach 10.01.2023
 ---@version: 1.0
 ---@license: MIT
----@tag init
+---@tag trails.init
 ---@mod trailblazer.trails
 ---@brief [[
 --- This module is responsible setting up the trails module.

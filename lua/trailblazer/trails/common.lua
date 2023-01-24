@@ -1,7 +1,7 @@
 ---@author: Leon Heidelbach 22.01.2023
 ---@version: 1.0
 ---@license: MIT
----@tag init
+---@tag trails.common
 ---@mod trailblazer.trails.common
 ---@brief [[
 --- This module is responsible for managing trails common functionality and runtime state.
