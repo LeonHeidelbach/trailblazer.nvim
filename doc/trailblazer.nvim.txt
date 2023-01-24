@@ -327,7 +327,7 @@ Log.error({name}, {additional_info?})                                *Log.error*
         {additional_info?}  (string)
 
 
-                                                                          *init*
+                                                                *trails.actions*
 ==============================================================================
                                                     *trailblazer.trails.actions*
 
@@ -385,7 +385,7 @@ Actions.set_trail_mark_select_mode({mode?})
         {mode?}  (string)
 
 
-                                                                          *init*
+                                                                 *trails.common*
 ==============================================================================
                                                      *trailblazer.trails.common*
 
@@ -546,7 +546,7 @@ Common.reregister_trail_marks()                  *Common.reregister_trail_marks*
      buffer range.
 
 
-                                                                          *init*
+                                                                 *trails.config*
 ==============================================================================
                                                      *trailblazer.trails.config*
 
@@ -559,7 +559,7 @@ Config.setup({options?})                                          *Config.setup*
         {options?}  (table)
 
 
-                                                                          *init*
+                                                                   *trails.init*
 ==============================================================================
                                                             *trailblazer.trails*
 
@@ -572,7 +572,7 @@ Trails.setup({options?})                                          *Trails.setup*
         {options?}  (table)
 
 
-                                                                          *init*
+                                                                *trails.motions*
 ==============================================================================
                                                     *trailblazer.trails.motions*
 
