@@ -26,13 +26,17 @@ Config.custom.available_trail_mark_lists = {
 }
 Config.custom.current_trail_mark_list_type = "quickfix"
 Config.custom.verbose_trail_mark_select = true
+Config.mark_symbol = "•"
 Config.custom.newest_mark_symbol = "⬤"
 Config.custom.cursor_mark_symbol = "⬤"
 Config.custom.next_mark_symbol = "⬤"
 Config.custom.previous_mark_symbol = "⬤"
 Config.custom.multiple_mark_symbol_counters_enabled = true
 Config.custom.number_line_color_enabled = true
+Config.trail_mark_in_text_highlights_enabled = true
+Config.trail_mark_symbol_line_indicators_enabled = false
 Config.custom.symbol_line_enabled = true
+
 
 Config.ns_name = "trailblazer"
 Config.ucid = 0

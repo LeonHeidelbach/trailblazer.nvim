@@ -512,9 +512,17 @@ function Common.reregister_trail_marks()
 
         special_marks[mark.buf] = special_marks[mark.buf]
       end
+
+      if config.custom.trail_mark_symbol_line_indicators_enabled and
+          (mark_options["sign_text"] == nil or mark_options["sign_text"] == "") then
+        mark_options["sign_text"] = config.custom.mark_symbol
+        mark_options["sign_hl_group"] = "TrailBlazerTrailMark"
+      end
     end
 
-    mark_options["virt_text"] = { { pos_text ~= "" and pos_text or " ", hl_group } }
+    if config.custom.trail_mark_in_text_highlights_enabled then
+      mark_options["virt_text"] = { { pos_text ~= "" and pos_text or " ", hl_group } }
+    end
 
     ok, mark.mark_id = pcall(api.nvim_buf_set_extmark, mark.buf, config.nsid,
       mark.pos[1] - 1, mark.pos[2], mark_options)

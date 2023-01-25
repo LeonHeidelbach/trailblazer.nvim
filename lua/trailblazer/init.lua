@@ -37,12 +37,15 @@ local function set_defaults(opts)
       current_trail_mark_mode = "global_chron", -- current / initial mode
       current_trail_mark_list_type = "quickfix", -- currently only quickfix lists are supported
       verbose_trail_mark_select = true, -- print current mode notification on mode change
+      mark_symbol = "•",
       newest_mark_symbol = "⬤",
       cursor_mark_symbol = "⬤",
       next_mark_symbol = "⬤",
       previous_mark_symbol = "⬤",
       multiple_mark_symbol_counters_enabled = true,
       number_line_color_enabled = true,
+      trail_mark_in_text_highlights_enabled = true,
+      trail_mark_symbol_line_indicators_enabled = false,
       symbol_line_enabled = true,
     },
     mappings = {
@@ -63,6 +66,11 @@ local function set_defaults(opts)
       },
     },
     hl_groups = {
+      TrailBlazerTrailMark = {
+        guifg = "White",
+        guibg = "none",
+        gui = "bold",
+      },
       TrailBlazerTrailMarkNext = {
         guifg = "Green",
         guibg = "none",
