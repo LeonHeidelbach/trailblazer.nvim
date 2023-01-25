@@ -13,6 +13,7 @@ Trails.config = require("trailblazer.trails.config")
 Trails.common = require("trailblazer.trails.common")
 Trails.actions = require("trailblazer.trails.actions")
 Trails.motions = require("trailblazer.trails.motions")
+Trails.list = require("trailblazer.trails.list")
 
 --- Setup the TrailBlazer trails module.
 ---@param options? table

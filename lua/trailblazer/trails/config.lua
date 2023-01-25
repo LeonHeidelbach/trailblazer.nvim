@@ -21,6 +21,10 @@ Config.custom.available_trail_mark_modes = {
   "buffer_local_line_sorted"
 }
 Config.custom.current_trail_mark_mode = "global_chron"
+Config.custom.available_trail_mark_lists = {
+  "quickfix",
+}
+Config.custom.current_trail_mark_list_type = "quickfix"
 Config.custom.verbose_trail_mark_select = true
 Config.custom.newest_mark_symbol = "⬤"
 Config.custom.cursor_mark_symbol = "⬤"

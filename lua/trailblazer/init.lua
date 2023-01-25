@@ -35,6 +35,7 @@ local function set_defaults(opts)
         "buffer_local_line_sorted"
       },
       current_trail_mark_mode = "global_chron", -- current / initial mode
+      current_trail_mark_list_type = "quickfix", -- currently only quickfix lists are supported
       verbose_trail_mark_select = true, -- print current mode notification on mode change
       newest_mark_symbol = "⬤",
       cursor_mark_symbol = "⬤",
@@ -51,7 +52,7 @@ local function set_defaults(opts)
           track_back = '<A-b>',
           peek_move_next_down = '<A-J>',
           peek_move_previous_up = '<A-K>',
-          -- open_trail_mark_list = '<A-m>',
+          toggle_trail_mark_list = '<A-m>',
         },
         actions = {
           delete_all_trail_marks = '<A-L>',
@@ -144,6 +145,7 @@ end
 function TrailBlazer.new_trail_mark(win, buf, pos)
   if not TrailBlazer.is_configured() then return end
   trails.actions.new_trail_mark(win, helpers.get_buf_nr(buf), pos)
+  trails.list.update_trail_mark_list()
 end
 
 --- Track back to the last trail mark.
@@ -151,6 +153,7 @@ end
 function TrailBlazer.track_back(buf)
   if not TrailBlazer.is_configured() then return end
   trails.actions.track_back(helpers.get_buf_nr(buf))
+  trails.list.update_trail_mark_list()
 end
 
 --- Peek move to the previous trail mark if sorted chronologically or up if sorted by line.
@@ -158,6 +161,7 @@ end
 function TrailBlazer.peek_move_previous_up(buf)
   if not TrailBlazer.is_configured() then return end
   trails.motions.peek_move_previous_up(helpers.get_buf_nr(buf))
+  trails.list.update_trail_mark_list()
 end
 
 --- Peek move to the next trail mark if sorted chronologically or down if sorted by line.
@@ -165,6 +169,7 @@ end
 function TrailBlazer.peek_move_next_down(buf)
   if not TrailBlazer.is_configured() then return end
   trails.motions.peek_move_next_down(helpers.get_buf_nr(buf))
+  trails.list.update_trail_mark_list()
 end
 
 --- Delete all trail marks from all or a specific buffer.
@@ -172,6 +177,7 @@ end
 function TrailBlazer.delete_all_trail_marks(buf)
   if not TrailBlazer.is_configured() then return end
   trails.actions.delete_all_trail_marks(helpers.get_buf_nr(buf))
+  trails.list.update_trail_mark_list()
 end
 
 --- Paste the selected register contents at the last trail mark of all or a specific buffer.
@@ -179,6 +185,7 @@ end
 function TrailBlazer.paste_at_last_trail_mark(buf)
   if not TrailBlazer.is_configured() then return end
   trails.actions.paste_at_last_trail_mark(helpers.get_buf_nr(buf))
+  trails.list.update_trail_mark_list()
 end
 
 --- Paste the selected register contents at all trail marks of all or a specific buffer.
@@ -186,6 +193,7 @@ end
 function TrailBlazer.paste_at_all_trail_marks(buf)
   if not TrailBlazer.is_configured() then return end
   trails.actions.paste_at_all_trail_marks(helpers.get_buf_nr(buf))
+  trails.list.update_trail_mark_list()
 end
 
 --- Set the trail mark selection mode to the given mode or toggle between the available modes.
@@ -193,6 +201,15 @@ end
 function TrailBlazer.set_trail_mark_select_mode(mode)
   if not TrailBlazer.is_configured() then return end
   trails.actions.set_trail_mark_select_mode(mode)
+  trails.list.update_trail_mark_list()
+end
+
+--- Toggle a list of all trail marks for the specified buffer in the specified list type.
+---@param type any
+---@param buf? any
+function TrailBlazer.toggle_trail_mark_list(type, buf)
+  if not TrailBlazer.is_configured() then return end
+  trails.list.toggle_trail_mark_list(type, helpers.get_buf_nr(buf))
 end
 
 --- Check if TrailBlazer is configured.

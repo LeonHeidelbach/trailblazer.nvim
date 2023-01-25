@@ -34,12 +34,13 @@ Log.langs = {
       hl_group_does_not_exist = "Highlight group does not exist: ",
       invalid_trailblazer_api_callback = "Provided callback for your keymap could not be found in "
           .. "the TrailBlazer API. Callback is -> ",
+      invalid_trailblazer_list_type = "Invalid TrailBlazer list type. Please use one of the "
+          .. "following: ",
     },
     errors = {
       not_configured = "TrailBlazer is not configured. Please call `require('trailblazer').setup()`"
           .. " first.",
-      unsupported_lang = "Unsupported language. Please use one of the following: " ..
-          table.concat(Log.config.available_langs, ", "),
+      unsupported_lang = "Unsupported language. Please use one of the following: ",
       invalid_buf_name = "Invalid buffer name. The current buffer has been used instead.",
       invalid_pos_for_buf_lines = "Could not retrieve buffer lines for the current cursor position.",
       invalid_trail_mark_mode = "Invalid trail mark select mode. Please use one of the following: ",
@@ -61,7 +62,7 @@ function Log.setup(lang)
     return
   end
 
-  Log.error("unsupported_lang")
+  Log.error("unsupported_lang", table.concat(Log.config.available_langs, ", "))
 end
 
 --- Log an info message.

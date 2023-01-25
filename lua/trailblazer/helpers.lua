@@ -199,4 +199,25 @@ function Helpers.buf_get_utf8_char_at_pos(buf, pos)
   return ""
 end
 
+--- Returns the absolute file path for the supplied buffer.
+---@param buf number
+---@return string
+function Helpers.buf_get_absolute_file_path(buf)
+  local name = api.nvim_buf_get_name(buf)
+  if name == "" then
+    return "[No Name]"
+  end
+  return name
+end
+
+--- Returns the relative workspace file path for the supplied buffer.
+---@param buf any
+---@return string
+function Helpers.buf_get_relative_file_path(buf)
+  local file_path = Helpers.buf_get_absolute_file_path(buf)
+  local workspace = vim.fn.getcwd()
+  local file_name = vim.fn.fnamemodify(file_path, ":t")
+  return file_path:gsub(workspace, ""):gsub(file_name, "") .. file_name
+end
+
 return Helpers

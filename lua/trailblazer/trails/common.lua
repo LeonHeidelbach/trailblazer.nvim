@@ -525,4 +525,21 @@ function Common.reregister_trail_marks()
   end
 end
 
+--- Returns a subset of the trail mark stack for a given buffer or the whole stack if no buffer is
+--- given.
+---@param buf? number
+---@return table?
+function Common.get_trail_mark_stack_subset_for_buf(buf)
+  if buf then
+    if fn.getbufvar(buf, "current_syntax") == "qf" then
+      return nil
+    end
+
+    return vim.tbl_filter(function(mark)
+      return mark.buf == buf
+    end, Common.trail_mark_stack)
+
+  else return Common.trail_mark_stack end
+end
+
 return Common
