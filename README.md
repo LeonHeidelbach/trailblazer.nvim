@@ -127,12 +127,15 @@ available and set by default:
         current_trail_mark_mode = "global_chron",
         current_trail_mark_list_type = "quickfix", -- currently only quickfix lists are supported
         verbose_trail_mark_select = true, -- print current mode notification on mode change
+        mark_symbol = "•", --  will only be used if trail_mark_symbol_line_indicators_enabled = true
         newest_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         cursor_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         next_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         previous_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         multiple_mark_symbol_counters_enabled = true,
         number_line_color_enabled = true,
+        trail_mark_in_text_highlights_enabled = true,
+        trail_mark_symbol_line_indicators_enabled = false, -- show indicators for all trail marks in symbol column
         symbol_line_enabled = true,
     },
     mappings = {
@@ -161,8 +164,13 @@ available and set by default:
         -- },
     },
     hl_groups = {
-        TrailBlazerTrailMarkNext = {
+        TrailBlazerTrailMark = {
             -- You can add any valid highlight group attribute to this table
+            guifg = "White",
+            guibg = "none",
+            gui = "bold",
+        },
+        TrailBlazerTrailMarkNext = {
             guifg = "Green",
             guibg = "none",
             gui = "bold",
