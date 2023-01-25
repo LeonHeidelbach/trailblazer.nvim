@@ -28,7 +28,7 @@ to come. If you have any suggestions or find any bugs, please open an issue.**
 
 ## Contents
 
-* [TrailBlazer](#trailblazer.nvim-⛺🌳)
+* [TrailBlazer](#trailblazernvim-)
     * [❓ Why Does TrailBlazer Exist?](#-why-does-trailblazer-exist)
     * [🔥 How To Properly Blaze The Trail](#-how-to-properly-blaze-the-trail)
     * [🔨 Requirements](#-requirements)
@@ -50,13 +50,14 @@ Navigating back and forth between multiple very specific points of interest in o
 spread over several windows can be a rather difficult task. Most of the time those spots are either
 located too far apart within one file to do a quick relative jump or to use [leap.nvim][leap.nvim]
 or are spread out between multiple documents but also not located at the same spot when using
-[harpoon][harpoon] jumps. Remembering default Neovim mark names on a per buffer basis is annoying
-and takes up valuable [RAM][ram-def-wikipedia] in your brain. Thus moving between those locations
-within large projects can slow you down tremendously. TrailBlazer aims to solve this problem by
-enabling you to leave trail marks as you navigate multiple files over different windows and buffers.
-Quickly move along the trail you mark as you journey through your project and start working wherever
-you left of right away whenever you need to. You can even use several immediate actions on your
-trail marks that allow you to be even more efficient.
+[harpoon][harpoon] jumps. Remembering default [Neovim][neovim] mark names on a per buffer basis is
+annoying and takes up valuable [RAM][ram-def-wikipedia] in your brain. Thus moving between those
+locations within large projects can slow you down tremendously. TrailBlazer aims to solve this
+problem by enabling you to leave trail marks as you navigate multiple files over different windows
+and buffers. Quickly move along the trail you mark as you journey through your project and start
+working wherever you left of right away whenever you need to. You can even use several immediate
+actions on your trail marks that allow you to be even more efficient. You can also toggle a reactive
+list view of all your trail marks and quickly jump to any of them.
 
 ## 🔥 How To Properly Blaze The Trail
 
@@ -124,6 +125,7 @@ available and set by default:
         -- global_chron_buf_switch_group_chron, global_chron_buf_switch_group_line_sorted,
         -- buffer_local_chron, buffer_local_line_sorted
         current_trail_mark_mode = "global_chron",
+        current_trail_mark_list_type = "quickfix", -- currently only quickfix lists are supported
         verbose_trail_mark_select = true, -- print current mode notification on mode change
         newest_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
         cursor_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
@@ -140,6 +142,7 @@ available and set by default:
                 track_back = '<A-b>',
                 peek_move_next_down = '<A-J>',
                 peek_move_previous_up = '<A-K>',
+                toggle_trail_mark_list = '<A-m>',
             },
             actions = {
                 delete_all_trail_marks = '<A-L>',
@@ -265,7 +268,7 @@ are roughly located even if they are not currently visible in the sign column. W
 symbols that can be displayed in the sign column, the highest possible number that will be shown
 next to your mark symbol is `4`, if all of the above mark symbols are located on the same line.
 
-##### Let's give you an example of how this works:
+##### Let's look at an example of how this works:
 
 As soon as you create a new trail mark it will by default have two of the above symbols, the „Newest
 Mark“ symbol and the „Current Cursor“ symbol set to the same line, so you will have the number `2`
@@ -287,16 +290,17 @@ directly like this:
 require("trailblazer").<function_name>(<args>)
 ```
 
-| Command                            | Arguments                                                                                                      | Description                                                                                                                                                                                                                                            |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `:TrailBlazerNewTrailMark`         | `<window? number>`<br>`<buffer? string \| number>`<br>`<cursor_pos_row? number>`<br>`<cursor_pos_col? number>` | Create a new / toggle existing trail mark at the current cursor position or at the specified window / buffer / position.                                                                                                                               |
-| `:TrailBlazerTrackBack`            | `<buffer? string \| number>`                                                                                   | Move to the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                                                                |
-| `:TrailBlazerPeekMovePreviousUp`   | `<buffer? string \| number`                                                                                    | Move to the previous global trail mark or the previous one within the specified buffer leading up to the oldest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor up. |
-| `:TrailBlazerPeekMoveNextDown`     | `<buffer? string \| number>`                                                                                   | Move to the next global trail mark or the next one within the specified buffer leading up to the newest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor down.       |
-| `:TrailBlazerDeleteAllTrailMarks`  | `<buffer? string \| number>`                                                                                   | Delete all trail marks globally or within the specified buffer.                                                                                                                                                                                        |
-| `:TrailBlazerPasteAtLastTrailMark` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                         |
-| `:TrailBlazerPasteAtAllTrailMarks` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                                                                                                               |
-| `:TrailBlazerTrailMarkSelectMode`  | `<mode? string>`                                                                                               | Cycle through or set the current trail mark selection mode.                                                                                                                                                                                            |
+| Command                            | Arguments                                                                                                      | Description                                                                                                                                                                                                                                               |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `:TrailBlazerNewTrailMark`         | `<window? number>`<br>`<buffer? string \| number>`<br>`<cursor_pos_row? number>`<br>`<cursor_pos_col? number>` | Create a new / toggle existing trail mark at the current cursor position or at the specified window / buffer / position.                                                                                                                                  |
+| `:TrailBlazerTrackBack`            | `<buffer? string \| number>`                                                                                   | Move to the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                                                                   |
+| `:TrailBlazerPeekMovePreviousUp`   | `<buffer? string \| number`                                                                                    | Move to the previous global trail mark or the previous one within the specified buffer leading up to the oldest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor up.    |
+| `:TrailBlazerPeekMoveNextDown`     | `<buffer? string \| number>`                                                                                   | Move to the next global trail mark or the next one within the specified buffer leading up to the newest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor down.          |
+| `:TrailBlazerDeleteAllTrailMarks`  | `<buffer? string \| number>`                                                                                   | Delete all trail marks globally or within the specified buffer.                                                                                                                                                                                           |
+| `:TrailBlazerPasteAtLastTrailMark` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                            |
+| `:TrailBlazerPasteAtAllTrailMarks` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                                                                                                                  |
+| `:TrailBlazerTrailMarkSelectMode`  | `<mode? string>`                                                                                               | Cycle through or set the current trail mark selection mode.                                                                                                                                                                                               |
+| `:TrailBlazerToggleTrailMarkList`  | `<type? string>`<br>`<buffer? string \| number>`                                                               | Toggle a global list of all trail marks or a subset within the given buffer. If no arguments are specified the current trail mark selection mode will be used to populate the list with either a subset or all trail marks in the mode specific order.    |
 
 ## 📚 Documentation
 
@@ -355,6 +359,7 @@ Discussions][discussions]. Issues are reserved for bug reports and feature reque
 [lua]: https://www.lua.org/
 [luarocks]: https://luarocks.org/
 [luacheck]: https://github.com/mpeterv/luacheck
+[neovim]: https://neovim.io/
 [leap.nvim]: https://github.com/ggandor/leap.nvim
 [harpoon]: https://github.com/ThePrimeagen/harpoon
 [busted]: https://olivinelabs.com/busted/
