@@ -24,6 +24,10 @@ function GET_AVAILABLE_TRAIL_MARK_SELECTION_MODES()
   return require("trailblazer.trails").config.custom.available_trail_mark_modes
 end
 
+function GET_AVAILABLE_TRAIL_MARK_LIST_MODES()
+  return require("trailblazer.trails").config.custom.available_trail_mark_lists
+end
+
 -- User commands
 api.nvim_create_user_command("TrailBlazerNewTrailMark",
   function(args) tb.new_trail_mark(tonumber(args.fargs[1]), tonumber(args.fargs[2]),
@@ -58,17 +62,23 @@ api.nvim_create_user_command("TrailBlazerTrailMarkSelectMode", function(args)
     args.args) and args.args or nil)
 end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_SELECTION_MODES" })
 
+api.nvim_create_user_command("TrailBlazerToggleTrailMarkList", function(args)
+  tb.toggle_trail_mark_list(args.fargs[1], args.fargs[2])
+end, { nargs = "*", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_LIST_MODES" })
+
 -- Auto commands
 api.nvim_create_autocmd("BufEnter", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",
   callback = require('trailblazer.trails.common').reregister_trail_marks
 })
+
 api.nvim_create_autocmd("BufWritePre", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",
   callback = require('trailblazer.trails.common').update_all_trail_mark_positions
 })
+
 api.nvim_create_autocmd("BufWritePost", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",
