@@ -1,6 +1,15 @@
-# TrailBlazer.nvim ⛺🌳
+<h1 dir="auto" align="center">TrailBlazer.nvim ⛺🌳</h1>
 
-[![Integration][integration-badge]][integration-runs]
+<p align="center" dir="auto">
+    <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" rel="nofollow"><img alt="GPLv3" src="https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge" style="max-width: 100%;"></a>
+    <a href="https://en.wikipedia.org/wiki/Free_and_open-source_software" rel="nofollow"><img alt="FOSS" src="https://img.shields.io/badge/FOSS-%E2%9C%93-blue.svg?style=for-the-badge" style="max-width: 100%;"></a>
+    <a href="https://www.lua.org/" rel="nofollow"><img alt="Lua" src="https://img.shields.io/badge/Lua-blue.svg?style=for-the-badge&amp;logo=lua" style="max-width: 100%;"></a>
+    <a href="https://neovim.io/" rel="nofollow"><img alt="Neovim" src="https://img.shields.io/badge/Neovim%200.8+-green.svg?style=for-the-badge&amp;logo=neovim" style="max-width: 100%;"></a></p>
+</p>
+
+<p align="center" dir="auto">
+    <a href="https://github.com/LeonHeidelbach/trailblazer.nvim/actions/workflows/integration.yml"><img src="https://github.com/LeonHeidelbach/trailblazer.nvim/actions/workflows/integration.yml/badge.svg" alt="Integration" style="max-width: 100%;"></a>
+</p>
 
 TrailBlazer enables you to seemlessly move through important project marks as quickly and
 efficiently as possible to make your workflow *blazingly fast ™*.
@@ -55,7 +64,7 @@ annoying and takes up valuable [RAM][ram-def-wikipedia] in your brain. Thus movi
 locations within large projects can slow you down tremendously. TrailBlazer aims to solve this
 problem by enabling you to leave trail marks as you navigate multiple files over different windows
 and buffers. Quickly move along the trail you mark as you journey through your project and start
-working wherever you left of right away whenever you need to. You can even use several immediate
+working wherever you left off right away whenever you need to. You can even use several immediate
 actions on your trail marks that allow you to be even more efficient. You can also toggle a reactive
 list view of all your trail marks and quickly jump to any of them.
 
@@ -376,6 +385,11 @@ Discussions][discussions]. Issues are reserved for bug reports and feature reque
 [matcher_combinators]: https://github.com/m00qek/matcher_combinators.lua
 [integration-badge]: https://github.com/LeonHeidelbach/trailblazer.nvim/actions/workflows/integration.yml/badge.svg
 [integration-runs]: https://github.com/LeonHeidelbach/trailblazer.nvim/actions/workflows/integration.yml
-[neovim-test-versions]: .github/workflows/integration.yml#L17
+[lua-badge]: https://img.shields.io/badge/Lua-blue.svg?style=for-the-badge&logo=lua
+[gplv3-badge]: https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge
+[gplv3-license]: https://www.gnu.org/licenses/gpl-3.0.en.html
+[foss-def-wikipedia]: https://en.wikipedia.org/wiki/Free_and_open-source_software
+[foss-badge]: https://img.shields.io/badge/FOSS-✓-blue.svg?style=for-the-badge
+[neovim-badge]: https://img.shields.io/badge/Neovim%200.8+-green.svg?style=for-the-badge&logo=neovim
 [help]: doc/trailblazer.nvim.txt
 [discussions]: https://github.com/LeonHeidelbach/trailblazer.nvim/discussions
