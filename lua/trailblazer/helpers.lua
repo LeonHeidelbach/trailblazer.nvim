@@ -1,6 +1,6 @@
 ---@author: Leon Heidelbach 12.01.2023
 ---@version: 1.0
----@license: MIT
+---@license: GPLv3
 ---@tag helpers
 ---@mod trailblazer.helpers
 ---@brief [[

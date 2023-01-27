@@ -1,6 +1,6 @@
 ---@author: Leon Heidelbach 25.01.2023
 ---@version: 1.0
----@license: MIT
+---@license: GPLv3
 ---@tag trails.list
 ---@mod trailblazer.trails.list
 ---@brief [[
@@ -124,6 +124,7 @@ function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
 end
 
 --- Register quickfix list keybindings.
+---@param mapping_table table
 function List.register_quickfix_keybindings(mapping_table)
   local qf_buf = List.get_quickfix_buf()
   keymaps.register_for_buf(mapping_table, "trailblazer.trails.list", List, qf_buf)

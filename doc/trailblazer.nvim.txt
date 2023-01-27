@@ -678,8 +678,12 @@ List.populate_quickfix_list_with_trail_marks({buf?}, {trail_mark_list?})
         {trail_mark_list?}  (table)
 
 
-List.register_quickfix_keybindings()        *List.register_quickfix_keybindings*
+                                            *List.register_quickfix_keybindings*
+List.register_quickfix_keybindings({mapping_table})
      Register quickfix list keybindings.
+
+    Parameters: ~
+        {mapping_table}  (table)
 
 
                                    *List.qf_action_move_trail_mark_stack_cursor*

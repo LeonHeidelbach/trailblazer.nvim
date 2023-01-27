@@ -1,6 +1,6 @@
 ---@author: Leon Heidelbach 10.01.2023
 ---@version: 1.0
----@license: MIT
+---@license: GPLv3
 ---@tag trails.init
 ---@mod trailblazer.trails
 ---@brief [[
