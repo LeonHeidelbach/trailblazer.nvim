@@ -39,7 +39,14 @@ function Keymaps.register_for_buf(key_maps, mod_name, mod, buf, warn_callback)
         for callback, map in pairs(map_type) do
           if not mod or mod and mod[callback] ~= nil then
             local cmd = string.format("<cmd>lua require('" .. mod_name .. "').%s()<CR>", callback)
-            vim.keymap.set(mode, map, cmd, Keymaps.config.default_map_opts, buf)
+            local opts = Keymaps.config.default_map_opts
+
+            if buf then
+              opts = vim.deepcopy(Keymaps.config.default_map_opts)
+              opts.buffer = buf
+            end
+
+            vim.keymap.set(mode, map, cmd, opts)
           else
             if warn_callback then
               warn_callback(mod_name, callback)
