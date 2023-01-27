@@ -311,13 +311,27 @@ TrailBlazer.is_configured()                          *TrailBlazer.is_configured*
 
  This module is responsible for setting up keymaps.
 
-Keymaps.register({key_maps}, {tb_api?})                       *Keymaps.register*
+                                                     *Keymaps.register_api_maps*
+Keymaps.register_api_maps({key_maps}, {tb_api?})
      Check if callback function exists in the TrailBlazer API and register all mappings in the
      supplied keymap table.
 
     Parameters: ~
         {key_maps}  (table)
         {tb_api?}   (table)
+
+
+                                                      *Keymaps.register_for_buf*
+Keymaps.register_for_buf({key_maps}, {mod_name}, {mod?}, {buf?}, {warn_callback?})
+     Check if callback function exists in the specified module and register all mappings in the
+     supplied keymap table.
+
+    Parameters: ~
+        {key_maps}        (table)
+        {mod_name}        (string)
+        {mod?}            (table)
+        {buf?}            (number)
+        {warn_callback?}  (function)
 
 
                                                                            *log*
@@ -530,6 +544,16 @@ Common.get_relative_marks_and_cursor({buf?}, {current_mark_index?})
         (number)
 
 
+                                             *Common.get_first_trail_mark_index*
+Common.get_first_trail_mark_index({win?}, {buf?}, {pos?})
+     Get the index of the first trail mark that matches the given window, buffer and position.
+
+    Parameters: ~
+        {win?}  (number)
+        {buf?}  (number)
+        {pos?}  (table<number,number>)  @return integer?
+
+
                         *Common.get_hl_group_for_current_trail_mark_select_mode*
 Common.get_hl_group_for_current_trail_mark_select_mode({mode?})
      Returns the corresponding highlight group for the provided or global trail mark selection mode.
@@ -654,11 +678,18 @@ List.populate_quickfix_list_with_trail_marks({buf?}, {trail_mark_list?})
         {trail_mark_list?}  (table)
 
 
-List.quick_fix_list_is_visible()                *List.quick_fix_list_is_visible*
-     Check if a TrailBlazer quick fix list is currently visible.
+List.register_quickfix_keybindings()        *List.register_quickfix_keybindings*
+     Register quickfix list keybindings.
 
-    Returns: ~
-        (boolean)
+
+                                   *List.qf_action_move_trail_mark_stack_cursor*
+List.qf_action_move_trail_mark_stack_cursor()
+     Move the trail mark stack cursor on selecting a trail mark from the quickfix list.
+
+
+List.get_quickfix_buf()                                  *List.get_quickfix_buf*
+     Check if a TrailBlazer quick fix list is currently visible and return its buffer number.
+    @return number?
 
 
                                                                 *trails.motions*
