@@ -34,6 +34,8 @@ Log.langs = {
       hl_group_does_not_exist = "Highlight group does not exist: ",
       invalid_trailblazer_api_callback = "Provided callback for your keymap could not be found in "
           .. "the TrailBlazer API. Callback is -> ",
+      invalid_trailblazer_mod_callback = "Provided callback for your keymap could not be found in "
+          .. "your module. [Callback | Module] is -> ",
       invalid_trailblazer_list_type = "Invalid TrailBlazer list type. Please use one of the "
           .. "following: ",
     },

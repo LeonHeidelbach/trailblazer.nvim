@@ -143,7 +143,7 @@ function TrailBlazer.setup(options)
   TrailBlazer.generated.hl_groups = highlights.register(TrailBlazer.options.hl_groups, true)
   trails.setup(TrailBlazer.options.trail_options)
   log.setup(TrailBlazer.options.lang)
-  keymaps.register(TrailBlazer.options.mappings, TrailBlazer)
+  keymaps.register_api_maps(TrailBlazer.options.mappings, TrailBlazer)
 end
 
 --- Create a new trail mark at the current cursor or defined position and buffer.
