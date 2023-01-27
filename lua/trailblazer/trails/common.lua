@@ -205,6 +205,8 @@ end
 ---@param remove_trail_mark boolean
 ---@return boolean
 function Common.focus_win_and_buf_by_trail_mark_index(buf, trail_mark_index, remove_trail_mark)
+  local old_trail_mark_cursor = Common.trail_mark_cursor
+
   if trail_mark_index > 0 then
     local trail_mark, ext_mark
     trail_mark_index, trail_mark, ext_mark = Common.get_marks_for_trail_mark_index(buf,
@@ -214,9 +216,14 @@ function Common.focus_win_and_buf_by_trail_mark_index(buf, trail_mark_index, rem
       return false
     end
 
-    return Common.focus_win_and_buf(trail_mark, ext_mark)
+    Common.trail_mark_cursor = trail_mark_index
+
+    if Common.focus_win_and_buf(trail_mark, ext_mark) then
+      return true
+    end
   end
 
+  Common.trail_mark_cursor = old_trail_mark_cursor
   return false
 end
 
@@ -346,6 +353,19 @@ function Common.get_relative_marks_and_cursor(buf, current_mark_index)
   end
 
   return marks, cursor
+end
+
+--- Get the index of the first trail mark that matches the given window, buffer and position.
+---@param win? number
+---@param buf? number
+---@param pos? table<number, number>
+---@return integer?
+function Common.get_first_trail_mark_index(win, buf, pos)
+  return helpers.tbl_indexof(function(mark)
+    return (not win or win and mark.win == win) and
+        (not win or buf and mark.buf == buf) and
+        (not pos or pos and mark.pos[1] == pos[1] and mark.pos[2] == pos[2])
+  end, Common.trail_mark_stack)
 end
 
 --- Returns the corresponding highlight group for the provided or global trail mark selection mode.

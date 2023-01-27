@@ -14,11 +14,19 @@ local List = {}
 local config = require("trailblazer.trails.config")
 local common = require("trailblazer.trails.common")
 local helpers = require("trailblazer.helpers")
+local keymaps = require("trailblazer.keymaps")
 local log = require("trailblazer.log")
 
 List.config = {
   qf_title = "TrailBlazer Trail Mark Stack: ",
-  qf_buf_name_separator = " - "
+  qf_buf_name_separator = " - ",
+  quickfix_mappings = {
+    nv = {
+      motions = {
+        qf_action_move_trail_mark_stack_cursor = "<CR>",
+      }
+    }
+  }
 }
 
 --- Toggle a list of all trail marks for the specified buffer in the specified list type.
@@ -46,7 +54,7 @@ function List.update_trail_mark_list(type, buf)
   buf = common.default_buf_for_current_mark_select_mode(buf)
 
   if type == "quickfix" then
-    if List.quick_fix_list_is_visible() then
+    if List.get_quickfix_buf() then
       List.populate_quickfix_list_with_trail_marks(buf,
         common.get_trail_mark_stack_subset_for_buf(buf))
     end
@@ -62,7 +70,7 @@ end
 ---@param trail_mark_list? table
 function List.toggle_quick_fix_list(buf, trail_mark_list)
 
-  if List.quick_fix_list_is_visible() then
+  if List.get_quickfix_buf() then
     vim.cmd("cclose")
     return
   end
@@ -72,6 +80,7 @@ function List.toggle_quick_fix_list(buf, trail_mark_list)
   end
 
   vim.cmd("copen")
+  List.register_quickfix_keybindings(List.config.quickfix_mappings)
 end
 
 --- Populate the quick fix list with the specified trail mark list.
@@ -105,23 +114,47 @@ function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
     qf_title = List.config.qf_title .. config.custom.current_trail_mark_mode
   end
 
+  local _, rel_cursor = common.get_relative_marks_and_cursor(buf, common.trail_mark_cursor)
+
   fn.setqflist({}, "r", {
     title = qf_title,
+    idx = rel_cursor,
     items = quick_fix_list,
   })
 end
 
---- Check if a TrailBlazer quick fix list is currently visible.
----@return boolean
-function List.quick_fix_list_is_visible()
+--- Register quickfix list keybindings.
+function List.register_quickfix_keybindings(mapping_table)
+  local qf_buf = List.get_quickfix_buf()
+  keymaps.register_for_buf(mapping_table, "trailblazer.trails.list", List, qf_buf)
+end
+
+--- Move the trail mark stack cursor on selecting a trail mark from the quickfix list.
+function List.qf_action_move_trail_mark_stack_cursor()
+  local qf = fn.getqflist({ id = 0, items = 1 })
+
+  if qf and qf.items and #qf.items > 0 then
+    local current_idx = api.nvim_win_get_cursor(0)[1]
+    local item = qf.items[current_idx]
+    local buf = item.bufnr
+    local mark = common.get_first_trail_mark_index(nil, buf, { item.lnum, item.col - 1 })
+
+    common.focus_win_and_buf_by_trail_mark_index(buf, mark, false)
+    List.update_trail_mark_list()
+  end
+end
+
+--- Check if a TrailBlazer quick fix list is currently visible and return its buffer number.
+---@return number?
+function List.get_quickfix_buf()
   for _, win in pairs(fn.getwininfo()) do
     if win["quickfix"] == 1 and win["variables"] and win["variables"]["quickfix_title"] and
         string.match(win["variables"]["quickfix_title"], "^" .. List.config.qf_title) then
-      return true
+      return win["bufnr"]
     end
   end
 
-  return false
+  return nil
 end
 
 return List
