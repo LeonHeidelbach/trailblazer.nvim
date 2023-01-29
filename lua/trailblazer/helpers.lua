@@ -211,7 +211,7 @@ function Helpers.buf_get_absolute_file_path(buf)
 end
 
 --- Returns the relative workspace file path for the supplied buffer.
----@param buf any
+---@param buf number
 ---@return string
 function Helpers.buf_get_relative_file_path(buf)
   local file_path = Helpers.buf_get_absolute_file_path(buf)

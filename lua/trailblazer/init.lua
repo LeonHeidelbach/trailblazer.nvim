@@ -205,7 +205,7 @@ function TrailBlazer.paste_at_all_trail_marks(buf)
 end
 
 --- Set the trail mark selection mode to the given mode or toggle between the available modes.
----@param mode any
+---@param mode string
 function TrailBlazer.set_trail_mark_select_mode(mode)
   if not TrailBlazer.is_configured() then return end
   trails.actions.set_trail_mark_select_mode(mode)
@@ -213,8 +213,8 @@ function TrailBlazer.set_trail_mark_select_mode(mode)
 end
 
 --- Toggle a list of all trail marks for the specified buffer in the specified list type.
----@param type any
----@param buf? any
+---@param type string
+---@param buf? number | string
 function TrailBlazer.toggle_trail_mark_list(type, buf)
   if not TrailBlazer.is_configured() then return end
   trails.list.toggle_trail_mark_list(type, helpers.get_buf_nr(buf))

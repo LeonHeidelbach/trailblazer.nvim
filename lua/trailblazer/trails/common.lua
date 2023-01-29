@@ -455,10 +455,19 @@ function Common.update_all_trail_mark_positions()
   end
 end
 
+--- Delete extmarks from all buffers.
+function Common.delete_all_ext_marks()
+  for _, buf in ipairs(api.nvim_list_bufs()) do
+    api.nvim_buf_clear_namespace(buf, config.nsid, 0, -1)
+  end
+end
+
 --- Reregister all trail marks on the stack. This function can also be used to restore trail marks
 --- after calling `vim.lsp.formatting` which currently causes extmarks to be moved out of the
 --- buffer range.
 function Common.reregister_trail_marks()
+  Common.delete_all_ext_marks()
+
   if #Common.trail_mark_stack <= 0 then return end
 
   local ok, hl_group
