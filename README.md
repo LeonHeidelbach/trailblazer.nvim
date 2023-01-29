@@ -43,6 +43,7 @@ to come. If you have any suggestions or find any bugs, please open an issue.**
     * [🔨 Requirements](#-requirements)
     * [📦 Installation](#-installation)
     * [⚙️ Configuration](#%EF%B8%8F-configuration)
+        * [Trail Mark Stacks](#trail-mark-stacks)
         * [Trail Mark Selection Modes](#trail-mark-selection-modes)
         * [Trail Mark Symbols](#trail-mark-symbols)
             * [Multiple Mark Symbol Counters](#multiple-mark-symbol-counters)
@@ -146,6 +147,15 @@ available and set by default:
         trail_mark_in_text_highlights_enabled = true,
         trail_mark_symbol_line_indicators_enabled = false, -- show indicators for all trail marks in symbol column
         symbol_line_enabled = true,
+        available_trail_mark_stack_sort_modes = {
+            "alpha_asc", -- alphabetical ascending
+            "alpha_dsc", -- alphabetical descending
+            "chron_asc", -- chronological ascending
+            "chron_dsc", -- chronological descending
+        },
+        -- The current / initially selected trail mark stack sort mode. Choose from one of the
+        -- available modes: alpha_asc, alpha_dsc, chron_asc, chron_dsc
+        current_trail_mark_stack_sort_mode = "alpha_asc"
     },
     mappings = {
         nv = { -- Mode union: normal & visual mode. Can be extended by adding i, x, ...
@@ -161,6 +171,9 @@ available and set by default:
                 paste_at_last_trail_mark = '<A-p>',
                 paste_at_all_trail_marks = '<A-P>',
                 set_trail_mark_select_mode = '<A-t>',
+                switch_to_next_trail_mark_stack = '<A-.>',
+                switch_to_previous_trail_mark_stack = '<A-,>',
+                set_trail_mark_stack_sort_mode = '<A-s>',
             },
         },
         -- You can also add/move any motion or action to mode specific mappings i.e.:
@@ -238,6 +251,26 @@ available and set by default:
 }
 ```
 
+### Trail mark stacks
+
+Trail mark stacks are a collection of trail marks which you can tranverse in many different ways by
+setting a specific trail mark selection mode. You can find out how those modes work further down
+below.
+
+You can create as many trail mark stacks as you like, which basically allows you to group trail
+marks in a custom way. You can give your trail mark stacks names and set a specific sort mode to
+toggle between them. By default there is only one trail mark stack called `default` and if that is
+enough for you, you don't ever have to create any new stacks. New trail marks will always be added
+to the currently selected trail mark stack.
+
+| Mode        | Description                                                                                                              |
+|-------------|--------------------------------------------------------------------------------------------------------------------------|
+| `alpha_asc` | This is the default mode. Trail mark stacks are toggled in alphabetically ascending order depending to their given name. |
+| `alpha_dsc` | Trail mark stacks are toggled in alphabetically descending order depending to their given name.                          |
+| `chron_asc` | Trail mark stacks are toggled in chronological ascending order depending to their creation time.                         |
+| `chron_dsc` | Trail mark stacks are toggled in chronological descending order depending to their creation time.                        |
+
+
 ### Trail mark selection modes
 
 Trail mark selection modes allow you to switch between different modes of traversing and executing
@@ -307,17 +340,24 @@ directly like this:
 require("trailblazer").<function_name>(<args>)
 ```
 
-| Command                            | Arguments                                                                                                      | Description                                                                                                                                                                                                                                               |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `:TrailBlazerNewTrailMark`         | `<window? number>`<br>`<buffer? string \| number>`<br>`<cursor_pos_row? number>`<br>`<cursor_pos_col? number>` | Create a new / toggle existing trail mark at the current cursor position or at the specified window / buffer / position.                                                                                                                                  |
-| `:TrailBlazerTrackBack`            | `<buffer? string \| number>`                                                                                   | Move to the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                                                                   |
-| `:TrailBlazerPeekMovePreviousUp`   | `<buffer? string \| number`                                                                                    | Move to the previous global trail mark or the previous one within the specified buffer leading up to the oldest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor up.    |
-| `:TrailBlazerPeekMoveNextDown`     | `<buffer? string \| number>`                                                                                   | Move to the next global trail mark or the next one within the specified buffer leading up to the newest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor down.          |
-| `:TrailBlazerDeleteAllTrailMarks`  | `<buffer? string \| number>`                                                                                   | Delete all trail marks globally or within the specified buffer.                                                                                                                                                                                           |
-| `:TrailBlazerPasteAtLastTrailMark` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                            |
-| `:TrailBlazerPasteAtAllTrailMarks` | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                                                                                                                  |
-| `:TrailBlazerTrailMarkSelectMode`  | `<mode? string>`                                                                                               | Cycle through or set the current trail mark selection mode.                                                                                                                                                                                               |
-| `:TrailBlazerToggleTrailMarkList`  | `<type? string>`<br>`<buffer? string \| number>`                                                               | Toggle a global list of all trail marks or a subset within the given buffer. If no arguments are specified the current trail mark selection mode will be used to populate the list with either a subset or all trail marks in the mode specific order.    |
+| Command                                   | Arguments                                                                                                      | Description                                                                                                                                                                                                                                            |
+|-------------------------------------------|----------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `:TrailBlazerNewTrailMark`                | `<window? number>`<br>`<buffer? string \| number>`<br>`<cursor_pos_row? number>`<br>`<cursor_pos_col? number>` | Create a new / toggle existing trail mark at the current cursor position or at the specified window / buffer / position.                                                                                                                               |
+| `:TrailBlazerTrackBack`                   | `<buffer? string \| number>`                                                                                   | Move to the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                                                                |
+| `:TrailBlazerPeekMovePreviousUp`          | `<buffer? string \| number`                                                                                    | Move to the previous global trail mark or the previous one within the specified buffer leading up to the oldest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor up. |
+| `:TrailBlazerPeekMoveNextDown`            | `<buffer? string \| number>`                                                                                   | Move to the next global trail mark or the next one within the specified buffer leading up to the newest one without removing it from the trail mark stack. In chronologically sorted trail mark modes this will move the trail mark cursor down.       |
+| `:TrailBlazerDeleteAllTrailMarks`         | `<buffer? string \| number>`                                                                                   | Delete all trail marks globally or within the specified buffer.                                                                                                                                                                                        |
+| `:TrailBlazerPasteAtLastTrailMark`        | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at the last global trail mark or the last one within the specified buffer and remove it from the trail mark stack.                                                                                         |
+| `:TrailBlazerPasteAtAllTrailMarks`        | `<buffer? string \| number>`                                                                                   | Paste the contents of any selected register at all global trail marks or at all trail marks within the specified buffer.                                                                                                                               |
+| `:TrailBlazerTrailMarkSelectMode`         | `<mode? string>`                                                                                               | Cycle through or set the current trail mark selection mode.                                                                                                                                                                                            |
+| `:TrailBlazerToggleTrailMarkList`         | `<type? string>`<br>`<buffer? string \| number>`                                                               | Toggle a global list of all trail marks or a subset within the given buffer. If no arguments are specified the current trail mark selection mode will be used to populate the list with either a subset or all trail marks in the mode specific order. |
+| `TrailBlazerSwitchTrailMarkStack`         | `<stack_name? string>`                                                                                         | Switch to the specified trail mark stack. If no stack under the specified name exists, it will be created. If no arguments are specified the `default` stack will be selected.                                                                         |
+| `TrailBlazerAddTrailMarkStack`            | `<stack_name? string>`                                                                                         | Add a new trail mark stack. If no arguments are specified the `default` stack will be added to the list of trail mark stacks.                                                                                                                          |
+| `TrailBlazerDeleteTrailMarkStacks`        | `<stack_name? string> ...`                                                                                     | Delete the specified trail mark stacks. If no arguments are specified the current trail mark stack will be deleted.                                                                                                                                    |
+| `TrailBlazerDeleteAllTrailMarkStacks`     | `no arguments`                                                                                                 | Delete all trail mark stacks.                                                                                                                                                                                                                          |
+| `TrailBlazerSwitchNextTrailMarkStack`     | `<sort_mode? string>`                                                                                          | Switch to the next trail mark stack using the specified sorting mode. If no arguments are specified the current default sort mode will be used.                                                                                                        |
+| `TrailBlazerSwitchPreviousTrailMarkStack` | `<sort_mode? string>`                                                                                          | Switch to the previous trail mark stack using the specified sorting mode. If no arguments are specified the current default sort mode will be used.                                                                                                    |
+| `TrailBlazerSetTrailMarkStackSortMode`    | `<sort_mode? string>`                                                                                          | Cycle through or set the current trail mark stack sort mode.                                                                                                                                                                                           |
 
 ## 📚 Documentation
 
