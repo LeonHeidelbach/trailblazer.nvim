@@ -253,22 +253,22 @@ available and set by default:
 
 ### Trail mark stacks
 
-Trail mark stacks are a collection of trail marks which you can tranverse in many different ways by
+Trail mark stacks are a collection of trail marks which you can traverse in many different ways by
 setting a specific trail mark selection mode. You can find out how those modes work further down
 below.
 
-You can create as many trail mark stacks as you like, which basically allows you to group trail
-marks in a custom way. You can give your trail mark stacks names and set a specific sort mode to
-toggle between them. By default there is only one trail mark stack called `default` and if that is
-enough for you, you don't ever have to create any new stacks. New trail marks will always be added
-to the currently selected trail mark stack.
+You can create as many trail mark stacks as you like, which allows you to group trail marks in any
+way you want, depending on your project needs. You can give your trail mark stacks names and use
+different sorting modes when switching between them. By default there is only one trail mark stack,
+called `default`, and if that is enough for you, you don't ever have to create any new stacks. New
+trail marks will always be added to the currently selected trail mark stack.
 
-| Mode        | Description                                                                                                              |
-|-------------|--------------------------------------------------------------------------------------------------------------------------|
-| `alpha_asc` | This is the default mode. Trail mark stacks are toggled in alphabetically ascending order depending to their given name. |
-| `alpha_dsc` | Trail mark stacks are toggled in alphabetically descending order depending to their given name.                          |
-| `chron_asc` | Trail mark stacks are toggled in chronological ascending order depending to their creation time.                         |
-| `chron_dsc` | Trail mark stacks are toggled in chronological descending order depending to their creation time.                        |
+| Mode        | Description                                                                                                                     |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `alpha_asc` | This is the default mode. Trail mark stacks are cycled through in alphabetically ascending order depending to their given name. |
+| `alpha_dsc` | Trail mark stacks are cycled through in alphabetically descending order depending to their given name.                          |
+| `chron_asc` | Trail mark stacks are cycled through in chronological ascending order depending to their creation time.                         |
+| `chron_dsc` | Trail mark stacks are cycled through in chronological descending order depending to their creation time.                        |
 
 
 ### Trail mark selection modes
