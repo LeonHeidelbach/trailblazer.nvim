@@ -135,7 +135,7 @@ Helpers.buf_get_relative_file_path({buf})
      Returns the relative workspace file path for the supplied buffer.
 
     Parameters: ~
-        {buf}  (any)
+        {buf}  (number)
 
     Returns: ~
         (string)
@@ -282,11 +282,11 @@ TrailBlazer.paste_at_all_trail_marks({buf?})
 
 
                                         *TrailBlazer.set_trail_mark_select_mode*
-TrailBlazer.set_trail_mark_select_mode({mode})
+TrailBlazer.set_trail_mark_select_mode({mode?})
      Set the trail mark selection mode to the given mode or toggle between the available modes.
 
     Parameters: ~
-        {mode}  (any)
+        {mode?}  (string)
 
 
                                             *TrailBlazer.toggle_trail_mark_list*
@@ -294,8 +294,63 @@ TrailBlazer.toggle_trail_mark_list({type}, {buf?})
      Toggle a list of all trail marks for the specified buffer in the specified list type.
 
     Parameters: ~
-        {type}  (any)
-        {buf?}  (any)
+        {type}  (string)
+        {buf?}  (number|string)
+
+
+                                           *TrailBlazer.switch_trail_mark_stack*
+TrailBlazer.switch_trail_mark_stack({name?})
+     Switch the trail mark stack to the specified stack.
+
+    Parameters: ~
+        {name?}  (string)
+
+
+                                           *TrailBlazer.delete_trail_mark_stack*
+TrailBlazer.delete_trail_mark_stack({name?})
+     Delete the specified trail mark stack or the current one if no name is supplied.
+
+    Parameters: ~
+        {name?}  (string)
+
+
+                                       *TrailBlazer.delte_all_trail_mark_stacks*
+TrailBlazer.delte_all_trail_mark_stacks()
+     Delete all trail mark stacks.
+
+
+                                              *TrailBlazer.add_trail_mark_stack*
+TrailBlazer.add_trail_mark_stack({name?})
+     Add the current trail mark stack under the specified name or "default" if no name is supplied.
+
+    Parameters: ~
+        {name?}  (string)
+
+
+                                   *TrailBlazer.switch_to_next_trail_mark_stack*
+TrailBlazer.switch_to_next_trail_mark_stack({sort_mode?})
+     Switch to the next trail mark stack using the given sort mode or the current one if no sort mode
+     is supplied.
+
+    Parameters: ~
+        {sort_mode?}  (string)
+
+
+                               *TrailBlazer.switch_to_previous_trail_mark_stack*
+TrailBlazer.switch_to_previous_trail_mark_stack({sort_mode?})
+     Switch to the previous trail mark stack using the given sort mode or the current one if no sort
+     mode is supplied.
+
+    Parameters: ~
+        {sort_mode?}  (string)
+
+
+                                    *TrailBlazer.set_trail_mark_stack_sort_mode*
+TrailBlazer.set_trail_mark_stack_sort_mode({sort_mode?})
+     Set the trail mark stack sort mode to the given mode or toggle between the available modes.
+
+    Parameters: ~
+        {sort_mode?}  (string)
 
 
 TrailBlazer.is_configured()                          *TrailBlazer.is_configured*
@@ -428,6 +483,57 @@ Actions.set_trail_mark_select_mode({mode?})
 
     Parameters: ~
         {mode?}  (string)
+
+
+Actions.switch_trail_mark_stack({name?})       *Actions.switch_trail_mark_stack*
+     Switch to the given trail mark stack.
+
+    Parameters: ~
+        {name?}  (string)
+
+
+Actions.delete_trail_mark_stack({name?})       *Actions.delete_trail_mark_stack*
+     Delete the specified trail mark stack or the current one if no name is supplied.
+
+    Parameters: ~
+        {name?}  (string)
+
+
+Actions.delete_all_trail_mark_stacks()    *Actions.delete_all_trail_mark_stacks*
+     Delete all trail mark stacks.
+
+
+Actions.add_trail_mark_stack({name?})             *Actions.add_trail_mark_stack*
+     Add the current trail mark stack under the specified name or "default" if no name is supplied.
+
+    Parameters: ~
+        {name?}  (string)
+
+
+                                       *Actions.switch_to_next_trail_mark_stack*
+Actions.switch_to_next_trail_mark_stack({sort_mode?})
+     Switch to the next trail mark stack using the given sort mode or the current one if no sort mode
+     is supplied.
+
+    Parameters: ~
+        {sort_mode?}  (string)
+
+
+                                   *Actions.switch_to_previous_trail_mark_stack*
+Actions.switch_to_previous_trail_mark_stack({sort_mode?})
+     Switch to the previous trail mark stack using the given sort mode or the current one if no sort
+     mode is supplied.
+
+    Parameters: ~
+        {sort_mode?}  (string)
+
+
+                                        *Actions.set_trail_mark_stack_sort_mode*
+Actions.set_trail_mark_stack_sort_mode({sort_mode?})
+     Set the trail mark stack sort mode to the given mode or toggle between the available modes.
+
+    Parameters: ~
+        {sort_mode?}  (string)
 
 
                                                                  *trails.common*
@@ -595,6 +701,10 @@ Common.update_all_trail_mark_positions()*Common.update_all_trail_mark_positions*
      buffer and updating the trail mark stack.
 
 
+Common.delete_all_ext_marks()                      *Common.delete_all_ext_marks*
+     Delete extmarks from all buffers.
+
+
 Common.reregister_trail_marks()                  *Common.reregister_trail_marks*
      Reregister all trail marks on the stack. This function can also be used to restore trail marks
      after calling `vim.lsp.formatting` which currently causes extmarks to be moved out of the
@@ -720,6 +830,83 @@ Motions.peek_move_next_down({buf?})                *Motions.peek_move_next_down*
 
     Returns: ~
         (boolean)
+
+
+                                                                 *trails.stacks*
+==============================================================================
+                                                     *trailblazer.trails.stacks*
+
+ This module is responsible for managing trail mark stacks.
+
+Stacks.add_stack({name?})                                     *Stacks.add_stack*
+     Pushes the current trail mark stack to the trail mark stack list under the given name.
+
+    Parameters: ~
+        {name?}  (string)
+
+
+Stacks.delete_stack({name?})                               *Stacks.delete_stack*
+     Deletes the trail mark stack under the given name or the current trail mark stack if no name
+     is supplied.
+
+    Parameters: ~
+        {name?}  (string|table)
+
+
+Stacks.delte_all_stacks()                              *Stacks.delte_all_stacks*
+     Deletes all trail mark stacks.
+
+
+                                                   *Stacks.switch_to_next_stack*
+Stacks.switch_to_next_stack({sort_mode?})
+     Move the current trail mark stack to the next trail mark stack in the trail mark stack list
+     depending on the given sort mode.
+
+    Parameters: ~
+        {sort_mode?}  (string)
+
+
+                                               *Stacks.switch_to_previous_stack*
+Stacks.switch_to_previous_stack({sort_mode?})
+     Move the current trail mark stack to the previous trail mark stack in the trail mark stack list
+
+    Parameters: ~
+        {sort_mode?}  (string)
+
+
+                                                   *Stacks.switch_current_stack*
+Stacks.switch_current_stack({name?}, {save?})
+     Switches the current trail mark stack to the trail mark stack under the given name.
+
+    Parameters: ~
+        {name?}  (string)
+        {save?}  (boolean)
+
+
+                                                 *Stacks.get_sorted_stack_names*
+Stacks.get_sorted_stack_names({sort_mode?})
+     Returns a table of all trail mark stack names sorted by the given sort mode.
+
+    Parameters: ~
+        {sort_mode?}  (string)  @return table<string>
+
+
+Stacks.get_valid_sort_mode({sort_mode?})            *Stacks.get_valid_sort_mode*
+     Returns a valid sort mode for the given input.
+
+    Parameters: ~
+        {sort_mode?}  (string)
+
+    Returns: ~
+        (string)
+
+
+                                         *Stacks.set_trail_mark_stack_sort_mode*
+Stacks.set_trail_mark_stack_sort_mode({sort_mode?})
+     Set the trail mark stack sort mode to the given mode or toggle between the available modes.
+
+    Parameters: ~
+        {sort_mode?}  (string)
 
 
 vim:tw=78:ts=8:noet:ft=help:norl:
