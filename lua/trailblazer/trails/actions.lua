@@ -14,6 +14,7 @@ local Actions = {}
 local config = require("trailblazer.trails.config")
 local common = require("trailblazer.trails.common")
 local helpers = require("trailblazer.helpers")
+local stacks = require("trailblazer.trails.stacks")
 local log = require("trailblazer.log")
 
 --- Add a new trail mark to the stack.
@@ -26,7 +27,7 @@ function Actions.new_trail_mark(win, buf, pos)
 
   if trail_mark_index and trail_mark then
     api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
-    table.remove(common.trail_mark_stack, trail_mark_index)
+    table.remove(stacks.current_trail_mark_stack, trail_mark_index)
 
     local newest_mark_index, oldest_mark_index = common.get_newest_and_oldest_mark_index_for_buf(
       buf)
@@ -66,14 +67,14 @@ function Actions.new_trail_mark(win, buf, pos)
     pos = current_cursor, mark_id = config.ucid + 1,
   }
 
-  table.insert(common.trail_mark_stack, new_mark)
+  table.insert(stacks.current_trail_mark_stack, new_mark)
 
   config.ucid = config.ucid + 1
   common.sort_trail_mark_stack()
   common.trail_mark_cursor, _ = common.get_newest_and_oldest_mark_index_for_buf(buf)
   common.reregister_trail_marks()
 
-  return common.trail_mark_stack[common.trail_mark_cursor]
+  return stacks.current_trail_mark_stack[common.trail_mark_cursor]
 end
 
 --- Remove the last global or buffer local trail mark from the stack.
@@ -125,13 +126,13 @@ function Actions.paste_at_all_trail_marks(buf)
   buf = common.default_buf_for_current_mark_select_mode(buf)
 
   if buf ~= nil then
-    for i = #common.trail_mark_stack, 1, -1 do
-      if common.trail_mark_stack[i].buf == buf then
+    for i = #stacks.current_trail_mark_stack, 1, -1 do
+      if stacks.current_trail_mark_stack[i].buf == buf then
         common.paste_at_trail_mark(buf, i)
       end
     end
   else
-    for i = #common.trail_mark_stack, 1, -1 do
+    for i = #stacks.current_trail_mark_stack, 1, -1 do
       common.paste_at_trail_mark(buf, i)
     end
   end
@@ -141,13 +142,13 @@ end
 ---@param buf? number
 function Actions.delete_all_trail_marks(buf)
   if buf == nil then
-    for _, mark in ipairs(common.trail_mark_stack) do
+    for _, mark in ipairs(stacks.current_trail_mark_stack) do
       pcall(api.nvim_buf_del_extmark, mark.buf, config.nsid, mark.mark_id)
       common.trail_mark_cursor = common.trail_mark_cursor - 1
     end
 
     common.trail_mark_cursor = common.trail_mark_cursor > 0 and common.trail_mark_cursor or 0
-    common.trail_mark_stack = {}
+    stacks.current_trail_mark_stack = {}
     config.ucid = 0
   else
     local ext_marks = api.nvim_buf_get_extmarks(buf, config.nsid, 0, -1, {})
@@ -156,11 +157,11 @@ function Actions.delete_all_trail_marks(buf)
       pcall(api.nvim_buf_del_extmark, buf, config.nsid, ext_mark[1])
     end
 
-    common.trail_mark_stack = vim.tbl_filter(function(mark)
+    stacks.current_trail_mark_stack = vim.tbl_filter(function(mark)
       return mark.buf ~= buf
-    end, common.trail_mark_stack)
+    end, stacks.current_trail_mark_stack)
 
-    common.trail_mark_cursor = #common.trail_mark_stack
+    common.trail_mark_cursor = #stacks.current_trail_mark_stack
   end
 end
 
@@ -189,6 +190,54 @@ function Actions.set_trail_mark_select_mode(mode)
   if config.custom.verbose_trail_mark_select then
     log.info("current_trail_mark_select_mode", config.custom.current_trail_mark_mode)
   end
+end
+
+--- Switch to the given trail mark stack.
+---@param name? string
+function Actions.switch_trail_mark_stack(name)
+  stacks.switch_current_stack(name)
+  common.reregister_trail_marks()
+end
+
+--- Delete the specified trail mark stack or the current one if no name is supplied.
+---@param name? string
+function Actions.delete_trail_mark_stack(name)
+  stacks.delete_stack(name)
+  common.reregister_trail_marks()
+end
+
+--- Delete all trail mark stacks.
+function Actions.delete_all_trail_mark_stacks()
+  stacks.delte_all_stacks()
+  common.reregister_trail_marks()
+end
+
+--- Add the current trail mark stack under the specified name or "default" if no name is supplied.
+---@param name? string
+function Actions.add_trail_mark_stack(name)
+  stacks.add_stack(name)
+end
+
+--- Switch to the next trail mark stack using the given sort mode or the current one if no sort mode
+--- is supplied.
+---@param sort_mode? string
+function Actions.switch_to_next_trail_mark_stack(sort_mode)
+  stacks.switch_to_next_stack(sort_mode)
+  common.reregister_trail_marks()
+end
+
+--- Switch to the previous trail mark stack using the given sort mode or the current one if no sort
+--- mode is supplied.
+---@param sort_mode? string
+function Actions.switch_to_previous_trail_mark_stack(sort_mode)
+  stacks.switch_to_previous_stack(sort_mode)
+  common.reregister_trail_marks()
+end
+
+--- Set the trail mark stack sort mode to the given mode or toggle between the available modes.
+---@param sort_mode? string
+function Actions.set_trail_mark_stack_sort_mode(sort_mode)
+  stacks.set_trail_mark_stack_sort_mode(sort_mode)
 end
 
 return Actions

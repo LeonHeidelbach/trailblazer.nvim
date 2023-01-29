@@ -36,7 +36,13 @@ Config.custom.number_line_color_enabled = true
 Config.trail_mark_in_text_highlights_enabled = true
 Config.trail_mark_symbol_line_indicators_enabled = false
 Config.custom.symbol_line_enabled = true
-
+Config.custom.available_trail_mark_stack_sort_modes = {
+  "alpha_asc",
+  "alpha_dsc",
+  "chron_asc",
+  "chron_dsc",
+}
+Config.custom.current_trail_mark_stack_sort_mode = "alpha_asc"
 
 Config.ns_name = "trailblazer"
 Config.ucid = 0

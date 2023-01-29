@@ -47,6 +47,13 @@ local function set_defaults(opts)
       trail_mark_in_text_highlights_enabled = true,
       trail_mark_symbol_line_indicators_enabled = false,
       symbol_line_enabled = true,
+      available_trail_mark_stack_sort_modes = {
+        "alpha_asc",
+        "alpha_dsc",
+        "chron_asc",
+        "chron_dsc",
+      },
+      current_trail_mark_stack_sort_mode = "alpha_asc"
     },
     mappings = {
       nv = { -- Mode union: normal & visual mode
@@ -62,6 +69,9 @@ local function set_defaults(opts)
           paste_at_last_trail_mark = '<A-p>',
           paste_at_all_trail_marks = '<A-P>',
           set_trail_mark_select_mode = '<A-t>',
+          switch_to_next_trail_mark_stack = '<A-.>',
+          switch_to_previous_trail_mark_stack = '<A-,>',
+          set_trail_mark_stack_sort_mode = '<A-s>',
         },
       },
     },
@@ -205,7 +215,7 @@ function TrailBlazer.paste_at_all_trail_marks(buf)
 end
 
 --- Set the trail mark selection mode to the given mode or toggle between the available modes.
----@param mode string
+---@param mode? string
 function TrailBlazer.set_trail_mark_select_mode(mode)
   if not TrailBlazer.is_configured() then return end
   trails.actions.set_trail_mark_select_mode(mode)
@@ -218,6 +228,62 @@ end
 function TrailBlazer.toggle_trail_mark_list(type, buf)
   if not TrailBlazer.is_configured() then return end
   trails.list.toggle_trail_mark_list(type, helpers.get_buf_nr(buf))
+end
+
+--- Switch the trail mark stack to the specified stack.
+---@param name? string
+function TrailBlazer.switch_trail_mark_stack(name)
+  if not TrailBlazer.is_configured() then return end
+  trails.actions.switch_trail_mark_stack(name)
+  trails.list.update_trail_mark_list()
+end
+
+--- Delete the specified trail mark stack or the current one if no name is supplied.
+---@param name? string
+function TrailBlazer.delete_trail_mark_stack(name)
+  if not TrailBlazer.is_configured() then return end
+  trails.actions.delete_trail_mark_stack(name)
+  trails.list.update_trail_mark_list()
+end
+
+--- Delete all trail mark stacks.
+function TrailBlazer.delte_all_trail_mark_stacks()
+  if not TrailBlazer.is_configured() then return end
+  trails.actions.delete_all_trail_mark_stacks()
+  trails.list.update_trail_mark_list()
+end
+
+--- Add the current trail mark stack under the specified name or "default" if no name is supplied.
+---@param name? string
+function TrailBlazer.add_trail_mark_stack(name)
+  if not TrailBlazer.is_configured() then return end
+  trails.actions.add_trail_mark_stack(name)
+  trails.list.update_trail_mark_list()
+end
+
+--- Switch to the next trail mark stack using the given sort mode or the current one if no sort mode
+--- is supplied.
+---@param sort_mode? string
+function TrailBlazer.switch_to_next_trail_mark_stack(sort_mode)
+  if not TrailBlazer.is_configured() then return end
+  trails.actions.switch_to_next_trail_mark_stack(sort_mode)
+  trails.list.update_trail_mark_list()
+end
+
+--- Switch to the previous trail mark stack using the given sort mode or the current one if no sort
+--- mode is supplied.
+---@param sort_mode? string
+function TrailBlazer.switch_to_previous_trail_mark_stack(sort_mode)
+  if not TrailBlazer.is_configured() then return end
+  trails.actions.switch_to_previous_trail_mark_stack(sort_mode)
+  trails.list.update_trail_mark_list()
+end
+
+--- Set the trail mark stack sort mode to the given mode or toggle between the available modes.
+---@param sort_mode? string
+function TrailBlazer.set_trail_mark_stack_sort_mode(sort_mode)
+  if not TrailBlazer.is_configured() then return end
+  trails.actions.set_trail_mark_stack_sort_mode(sort_mode)
 end
 
 --- Check if TrailBlazer is configured.

@@ -13,12 +13,14 @@ local List = {}
 
 local config = require("trailblazer.trails.config")
 local common = require("trailblazer.trails.common")
+local stacks = require("trailblazer.trails.stacks")
 local helpers = require("trailblazer.helpers")
 local keymaps = require("trailblazer.keymaps")
 local log = require("trailblazer.log")
 
 List.config = {
   qf_title = "TrailBlazer Trail Mark Stack: ",
+  qf_stack_name_separator = " ~ ",
   qf_buf_name_separator = " - ",
   quickfix_mappings = {
     nv = {
@@ -108,10 +110,12 @@ function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
   end
 
   if buf then
-    qf_title = List.config.qf_title .. config.custom.current_trail_mark_mode ..
-        List.config.qf_buf_name_separator .. helpers.buf_get_relative_file_path(buf)
+    qf_title = List.config.qf_title .. stacks.current_trail_mark_stack_name ..
+        List.config.qf_stack_name_separator .. config.custom.current_trail_mark_mode
+        .. List.config.qf_buf_name_separator .. helpers.buf_get_relative_file_path(buf)
   else
-    qf_title = List.config.qf_title .. config.custom.current_trail_mark_mode
+    qf_title = List.config.qf_title .. stacks.current_trail_mark_stack_name ..
+        List.config.qf_stack_name_separator .. config.custom.current_trail_mark_mode
   end
 
   local _, rel_cursor = common.get_relative_marks_and_cursor(buf, common.trail_mark_cursor)

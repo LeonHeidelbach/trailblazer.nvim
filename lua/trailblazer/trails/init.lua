@@ -11,6 +11,7 @@ local Trails = {}
 
 Trails.config = require("trailblazer.trails.config")
 Trails.common = require("trailblazer.trails.common")
+Trails.stacks = require("trailblazer.trails.stacks")
 Trails.actions = require("trailblazer.trails.actions")
 Trails.motions = require("trailblazer.trails.motions")
 Trails.list = require("trailblazer.trails.list")

@@ -27,6 +27,11 @@ Log.langs = {
   en = {
     infos = {
       current_trail_mark_select_mode = "Current trail mark select mode: ",
+      trail_mark_stack_deleted = "Trail mark stack deleted: ",
+      trail_mark_stack_switched = "Trail mark stack switched to: ",
+      no_next_trail_mark_stack = "No next trail mark stack available.",
+      no_previous_trail_mark_stack = "No previous trail mark stack available.",
+      current_trail_mark_stack_sort_mode = "Current trail mark stack sort mode: ",
     },
     warnings = {
       invalid_trail_mark_select_mode = "Invalid trail mark select mode. Please use one of the "
@@ -38,6 +43,8 @@ Log.langs = {
           .. "your module. [Callback | Module] is -> ",
       invalid_trailblazer_list_type = "Invalid TrailBlazer list type. Please use one of the "
           .. "following: ",
+      invalid_trail_mark_stack_sort_mode = "Invalid trail mark stack sort mode. Please use one of "
+          .. "the following: ",
     },
     errors = {
       not_configured = "TrailBlazer is not configured. Please call `require('trailblazer').setup()`"
@@ -72,7 +79,7 @@ end
 ---@param additional_info? string
 function Log.info(name, additional_info)
   api.nvim_notify(Log.config.prefixes.info .. " " .. Log.current_lang.infos[name] ..
-    (tostring(additional_info) or ""), 0, {})
+    (additional_info and tostring(additional_info) or ""), 0, {})
 end
 
 --- Log a warning message.
@@ -80,7 +87,7 @@ end
 ---@param additional_info? string
 function Log.warn(name, additional_info)
   api.nvim_err_writeln(Log.config.prefixes.warn .. " " .. Log.current_lang.warnings[name] ..
-    (tostring(additional_info) or ""))
+    (additional_info and tostring(additional_info) or ""))
 end
 
 --- Log an error message.
@@ -88,7 +95,7 @@ end
 ---@param additional_info? string
 function Log.error(name, additional_info)
   error(Log.config.prefixes.error .. " " .. Log.current_lang.errors[name] ..
-    (tostring(additional_info) or ""))
+    (additional_info and tostring(additional_info) or ""))
 end
 
 Log.setup(Log.config.default_lang)

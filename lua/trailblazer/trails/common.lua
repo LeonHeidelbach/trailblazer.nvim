@@ -13,10 +13,10 @@ local Common = {}
 
 local config = require("trailblazer.trails.config")
 local helpers = require("trailblazer.helpers")
+local stacks = require("trailblazer.trails.stacks")
 local log = require("trailblazer.log")
 
 Common.trail_mark_cursor = 0
-Common.trail_mark_stack = {}
 
 --- Paste the selected register contents at a specifi trail mark.
 ---@param buf? number
@@ -38,7 +38,7 @@ function Common.paste_at_trail_mark(buf, trail_mark_index)
   api.nvim_paste(fn.getreg(api.nvim_get_vvar("register")), false, -1)
   api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
 
-  Common.trail_mark_cursor = #Common.trail_mark_stack
+  Common.trail_mark_cursor = #stacks.current_trail_mark_stack
   Common.reregister_trail_marks()
 
   return true
@@ -78,11 +78,11 @@ function Common.sort_trail_mark_stack(mode)
   end
 
   if mode == "global_chron" then
-    table.sort(Common.trail_mark_stack, function(a, b)
+    table.sort(stacks.current_trail_mark_stack, function(a, b)
       return a.timestamp < b.timestamp
     end)
   elseif mode == "global_buf_line_sorted" then
-    table.sort(Common.trail_mark_stack, function(a, b)
+    table.sort(stacks.current_trail_mark_stack, function(a, b)
       if a.buf == b.buf then
         if a.pos[1] == b.pos[1] then
           return a.pos[2] < b.pos[2]
@@ -94,15 +94,15 @@ function Common.sort_trail_mark_stack(mode)
       end
     end)
   elseif mode == "global_chron_buf_line_sorted" then
-    table.sort(Common.trail_mark_stack, function(a, b)
+    table.sort(stacks.current_trail_mark_stack, function(a, b)
       return a.timestamp < b.timestamp
     end)
 
-    table.sort(Common.trail_mark_stack, function(a, b)
+    table.sort(stacks.current_trail_mark_stack, function(a, b)
       return a.buf < b.buf
     end)
 
-    table.sort(Common.trail_mark_stack, function(a, b)
+    table.sort(stacks.current_trail_mark_stack, function(a, b)
       return a.pos[1] < b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] < b.pos[2])
     end)
   elseif mode == "global_chron_buf_switch_group_chron" or
@@ -124,11 +124,11 @@ function Common.sort_trail_mark_stack(mode)
       current_subset = {}
     end
 
-    table.sort(Common.trail_mark_stack, function(a, b)
+    table.sort(stacks.current_trail_mark_stack, function(a, b)
       return a.timestamp > b.timestamp
     end)
 
-    for _, mark in ipairs(Common.trail_mark_stack) do
+    for _, mark in ipairs(stacks.current_trail_mark_stack) do
       if current_buf ~= mark.buf then
         if current_buf > -1 then
           sort_current_subset_and_insert()
@@ -156,9 +156,9 @@ function Common.sort_trail_mark_stack(mode)
       helpers.tbl_append(new_trail_mark_stack, subset)
     end
 
-    Common.trail_mark_stack = new_trail_mark_stack
+    stacks.current_trail_mark_stack = new_trail_mark_stack
   elseif mode == "buffer_local_chron" then
-    table.sort(Common.trail_mark_stack, function(a, b)
+    table.sort(stacks.current_trail_mark_stack, function(a, b)
       if a.buf == b.buf then
         return a.timestamp < b.timestamp
       else
@@ -166,7 +166,7 @@ function Common.sort_trail_mark_stack(mode)
       end
     end)
   elseif mode == "buffer_local_line_sorted" then
-    table.sort(Common.trail_mark_stack, function(a, b)
+    table.sort(stacks.current_trail_mark_stack, function(a, b)
       if a.buf == b.buf then
         return a.pos[1] < b.pos[1] or (a.pos[1] == b.pos[1] and a.pos[2] < b.pos[2])
       else
@@ -251,16 +251,16 @@ function Common.get_trail_mark_under_cursor(win, buf, pos)
     trail_mark_index = helpers.tbl_indexof(function(trail_mark)
       return current_win == trail_mark.win and current_buffer == trail_mark.buf and
           trail_mark.mark_id == current_ext_mark[1]
-    end, Common.trail_mark_stack)
+    end, stacks.current_trail_mark_stack)
   end
 
   if trail_mark_index ~= nil then
-    if Common.trail_mark_cursor > #Common.trail_mark_stack then
+    if Common.trail_mark_cursor > #stacks.current_trail_mark_stack then
       Common.trail_mark_cursor = trail_mark_index
     end
 
     Common.reregister_trail_marks()
-    return trail_mark_index, Common.trail_mark_stack[trail_mark_index]
+    return trail_mark_index, stacks.current_trail_mark_stack[trail_mark_index]
   end
 
   Common.reregister_trail_marks()
@@ -277,9 +277,9 @@ end
 function Common.get_marks_for_trail_mark_index(buf, newest_mark_index, remove_trail_mark)
   local ok, extracted_ext_mark, last_mark
 
-  while #Common.trail_mark_stack > 0 do
+  while #stacks.current_trail_mark_stack > 0 do
     if newest_mark_index then
-      last_mark = Common.trail_mark_stack[newest_mark_index]
+      last_mark = stacks.current_trail_mark_stack[newest_mark_index]
 
       if last_mark then
         ok, extracted_ext_mark, _ = pcall(api.nvim_buf_get_extmarks, last_mark.buf,
@@ -287,7 +287,7 @@ function Common.get_marks_for_trail_mark_index(buf, newest_mark_index, remove_tr
       end
 
       if remove_trail_mark then
-        table.remove(Common.trail_mark_stack, newest_mark_index)
+        table.remove(stacks.current_trail_mark_stack, newest_mark_index)
       end
 
       if ok then break end
@@ -310,7 +310,7 @@ function Common.get_newest_and_oldest_mark_index_for_buf(buf)
   local newest_mark_index = nil
   local oldest_mark_index = nil
 
-  for i, trail_mark in ipairs(Common.trail_mark_stack) do
+  for i, trail_mark in ipairs(stacks.current_trail_mark_stack) do
     if (not buf or trail_mark.buf == buf) then
       if trail_mark.timestamp > max_time then
         max_time = trail_mark.timestamp
@@ -324,7 +324,7 @@ function Common.get_newest_and_oldest_mark_index_for_buf(buf)
     end
   end
 
-  return newest_mark_index or #Common.trail_mark_stack, oldest_mark_index or 0
+  return newest_mark_index or #stacks.current_trail_mark_stack, oldest_mark_index or 0
 end
 
 --- Get a mark selection depending on the current mark selection mode and the corresponding
@@ -339,17 +339,17 @@ function Common.get_relative_marks_and_cursor(buf, current_mark_index)
   if buf then
     marks = vim.tbl_filter(function(mark)
       return mark.buf == buf
-    end, Common.trail_mark_stack)
+    end, stacks.current_trail_mark_stack)
     cursor = helpers.tbl_indexof(function(mark)
-      return mark.buf == buf and Common.trail_mark_stack[current_mark_index] and
-          Common.trail_mark_stack[current_mark_index].mark_id == mark.mark_id
+      return mark.buf == buf and stacks.current_trail_mark_stack[current_mark_index] and
+          stacks.current_trail_mark_stack[current_mark_index].mark_id == mark.mark_id
     end, marks) or helpers.tbl_indexof(function(mark)
-      return mark.buf == buf and Common.trail_mark_stack[Common.trail_mark_cursor] and
-          mark.timestamp == Common.trail_mark_stack[Common.trail_mark_cursor].timestamp
+      return mark.buf == buf and stacks.current_trail_mark_stack[Common.trail_mark_cursor] and
+          mark.timestamp == stacks.current_trail_mark_stack[Common.trail_mark_cursor].timestamp
     end, marks) or #marks
   else
-    marks = Common.trail_mark_stack
-    cursor = Common.trail_mark_cursor or #Common.trail_mark_stack
+    marks = stacks.current_trail_mark_stack
+    cursor = Common.trail_mark_cursor or #stacks.current_trail_mark_stack
   end
 
   return marks, cursor
@@ -365,7 +365,7 @@ function Common.get_first_trail_mark_index(win, buf, pos)
     return (not win or win and mark.win == win) and
         (not win or buf and mark.buf == buf) and
         (not pos or pos and mark.pos[1] == pos[1] and mark.pos[2] == pos[2])
-  end, Common.trail_mark_stack)
+  end, stacks.current_trail_mark_stack)
 end
 
 --- Returns the corresponding highlight group for the provided or global trail mark selection mode.
@@ -396,7 +396,7 @@ function Common.translate_actual_cursor_from_relative_marks_and_cursor(buf, mark
 
   Common.trail_mark_cursor = helpers.tbl_indexof(function(mark)
     return marks[cursor] and mark.timestamp == marks[cursor].timestamp
-  end, Common.trail_mark_stack) or newest_mark_index
+  end, stacks.current_trail_mark_stack) or newest_mark_index
 
   Common.reregister_trail_marks()
 end
@@ -416,17 +416,17 @@ end
 
 --- Remove duplicate trail marks from the stack.
 function Common.remove_duplicate_pos_trail_marks()
-  local trail_count = #Common.trail_mark_stack
-  Common.trail_mark_stack = helpers.dedupe(function(item, dedupe_tbl)
+  local trail_count = #stacks.current_trail_mark_stack
+  stacks.current_trail_mark_stack = helpers.dedupe(function(item, dedupe_tbl)
     return helpers.tbl_find(function(dedupe_item)
       return item.win == dedupe_item.win and item.buf == dedupe_item.buf and
           item.pos[1] == dedupe_item.pos[1] and item.pos[2] == dedupe_item.pos[2]
     end, dedupe_tbl) ~= nil
-  end, Common.trail_mark_stack, function(item)
+  end, stacks.current_trail_mark_stack, function(item)
     api.nvim_buf_del_extmark(item.buf, config.nsid, item.mark_id)
   end)
-  if trail_count ~= #Common.trail_mark_stack then
-    Common.trail_mark_cursor = #Common.trail_mark_stack - 1
+  if trail_count ~= #stacks.current_trail_mark_stack then
+    Common.trail_mark_cursor = #stacks.current_trail_mark_stack - 1
   end
 end
 
@@ -442,7 +442,7 @@ function Common.update_all_trail_mark_positions()
     return { [buf] = api.nvim_buf_get_extmarks(buf, config.nsid, 0, -1, {}) }
   end, vim.tbl_keys(buf_list), true)
 
-  for _, trail_mark in ipairs(Common.trail_mark_stack) do
+  for _, trail_mark in ipairs(stacks.current_trail_mark_stack) do
     if ext_marks[trail_mark.buf] then
       local ext_mark = helpers.tbl_find(function(ext_mark)
         return ext_mark[1] == trail_mark.mark_id
@@ -468,16 +468,16 @@ end
 function Common.reregister_trail_marks()
   Common.delete_all_ext_marks()
 
-  if #Common.trail_mark_stack <= 0 then return end
+  if #stacks.current_trail_mark_stack <= 0 then return end
 
   local ok, hl_group
   local newest_mark_index, _ = Common.get_newest_and_oldest_mark_index_for_buf(
     Common.default_buf_for_current_mark_select_mode(nil))
-  local current_cursor_mark = Common.trail_mark_stack[Common.trail_mark_cursor] or
-      Common.trail_mark_stack[#Common.trail_mark_stack]
+  local current_cursor_mark = stacks.current_trail_mark_stack[Common.trail_mark_cursor] or
+      stacks.current_trail_mark_stack[#stacks.current_trail_mark_stack]
   local special_marks = {}
 
-  for i, mark in ipairs(Common.trail_mark_stack) do
+  for i, mark in ipairs(stacks.current_trail_mark_stack) do
     local pos_text = helpers.buf_get_utf8_char_at_pos(mark.buf, mark.pos)
 
     local mark_options = {
@@ -557,7 +557,7 @@ function Common.reregister_trail_marks()
       mark.pos[1] - 1, mark.pos[2], mark_options)
 
     if not ok then
-      table.remove(Common.trail_mark_stack, i)
+      table.remove(stacks.current_trail_mark_stack, i)
     end
   end
 end
@@ -574,9 +574,9 @@ function Common.get_trail_mark_stack_subset_for_buf(buf)
 
     return vim.tbl_filter(function(mark)
       return mark.buf == buf
-    end, Common.trail_mark_stack)
+    end, stacks.current_trail_mark_stack)
 
-  else return Common.trail_mark_stack end
+  else return stacks.current_trail_mark_stack end
 end
 
 return Common
