@@ -28,6 +28,14 @@ function GET_AVAILABLE_TRAIL_MARK_LIST_MODES()
   return require("trailblazer.trails").config.custom.available_trail_mark_lists
 end
 
+function GET_AVAILABLE_TRAIL_MARK_STACKS()
+  return require("trailblazer.trails").stacks.get_sorted_stack_names()
+end
+
+function GET_AVAILABLE_TRAIL_MARK_STACK_SORT_MODES()
+  return require("trailblazer.trails").config.custom.available_trail_mark_stack_sort_modes
+end
+
 -- User commands
 api.nvim_create_user_command("TrailBlazerNewTrailMark",
   function(args) tb.new_trail_mark(tonumber(args.fargs[1]), tonumber(args.fargs[2]),
@@ -65,6 +73,34 @@ end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_SELECT
 api.nvim_create_user_command("TrailBlazerToggleTrailMarkList", function(args)
   tb.toggle_trail_mark_list(args.fargs[1], args.fargs[2])
 end, { nargs = "*", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_LIST_MODES" })
+
+api.nvim_create_user_command("TrailBlazerSwitchTrailMarkStack", function(args)
+  tb.switch_trail_mark_stack(args.args)
+end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACKS" })
+
+api.nvim_create_user_command("TrailBlazerAddTrailMarkStack", function(args)
+  tb.add_trail_mark_stack(args.args)
+end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACKS" })
+
+api.nvim_create_user_command("TrailBlazerDeleteTrailMarkStack", function(args)
+  tb.delete_trail_mark_stack(args.fargs)
+end, { nargs = "*", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACKS" })
+
+api.nvim_create_user_command("TrailBlazerDeleteAllTrailMarkStacks", tb.delte_all_trail_mark_stacks,
+  {})
+
+api.nvim_create_user_command("TrailBlazerSwitchNextTrailMarkStack", function(args)
+  tb.switch_to_next_trail_mark_stack(args.args)
+end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACK_SORT_MODES" })
+
+api.nvim_create_user_command("TrailBlazerSwitchPreviousTrailMarkStack", function(args)
+  tb.switch_to_previous_trail_mark_stack(args.args)
+end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACK_SORT_MODES" })
+
+api.nvim_create_user_command("TrailBlazerSetTrailMarkStackSortMode", function(args)
+  tb.set_trail_mark_stack_sort_mode(vim.tbl_contains(GET_AVAILABLE_TRAIL_MARK_STACK_SORT_MODES(),
+    args.args) and args.args or nil)
+end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACK_SORT_MODES" })
 
 -- Auto commands
 api.nvim_create_autocmd("BufEnter", {
