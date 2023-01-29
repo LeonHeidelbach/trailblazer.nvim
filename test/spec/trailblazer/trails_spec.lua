@@ -5,7 +5,7 @@ describe("Trails.actions.new_trail_mark:", function()
   it("Register a new trail mark with no active buffer. Throws 'invalid_pos_for_buf_lines error'.",
     function()
       assert.has_error(tr.actions.new_trail_mark)
-      assert.are.same(true, #tr.common.trail_mark_stack == 0)
+      assert.are.same(true, #tr.stacks.current_trail_mark_stack == 0)
     end)
 end)
 
@@ -30,7 +30,7 @@ describe("Trails.actions.new_trail_mark:", function()
       local mark = tr.actions.new_trail_mark()
       if not mark then error("No trail mark was created.") end
       assert.are.same(true, mark ~= nil)
-      assert.are.same(mark, tr.common.trail_mark_stack[tr.common.trail_mark_cursor])
+      assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.common.trail_mark_cursor])
     end)
 end)
 
@@ -40,7 +40,7 @@ describe("Trails.actions.track_back:", function()
     local mark = tr.actions.new_trail_mark(nil, buf, nil)
     if not mark then error("No trail mark was created.") end
     assert.are.same(true, mark ~= nil)
-    assert.are.same(mark, tr.common.trail_mark_stack[tr.common.trail_mark_cursor])
+    assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.common.trail_mark_cursor])
     assert.are.same(true, tr.actions.track_back())
     assert.are.same(api.nvim_win_get_cursor(0), mark.pos)
   end)
@@ -52,11 +52,11 @@ describe("Trails.motions.peek_move_next_down:", function()
     local mark = tr.actions.new_trail_mark(nil, buf, nil)
     if not mark then error("No trail mark was created.") end
     assert.are.same(true, mark ~= nil)
-    assert.are.same(mark, tr.common.trail_mark_stack[tr.common.trail_mark_cursor])
+    assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.common.trail_mark_cursor])
     assert.are.same(true, tr.motions.peek_move_next_down())
     assert.are.same(true, tr.motions.peek_move_next_down())
     assert.are.same(api.nvim_win_get_cursor(0),
-      tr.common.trail_mark_stack[#tr.common.trail_mark_stack - 2].pos)
+      tr.stacks.current_trail_mark_stack[#tr.stacks.current_trail_mark_stack - 2].pos)
   end)
 end)
 
@@ -66,9 +66,9 @@ describe("Trails.motions.peek_move_previous_up:", function()
     local mark = tr.actions.new_trail_mark(nil, buf, nil)
     if not mark then error("No trail mark was created.") end
     assert.are.same(mark ~= nil, true)
-    assert.are.same(mark, tr.common.trail_mark_stack[tr.common.trail_mark_cursor])
+    assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.common.trail_mark_cursor])
     assert.are.same(true, tr.motions.peek_move_previous_up())
     assert.are.same(api.nvim_win_get_cursor(0),
-      tr.common.trail_mark_stack[#tr.common.trail_mark_stack - 2].pos)
+      tr.stacks.current_trail_mark_stack[#tr.stacks.current_trail_mark_stack - 2].pos)
   end)
 end)
