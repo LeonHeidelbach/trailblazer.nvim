@@ -265,10 +265,10 @@ trail marks will always be added to the currently selected trail mark stack.
 
 | Mode        | Description                                                                                                                     |
 |-------------|---------------------------------------------------------------------------------------------------------------------------------|
-| `alpha_asc` | This is the default mode. Trail mark stacks are cycled through in alphabetically ascending order depending to their given name. |
-| `alpha_dsc` | Trail mark stacks are cycled through in alphabetically descending order depending to their given name.                          |
-| `chron_asc` | Trail mark stacks are cycled through in chronological ascending order depending to their creation time.                         |
-| `chron_dsc` | Trail mark stacks are cycled through in chronological descending order depending to their creation time.                        |
+| `alpha_asc` | This is the default mode. Trail mark stacks are cycled through in alphabetically ascending order depending on their given name. |
+| `alpha_dsc` | Trail mark stacks are cycled through in alphabetically descending order depending on their given name.                          |
+| `chron_asc` | Trail mark stacks are cycled through in chronological ascending order depending on their creation time.                         |
+| `chron_dsc` | Trail mark stacks are cycled through in chronological descending order depending on their creation time.                        |
 
 
 ### Trail mark selection modes
