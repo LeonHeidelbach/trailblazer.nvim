@@ -148,6 +148,12 @@ available and set by default:
         trail_mark_in_text_highlights_enabled = true,
         trail_mark_symbol_line_indicators_enabled = false, -- show indicators for all trail marks in symbol column
         symbol_line_enabled = true,
+        default_trail_mark_stacks = {
+            -- this is the list of trail mark stacks that will be created by default. Add as many
+            -- as you like to this list. You can always create new ones in Neovim by using either
+            -- `:TrailBlazerSwitchTrailMarkStack <name>` or `:TrailBlazerAddTrailMarkStack <name>`
+            "default" -- , "stack_2", ...
+        },
         available_trail_mark_stack_sort_modes = {
             "alpha_asc", -- alphabetical ascending
             "alpha_dsc", -- alphabetical descending
