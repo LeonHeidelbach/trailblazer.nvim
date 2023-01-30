@@ -824,9 +824,18 @@ List.qf_action_save_visual_selection_start_line()
      Save the visual selection start line number for the quickfix list.
 
 
-List.get_quickfix_buf()                                  *List.get_quickfix_buf*
+List.restore_default_qflist({callback?})           *List.restore_default_qflist*
+     Restore the default quickfix list behavior.
+
+    Parameters: ~
+        {callback?}  (function)
+
+
+List.get_quickfix_buf({any_qf?})                         *List.get_quickfix_buf*
      Check if a TrailBlazer quick fix list is currently visible and return its buffer number.
-    @return number?
+
+    Parameters: ~
+        {any_qf?}  (boolean)  @return number?
 
 
                                                                 *trails.motions*
@@ -860,6 +869,13 @@ Motions.peek_move_next_down({buf?})                *Motions.peek_move_next_down*
                                                      *trailblazer.trails.stacks*
 
  This module is responsible for managing trail mark stacks.
+
+Stacks.setup({options?})                                          *Stacks.setup*
+     Setup TrailBlazer trail mark stacks.
+
+    Parameters: ~
+        {options?}  (table)
+
 
 Stacks.add_stack({name?})                                     *Stacks.add_stack*
      Pushes the current trail mark stack to the trail mark stack list under the given name.
