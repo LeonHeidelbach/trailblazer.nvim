@@ -47,6 +47,9 @@ local function set_defaults(opts)
       trail_mark_in_text_highlights_enabled = true,
       trail_mark_symbol_line_indicators_enabled = false,
       symbol_line_enabled = true,
+      default_trail_mark_stacks = {
+        "default"
+      },
       available_trail_mark_stack_sort_modes = {
         "alpha_asc",
         "alpha_dsc",

@@ -36,6 +36,9 @@ Config.custom.number_line_color_enabled = true
 Config.trail_mark_in_text_highlights_enabled = true
 Config.trail_mark_symbol_line_indicators_enabled = false
 Config.custom.symbol_line_enabled = true
+Config.custom.default_trail_mark_stacks = {
+  "default"
+}
 Config.custom.available_trail_mark_stack_sort_modes = {
   "alpha_asc",
   "alpha_dsc",

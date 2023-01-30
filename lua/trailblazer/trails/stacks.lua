@@ -19,6 +19,17 @@ Stacks.current_trail_mark_stack_name = "default"
 Stacks.current_trail_mark_stack = {}
 Stacks.trail_mark_stack_list = {}
 
+--- Setup TrailBlazer trail mark stacks.
+---@param options? table
+function Stacks.setup(options)
+  if options and options.default_trail_mark_stacks and
+      type(options.default_trail_mark_stacks) == "table" then
+    for _, name in ipairs(options.default_trail_mark_stacks) do
+      Stacks.add_stack(name)
+    end
+  end
+end
+
 --- Pushes the current trail mark stack to the trail mark stack list under the given name.
 ---@param name? string
 function Stacks.add_stack(name)
