@@ -79,8 +79,9 @@ end
 ---@param trail_mark_list? table
 function List.toggle_quick_fix_list(buf, trail_mark_list)
 
-  if List.get_quickfix_buf() then
-    vim.cmd("cclose")
+  local qf_buf = List.get_quickfix_buf()
+  if qf_buf then
+    pcall(api.nvim_command, "bdelete! " .. qf_buf)
     return
   end
 
@@ -143,6 +144,10 @@ end
 
 --- Move the trail mark stack cursor on selecting a trail mark from the quickfix list.
 function List.qf_action_move_trail_mark_stack_cursor()
+  if List.get_quickfix_buf() == nil then
+    return List.restore_default_qflist()
+  end
+
   local qf = fn.getqflist({ id = 0, items = 1 })
 
   if qf and qf.items and #qf.items > 0 then
@@ -160,6 +165,10 @@ end
 
 --- Delete the selected trail marks from the trail mark stack.
 function List.qf_action_delete_trail_mark_selection()
+  if List.get_quickfix_buf() == nil then
+    return List.restore_default_qflist()
+  end
+
   local qf = fn.getqflist({ id = 0, items = 1 })
 
   if qf and qf.items and #qf.items > 0 then
@@ -184,16 +193,47 @@ end
 
 --- Save the visual selection start line number for the quickfix list.
 function List.qf_action_save_visual_selection_start_line()
+  if List.get_quickfix_buf() == nil then
+    List.restore_default_qflist()
+    return
+  end
   List.config.visual_selection_start_line = api.nvim_win_get_cursor(0)[1]
   api.nvim_command("normal! V")
 end
 
+--- Restore the default quickfix list behavior.
+---@param callback? function
+function List.restore_default_qflist(callback)
+  local qf_cursor_pos = api.nvim_win_get_cursor(0)
+  local qf_buf = List.get_quickfix_buf(true)
+  local qf = fn.getqflist({ id = 0, items = 1 })
+  local qf_title = qf.title
+  local qf_idx = qf.idx
+  local qf_items = qf.items
+
+  pcall(api.nvim_command, "bdelete! " .. qf_buf)
+
+  fn.setqflist({}, "r", {
+    title = qf_title,
+    idx = qf_idx,
+    items = qf_items,
+  })
+
+  vim.cmd("copen")
+  api.nvim_win_set_cursor(0, qf_cursor_pos)
+
+  if callback then
+    callback()
+  end
+end
+
 --- Check if a TrailBlazer quick fix list is currently visible and return its buffer number.
+---@param any_qf? boolean
 ---@return number?
-function List.get_quickfix_buf()
+function List.get_quickfix_buf(any_qf)
   for _, win in pairs(fn.getwininfo()) do
-    if win["quickfix"] == 1 and win["variables"] and win["variables"]["quickfix_title"] and
-        string.match(win["variables"]["quickfix_title"], "^" .. List.config.qf_title) then
+    if win["quickfix"] == 1 and (any_qf or win["variables"] and win["variables"]["quickfix_title"]
+        and string.match(win["variables"]["quickfix_title"], "^" .. List.config.qf_title)) then
       return win["bufnr"]
     end
   end
