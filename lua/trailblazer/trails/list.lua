@@ -26,6 +26,13 @@ List.config = {
     nv = {
       motions = {
         qf_action_move_trail_mark_stack_cursor = "<CR>",
+      },
+      actions = {
+        qf_action_delete_trail_mark_selection = "d",
+        qf_action_save_visual_selection_start_line = "v",
+      },
+      alt_action_maps = {
+        qf_action_save_visual_selection_start_line = "V",
       }
     }
   }
@@ -144,9 +151,41 @@ function List.qf_action_move_trail_mark_stack_cursor()
     local buf = item.bufnr
     local mark = common.get_first_trail_mark_index(nil, buf, { item.lnum, item.col - 1 })
 
+    if fn.mode() == 'V' then api.nvim_command('normal! V') end
+
     common.focus_win_and_buf_by_trail_mark_index(buf, mark, false)
     List.update_trail_mark_list()
   end
+end
+
+--- Delete the selected trail marks from the trail mark stack.
+function List.qf_action_delete_trail_mark_selection()
+  local qf = fn.getqflist({ id = 0, items = 1 })
+
+  if qf and qf.items and #qf.items > 0 then
+    local current_idx = api.nvim_win_get_cursor(0)[1]
+    local start_idx, end_idx = current_idx, current_idx
+
+    if fn.mode() == 'V' and current_idx ~= List.config.visual_selection_start_line then
+      start_idx = math.min(List.config.visual_selection_start_line, current_idx)
+      end_idx = math.max(List.config.visual_selection_start_line, current_idx)
+      api.nvim_command("normal! V")
+    end
+
+    for i = start_idx, end_idx do
+      local item = qf.items[i]
+      local buf = item.bufnr
+      common.delete_trail_mark_at_pos(-1, buf, { item.lnum, item.col - 1 })
+    end
+
+    List.update_trail_mark_list()
+  end
+end
+
+--- Save the visual selection start line number for the quickfix list.
+function List.qf_action_save_visual_selection_start_line()
+  List.config.visual_selection_start_line = api.nvim_win_get_cursor(0)[1]
+  api.nvim_command("normal! V")
 end
 
 --- Check if a TrailBlazer quick fix list is currently visible and return its buffer number.

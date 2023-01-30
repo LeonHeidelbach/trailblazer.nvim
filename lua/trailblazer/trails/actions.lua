@@ -23,25 +23,7 @@ local log = require("trailblazer.log")
 ---@param pos? table<number, number>
 ---@return table?
 function Actions.new_trail_mark(win, buf, pos)
-  local trail_mark_index, trail_mark = common.get_trail_mark_under_cursor(win, buf, pos)
-
-  if trail_mark_index and trail_mark then
-    api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
-    table.remove(stacks.current_trail_mark_stack, trail_mark_index)
-
-    local newest_mark_index, oldest_mark_index = common.get_newest_and_oldest_mark_index_for_buf(
-      buf)
-
-    if trail_mark_index <= common.trail_mark_cursor and common.trail_mark_cursor
-        >= oldest_mark_index and common.trail_mark_cursor <= newest_mark_index then
-      common.trail_mark_cursor = common.trail_mark_cursor - 1
-    elseif common.trail_mark_cursor - 1 <= oldest_mark_index then
-      common.trail_mark_cursor = oldest_mark_index
-    end
-
-    common.reregister_trail_marks()
-    return nil
-  end
+  if common.delete_trail_mark_at_pos(win, buf, pos) then return nil end
 
   local current_win = win or api.nvim_get_current_win()
   local current_buf = buf or api.nvim_get_current_buf()

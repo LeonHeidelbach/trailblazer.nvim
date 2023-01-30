@@ -227,21 +227,21 @@ function Common.focus_win_and_buf_by_trail_mark_index(buf, trail_mark_index, rem
   return false
 end
 
---- Return the trail mark and its index in the trail mark stack under the current cursor location.
+--- Returns the trail mark and its index in the trail mark stack at the specified location.
 ---@param win? number
 ---@param buf? number
 ---@param pos? table<number, number>
 ---@return number?
 ---@return table?
-function Common.get_trail_mark_under_cursor(win, buf, pos)
+function Common.get_trail_mark_at_pos(win, buf, pos)
   local trail_mark_index
   local current_win = win or api.nvim_get_current_win()
   local current_buffer = buf or api.nvim_get_current_buf()
-  local current_cursor = pos or api.nvim_win_get_cursor(0)
+  local current_pos = pos or api.nvim_win_get_cursor(0)
   local ext_marks = api.nvim_buf_get_extmarks(current_buffer, config.nsid, 0, -1, {})
 
   local current_ext_mark = helpers.tbl_find(function(ext_mark)
-    return ext_mark[2] + 1 == current_cursor[1] and ext_mark[3] == current_cursor[2]
+    return ext_mark[2] + 1 == current_pos[1] and ext_mark[3] == current_pos[2]
   end, ext_marks)
 
   Common.update_all_trail_mark_positions()
@@ -249,8 +249,8 @@ function Common.get_trail_mark_under_cursor(win, buf, pos)
 
   if current_ext_mark ~= nil then
     trail_mark_index = helpers.tbl_indexof(function(trail_mark)
-      return current_win == trail_mark.win and current_buffer == trail_mark.buf and
-          trail_mark.mark_id == current_ext_mark[1]
+      return (current_win == -1 or current_win == trail_mark.win)
+          and current_buffer == trail_mark.buf and trail_mark.mark_id == current_ext_mark[1]
     end, stacks.current_trail_mark_stack)
   end
 
@@ -453,6 +453,35 @@ function Common.update_all_trail_mark_positions()
       end
     end
   end
+end
+
+--- Delete the trail mark at the provided position.
+---@param win? number
+---@param buf? number
+---@param pos? table<number,number>
+---@return boolean
+function Common.delete_trail_mark_at_pos(win, buf, pos)
+  local trail_mark_index, trail_mark = Common.get_trail_mark_at_pos(win, buf, pos)
+
+  if trail_mark_index and trail_mark then
+    api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
+    table.remove(stacks.current_trail_mark_stack, trail_mark_index)
+
+    local newest_mark_index, oldest_mark_index = Common.get_newest_and_oldest_mark_index_for_buf(
+      buf)
+
+    if trail_mark_index <= Common.trail_mark_cursor and Common.trail_mark_cursor
+        >= oldest_mark_index and Common.trail_mark_cursor <= newest_mark_index then
+      Common.trail_mark_cursor = Common.trail_mark_cursor - 1
+    elseif Common.trail_mark_cursor - 1 <= oldest_mark_index then
+      Common.trail_mark_cursor = oldest_mark_index
+    end
+
+    Common.reregister_trail_marks()
+    return true
+  end
+
+  return false
 end
 
 --- Delete extmarks from all buffers.
