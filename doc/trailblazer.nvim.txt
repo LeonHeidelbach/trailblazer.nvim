@@ -605,9 +605,9 @@ Common.focus_win_and_buf_by_trail_mark_index({buf?}, {trail_mark_index?}, {remov
         (boolean)
 
 
-                                            *Common.get_trail_mark_under_cursor*
-Common.get_trail_mark_under_cursor({win?}, {buf?}, {pos?})
-     Return the trail mark and its index in the trail mark stack under the current cursor location.
+                                                  *Common.get_trail_mark_at_pos*
+Common.get_trail_mark_at_pos({win?}, {buf?}, {pos?})
+     Returns the trail mark and its index in the trail mark stack at the specified location.
 
     Parameters: ~
         {win?}  (number)
@@ -699,6 +699,19 @@ Common.remove_duplicate_pos_trail_marks()
 Common.update_all_trail_mark_positions()*Common.update_all_trail_mark_positions*
      Update the positions of all trail marks in the stack by loading all extmarks for each loaded
      buffer and updating the trail mark stack.
+
+
+                                               *Common.delete_trail_mark_at_pos*
+Common.delete_trail_mark_at_pos({win?}, {buf?}, {pos?})
+     Delete the trail mark at the provided position.
+
+    Parameters: ~
+        {win?}  (number)
+        {buf?}  (number)
+        {pos?}  (table<number,number>)
+
+    Returns: ~
+        (boolean)
 
 
 Common.delete_all_ext_marks()                      *Common.delete_all_ext_marks*
@@ -799,6 +812,16 @@ List.register_quickfix_keybindings({mapping_table})
                                    *List.qf_action_move_trail_mark_stack_cursor*
 List.qf_action_move_trail_mark_stack_cursor()
      Move the trail mark stack cursor on selecting a trail mark from the quickfix list.
+
+
+                                    *List.qf_action_delete_trail_mark_selection*
+List.qf_action_delete_trail_mark_selection()
+     Delete the selected trail marks from the trail mark stack.
+
+
+                               *List.qf_action_save_visual_selection_start_line*
+List.qf_action_save_visual_selection_start_line()
+     Save the visual selection start line number for the quickfix list.
 
 
 List.get_quickfix_buf()                                  *List.get_quickfix_buf*
