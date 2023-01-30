@@ -46,12 +46,12 @@ function Actions.new_trail_mark(win, buf, pos)
   local new_mark = {
     timestamp = fn.reltimefloat(fn.reltime()),
     win = current_win, buf = current_buf,
-    pos = current_cursor, mark_id = config.ucid + 1,
+    pos = current_cursor, mark_id = stacks.ucid + 1,
   }
 
   table.insert(stacks.current_trail_mark_stack, new_mark)
 
-  config.ucid = config.ucid + 1
+  stacks.ucid = stacks.ucid + 1
   common.sort_trail_mark_stack()
   common.trail_mark_cursor, _ = common.get_newest_and_oldest_mark_index_for_buf(buf)
   common.reregister_trail_marks()
@@ -131,7 +131,7 @@ function Actions.delete_all_trail_marks(buf)
 
     common.trail_mark_cursor = common.trail_mark_cursor > 0 and common.trail_mark_cursor or 0
     stacks.current_trail_mark_stack = {}
-    config.ucid = 0
+    stacks.ucid = 0
   else
     local ext_marks = api.nvim_buf_get_extmarks(buf, config.nsid, 0, -1, {})
 

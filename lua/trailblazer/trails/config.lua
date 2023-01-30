@@ -45,7 +45,6 @@ Config.custom.available_trail_mark_stack_sort_modes = {
 Config.custom.current_trail_mark_stack_sort_mode = "alpha_asc"
 
 Config.ns_name = "trailblazer"
-Config.ucid = 0
 Config.nsid = api.nvim_create_namespace(Config.ns_name)
 
 --- Setup the TrailBlazer config module.

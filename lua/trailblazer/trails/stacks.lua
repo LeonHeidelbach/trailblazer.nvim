@@ -14,9 +14,9 @@ local config = require("trailblazer.trails.config")
 local helpers = require("trailblazer.helpers")
 local log = require("trailblazer.log")
 
+Stacks.ucid = 0
 Stacks.current_trail_mark_stack_name = "default"
 Stacks.current_trail_mark_stack = {}
-
 Stacks.trail_mark_stack_list = {}
 
 --- Pushes the current trail mark stack to the trail mark stack list under the given name.
