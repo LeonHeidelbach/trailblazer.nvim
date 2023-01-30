@@ -47,6 +47,7 @@ to come. If you have any suggestions or find any bugs, please open an issue.**
         * [Trail Mark Selection Modes](#trail-mark-selection-modes)
         * [Trail Mark Symbols](#trail-mark-symbols)
             * [Multiple Mark Symbol Counters](#multiple-mark-symbol-counters)
+        * [Trail Mark QuickFix-List](#trail-mark-quickfix-list)
     * [💻 User commands](#-user-commands)
     * [📚 Documentation](#-documentation)
     * [👥 Contributing](#-contributing)
@@ -328,6 +329,22 @@ be added to the line changing the displayed number to `3`. If you now add a thir
 line and peek move back to the trail mark before, we have the maximum number of four symbols in the
 same line as now the "Next Mark" symbol would also be added to the sign column changing the
 displayed number to `4`.
+
+### Trail Mark QuickFix-List
+
+With TrailBlazer you can view, delete and quickly jump to any of your trail marks from within a
+QuickFix-List. In the title bar of the QuickFix-List you can see the name of the current trail mark
+stack as well as the selection mode. If you are using any "buffer local" selection mode you will
+also see the name of the file in the current buffer.
+
+This QuickFix-List does also have a few special features that make editing your trail mark stack
+very convenient. The following key maps are currently available within the Trail Mark QuickFix-List:
+
+| Key Maps                     | Key-Code   | Description                                                                       |
+|------------------------------|------------|-----------------------------------------------------------------------------------|
+| <kbd>Enter</kbd>             | `<CR>`     | Jump to the trail mark under your cursor and set the current trail mark cursor.   |
+| <kbd>v</kbd> or <kbd>V</kbd> | `v` or `V` | Enter visual line mode and select multiple trail marks.                           |
+| <kbd>d</kbd>                 | `d`        | Delete the trail mark under your cursor or all trail marks within your selection. |
 
 ## 💻 User commands
 
