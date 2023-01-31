@@ -15,13 +15,14 @@ local helpers = require("trailblazer.helpers")
 local log = require("trailblazer.log")
 
 Stacks.ucid = 0
-Stacks.current_trail_mark_stack_name = "default"
 Stacks.current_trail_mark_stack = {}
 Stacks.trail_mark_stack_list = {}
 
 --- Setup TrailBlazer trail mark stacks.
 ---@param options? table
 function Stacks.setup(options)
+  Stacks.current_trail_mark_stack_name = config.custom.default_trail_mark_stacks[1] or "default"
+
   if options and options.default_trail_mark_stacks and
       type(options.default_trail_mark_stacks) == "table" then
     for _, name in ipairs(options.default_trail_mark_stacks) do
@@ -101,6 +102,10 @@ function Stacks.switch_to_next_stack(sort_mode)
     return name == Stacks.current_trail_mark_stack_name
   end, stack_names)
 
+  if current_stack_index == nil then
+    current_stack_index = 1
+  end
+
   Stacks.switch_current_stack(stack_names[current_stack_index >= #stack_names and 1
       or current_stack_index + 1])
 end
@@ -119,6 +124,10 @@ function Stacks.switch_to_previous_stack(sort_mode)
   local current_stack_index = helpers.tbl_indexof(function(name)
     return name == Stacks.current_trail_mark_stack_name
   end, stack_names)
+
+  if current_stack_index == nil then
+    current_stack_index = 1
+  end
 
   Stacks.switch_current_stack(stack_names[current_stack_index <= 1 and #stack_names
       or current_stack_index - 1])
