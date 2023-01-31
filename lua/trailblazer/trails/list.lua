@@ -25,7 +25,7 @@ List.config = {
   quickfix_mappings = {
     nv = {
       motions = {
-        qf_action_move_trail_mark_stack_cursor = "<CR>",
+        qf_motion_move_trail_mark_stack_cursor = "<CR>",
       },
       actions = {
         qf_action_delete_trail_mark_selection = "d",
@@ -63,7 +63,7 @@ function List.update_trail_mark_list(type, buf)
   buf = common.default_buf_for_current_mark_select_mode(buf)
 
   if type == "quickfix" then
-    if List.get_quickfix_buf() then
+    if List.get_trailblazer_quickfix_buf() then
       List.populate_quickfix_list_with_trail_marks(buf,
         common.get_trail_mark_stack_subset_for_buf(buf))
     end
@@ -79,7 +79,7 @@ end
 ---@param trail_mark_list? table
 function List.toggle_quick_fix_list(buf, trail_mark_list)
 
-  local qf_buf = List.get_quickfix_buf()
+  local qf_buf = List.get_trailblazer_quickfix_buf()
   if qf_buf then
     pcall(api.nvim_command, "bdelete! " .. qf_buf)
     return
@@ -138,15 +138,17 @@ end
 --- Register quickfix list keybindings.
 ---@param mapping_table table
 function List.register_quickfix_keybindings(mapping_table)
-  local qf_buf = List.get_quickfix_buf()
+  local qf_buf = List.get_trailblazer_quickfix_buf()
   keymaps.register_for_buf(mapping_table, "trailblazer.trails.list", List, qf_buf)
 end
 
 --- Move the trail mark stack cursor on selecting a trail mark from the quickfix list.
-function List.qf_action_move_trail_mark_stack_cursor()
-  if List.get_quickfix_buf() == nil then
-    return List.restore_default_qflist()
-  end
+function List.qf_motion_move_trail_mark_stack_cursor()
+  if List.restore_default_quickfix_keybindings_if_needed(function()
+    api.nvim_feedkeys(api.nvim_replace_termcodes(
+      List.config.quickfix_mappings.nv.motions.qf_motion_move_trail_mark_stack_cursor, true,
+      true, true), "n", true)
+  end) then return end
 
   local qf = fn.getqflist({ id = 0, items = 1 })
 
@@ -165,9 +167,7 @@ end
 
 --- Delete the selected trail marks from the trail mark stack.
 function List.qf_action_delete_trail_mark_selection()
-  if List.get_quickfix_buf() == nil then
-    return List.restore_default_qflist()
-  end
+  if List.restore_default_quickfix_keybindings_if_needed() then return end
 
   local qf = fn.getqflist({ id = 0, items = 1 })
 
@@ -193,44 +193,31 @@ end
 
 --- Save the visual selection start line number for the quickfix list.
 function List.qf_action_save_visual_selection_start_line()
-  if List.get_quickfix_buf() == nil then
-    List.restore_default_qflist()
-    return
-  end
+  if List.restore_default_quickfix_keybindings_if_needed() then return end
   List.config.visual_selection_start_line = api.nvim_win_get_cursor(0)[1]
   api.nvim_command("normal! V")
 end
 
---- Restore the default quickfix list behavior.
+--- Restore the default quickfix list behavior if the current quickfix list is not a TrailBlazer
+--- quickfix list.
 ---@param callback? function
-function List.restore_default_qflist(callback)
-  local qf_cursor_pos = api.nvim_win_get_cursor(0)
-  local qf_buf = List.get_quickfix_buf(true)
-  local qf = fn.getqflist({ id = 0, items = 1 })
-  local qf_title = qf.title
-  local qf_idx = qf.idx
-  local qf_items = qf.items
+---@return boolean
+function List.restore_default_quickfix_keybindings_if_needed(callback)
+  if List.get_trailblazer_quickfix_buf() == nil then
+    keymaps.unregister_for_buf(List.config.quickfix_mappings, "trailblazer.trails.list", List,
+      List.get_trailblazer_quickfix_buf(true))
 
-  pcall(api.nvim_command, "bdelete! " .. qf_buf)
+    if callback then callback() end
 
-  fn.setqflist({}, "r", {
-    title = qf_title,
-    idx = qf_idx,
-    items = qf_items,
-  })
-
-  vim.cmd("copen")
-  api.nvim_win_set_cursor(0, qf_cursor_pos)
-
-  if callback then
-    callback()
+    return true
   end
+  return false
 end
 
 --- Check if a TrailBlazer quick fix list is currently visible and return its buffer number.
 ---@param any_qf? boolean
 ---@return number?
-function List.get_quickfix_buf(any_qf)
+function List.get_trailblazer_quickfix_buf(any_qf)
   for _, win in pairs(fn.getwininfo()) do
     if win["quickfix"] == 1 and (any_qf or win["variables"] and win["variables"]["quickfix_title"]
         and string.match(win["variables"]["quickfix_title"], "^" .. List.config.qf_title)) then
