@@ -106,7 +106,19 @@ end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACK_
 api.nvim_create_autocmd("BufEnter", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",
-  callback = require('trailblazer.trails.common').reregister_trail_marks
+  callback = function()
+    require('trailblazer.trails.common').reregister_trail_marks()
+    require('trailblazer.trails.list').update_trail_mark_list()
+  end
+})
+
+api.nvim_create_autocmd("BufDelete", {
+  group = cfg.auto_groups.trailblazer,
+  pattern = "*",
+  callback = function()
+    require('trailblazer.trails.common').reregister_trail_marks()
+    require('trailblazer.trails.list').update_trail_mark_list()
+  end
 })
 
 api.nvim_create_autocmd("BufWritePre", {
@@ -118,5 +130,8 @@ api.nvim_create_autocmd("BufWritePre", {
 api.nvim_create_autocmd("BufWritePost", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",
-  callback = require('trailblazer.trails.common').reregister_trail_marks
+  callback = function()
+    require('trailblazer.trails.common').reregister_trail_marks()
+    require('trailblazer.trails.list').update_trail_mark_list()
+  end
 })

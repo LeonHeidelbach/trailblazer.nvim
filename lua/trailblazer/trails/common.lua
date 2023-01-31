@@ -207,7 +207,7 @@ end
 function Common.focus_win_and_buf_by_trail_mark_index(buf, trail_mark_index, remove_trail_mark)
   local old_trail_mark_cursor = Common.trail_mark_cursor
 
-  if trail_mark_index > 0 then
+  if trail_mark_index and trail_mark_index > 0 then
     local trail_mark, ext_mark
     trail_mark_index, trail_mark, ext_mark = Common.get_marks_for_trail_mark_index(buf,
       trail_mark_index, remove_trail_mark)
@@ -507,83 +507,87 @@ function Common.reregister_trail_marks()
   local special_marks = {}
 
   for i, mark in ipairs(stacks.current_trail_mark_stack) do
-    local pos_text = helpers.buf_get_utf8_char_at_pos(mark.buf, mark.pos)
+    if api.nvim_buf_is_loaded(mark.buf) and api.nvim_buf_is_valid(mark.buf) then
+      local pos_text = helpers.buf_get_utf8_char_at_pos(mark.buf, mark.pos)
 
-    local mark_options = {
-      id = mark.mark_id,
-      virt_text_pos = "overlay",
-      hl_mode = "combine",
-      strict = true,
-      priority = i,
-    }
-
-    if i == newest_mark_index then
-      hl_group = "TrailBlazerTrailMarkNewest"
-    elseif current_cursor_mark and current_cursor_mark.pos[1] == mark.pos[1]
-        and current_cursor_mark.pos[2] == mark.pos[2] then
-      hl_group = "TrailBlazerTrailMarkCursor"
-    else
-      hl_group = Common.get_hl_group_for_current_trail_mark_select_mode()
-    end
-
-    if config.custom.number_line_color_enabled then
-      mark_options["number_hl_group"] = hl_group .. "Inverted"
-    end
-
-    if config.custom.symbol_line_enabled then
-      if special_marks[mark.buf] == nil then
-        special_marks[mark.buf] = {}
-      end
-
-      if i == Common.trail_mark_cursor + 1 then
-        mark_options["sign_text"] = config.custom.next_mark_symbol
-        mark_options["sign_hl_group"] = "TrailBlazerTrailMarkNext"
-        table.insert(special_marks[mark.buf], mark.pos[1])
-      elseif i == Common.trail_mark_cursor - 1 then
-        mark_options["sign_text"] = config.custom.previous_mark_symbol
-        mark_options["sign_hl_group"] = "TrailBlazerTrailMarkPrevious"
-        table.insert(special_marks[mark.buf], mark.pos[1])
-      end
+      local mark_options = {
+        id = mark.mark_id,
+        virt_text_pos = "overlay",
+        hl_mode = "combine",
+        strict = true,
+        priority = i,
+      }
 
       if i == newest_mark_index then
-        mark_options["sign_text"] = config.custom.newest_mark_symbol
-        mark_options["sign_hl_group"] = hl_group .. "Inverted"
-        table.insert(special_marks[mark.buf], mark.pos[1])
-      end
-
-      if current_cursor_mark and current_cursor_mark.pos[1] == mark.pos[1]
+        hl_group = "TrailBlazerTrailMarkNewest"
+      elseif current_cursor_mark and current_cursor_mark.pos[1] == mark.pos[1]
           and current_cursor_mark.pos[2] == mark.pos[2] then
-        mark_options["sign_text"] = config.custom.cursor_mark_symbol
-        mark_options["sign_hl_group"] = hl_group .. "Inverted"
-        table.insert(special_marks[mark.buf], mark.pos[1])
+        hl_group = "TrailBlazerTrailMarkCursor"
+      else
+        hl_group = Common.get_hl_group_for_current_trail_mark_select_mode()
       end
 
-      if config.custom.multiple_mark_symbol_counters_enabled and mark_options["sign_text"]
-          and mark_options["sign_text"] ~= "" then
-        local count = helpers.tbl_count(function(a) return a == mark.pos[1] end,
-          special_marks[mark.buf])
+      if config.custom.number_line_color_enabled then
+        mark_options["number_hl_group"] = hl_group .. "Inverted"
+      end
 
-        if count > 1 then
-          mark_options["sign_text"] = helpers.sub(tostring(count) .. mark_options["sign_text"],
-            1, 2)
+      if config.custom.symbol_line_enabled then
+        if special_marks[mark.buf] == nil then
+          special_marks[mark.buf] = {}
         end
 
-        special_marks[mark.buf] = special_marks[mark.buf]
+        if i == Common.trail_mark_cursor + 1 then
+          mark_options["sign_text"] = config.custom.next_mark_symbol
+          mark_options["sign_hl_group"] = "TrailBlazerTrailMarkNext"
+          table.insert(special_marks[mark.buf], mark.pos[1])
+        elseif i == Common.trail_mark_cursor - 1 then
+          mark_options["sign_text"] = config.custom.previous_mark_symbol
+          mark_options["sign_hl_group"] = "TrailBlazerTrailMarkPrevious"
+          table.insert(special_marks[mark.buf], mark.pos[1])
+        end
+
+        if i == newest_mark_index then
+          mark_options["sign_text"] = config.custom.newest_mark_symbol
+          mark_options["sign_hl_group"] = hl_group .. "Inverted"
+          table.insert(special_marks[mark.buf], mark.pos[1])
+        end
+
+        if current_cursor_mark and current_cursor_mark.pos[1] == mark.pos[1]
+            and current_cursor_mark.pos[2] == mark.pos[2] then
+          mark_options["sign_text"] = config.custom.cursor_mark_symbol
+          mark_options["sign_hl_group"] = hl_group .. "Inverted"
+          table.insert(special_marks[mark.buf], mark.pos[1])
+        end
+
+        if config.custom.multiple_mark_symbol_counters_enabled and mark_options["sign_text"]
+            and mark_options["sign_text"] ~= "" then
+          local count = helpers.tbl_count(function(a) return a == mark.pos[1] end,
+            special_marks[mark.buf])
+
+          if count > 1 then
+            mark_options["sign_text"] = helpers.sub(tostring(count) .. mark_options["sign_text"],
+              1, 2)
+          end
+
+          special_marks[mark.buf] = special_marks[mark.buf]
+        end
+
+        if config.custom.trail_mark_symbol_line_indicators_enabled and
+            (mark_options["sign_text"] == nil or mark_options["sign_text"] == "") then
+          mark_options["sign_text"] = config.custom.mark_symbol
+          mark_options["sign_hl_group"] = "TrailBlazerTrailMark"
+        end
       end
 
-      if config.custom.trail_mark_symbol_line_indicators_enabled and
-          (mark_options["sign_text"] == nil or mark_options["sign_text"] == "") then
-        mark_options["sign_text"] = config.custom.mark_symbol
-        mark_options["sign_hl_group"] = "TrailBlazerTrailMark"
+      if config.custom.trail_mark_in_text_highlights_enabled then
+        mark_options["virt_text"] = { { pos_text ~= "" and pos_text or " ", hl_group } }
       end
-    end
 
-    if config.custom.trail_mark_in_text_highlights_enabled then
-      mark_options["virt_text"] = { { pos_text ~= "" and pos_text or " ", hl_group } }
+      ok, mark.mark_id = pcall(api.nvim_buf_set_extmark, mark.buf, config.nsid,
+        mark.pos[1] - 1, mark.pos[2], mark_options)
+    else
+      ok = false
     end
-
-    ok, mark.mark_id = pcall(api.nvim_buf_set_extmark, mark.buf, config.nsid,
-      mark.pos[1] - 1, mark.pos[2], mark_options)
 
     if not ok then
       table.remove(stacks.current_trail_mark_stack, i)
