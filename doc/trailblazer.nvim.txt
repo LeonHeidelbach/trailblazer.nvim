@@ -389,6 +389,19 @@ Keymaps.register_for_buf({key_maps}, {mod_name}, {mod?}, {buf?}, {warn_callback?
         {warn_callback?}  (function)
 
 
+                                                    *Keymaps.unregister_for_buf*
+Keymaps.unregister_for_buf({key_maps}, {mod_name}, {mod?}, {buf?}, {warn_callback?})
+     Check if callback function exists in the specified module and unregister all mappings in the
+     supplied keymap table.
+
+    Parameters: ~
+        {key_maps}        (table)
+        {mod_name}        (string)
+        {mod?}            (table)
+        {buf?}            (number)
+        {warn_callback?}  (function)
+
+
                                                                            *log*
 ==============================================================================
                                                                *trailblazer.log*
@@ -809,8 +822,8 @@ List.register_quickfix_keybindings({mapping_table})
         {mapping_table}  (table)
 
 
-                                   *List.qf_action_move_trail_mark_stack_cursor*
-List.qf_action_move_trail_mark_stack_cursor()
+                                   *List.qf_motion_move_trail_mark_stack_cursor*
+List.qf_motion_move_trail_mark_stack_cursor()
      Move the trail mark stack cursor on selecting a trail mark from the quickfix list.
 
 
@@ -824,14 +837,20 @@ List.qf_action_save_visual_selection_start_line()
      Save the visual selection start line number for the quickfix list.
 
 
-List.restore_default_qflist({callback?})           *List.restore_default_qflist*
-     Restore the default quickfix list behavior.
+                           *List.restore_default_quickfix_keybindings_if_needed*
+List.restore_default_quickfix_keybindings_if_needed({callback?})
+     Restore the default quickfix list behavior if the current quickfix list is not a TrailBlazer
+     quickfix list.
 
     Parameters: ~
         {callback?}  (function)
 
+    Returns: ~
+        (boolean)
 
-List.get_quickfix_buf({any_qf?})                         *List.get_quickfix_buf*
+
+                                             *List.get_trailblazer_quickfix_buf*
+List.get_trailblazer_quickfix_buf({any_qf?})
      Check if a TrailBlazer quick fix list is currently visible and return its buffer number.
 
     Parameters: ~
