@@ -126,7 +126,7 @@ function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
         List.config.qf_stack_name_separator .. config.custom.current_trail_mark_mode
   end
 
-  local _, rel_cursor = common.get_relative_marks_and_cursor(buf, common.trail_mark_cursor)
+  local _, rel_cursor = common.get_relative_marks_and_cursor(buf, stacks.trail_mark_cursor)
 
   fn.setqflist({}, "r", {
     title = qf_title,

@@ -53,10 +53,10 @@ function Actions.new_trail_mark(win, buf, pos)
 
   stacks.ucid = stacks.ucid + 1
   common.sort_trail_mark_stack()
-  common.trail_mark_cursor, _ = common.get_newest_and_oldest_mark_index_for_buf(buf)
+  stacks.trail_mark_cursor, _ = common.get_newest_and_oldest_mark_index_for_buf(buf)
   common.reregister_trail_marks()
 
-  return stacks.current_trail_mark_stack[common.trail_mark_cursor]
+  return stacks.current_trail_mark_stack[stacks.trail_mark_cursor]
 end
 
 --- Remove the last global or buffer local trail mark from the stack.
@@ -78,7 +78,7 @@ function Actions.track_back(buf)
     common.focus_win_and_buf(trail_mark, ext_mark)
     api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
 
-    common.trail_mark_cursor, _ = common.get_newest_and_oldest_mark_index_for_buf(buf)
+    stacks.trail_mark_cursor, _ = common.get_newest_and_oldest_mark_index_for_buf(buf)
     common.reregister_trail_marks()
 
     return true
@@ -126,10 +126,10 @@ function Actions.delete_all_trail_marks(buf)
   if buf == nil then
     for _, mark in ipairs(stacks.current_trail_mark_stack) do
       pcall(api.nvim_buf_del_extmark, mark.buf, config.nsid, mark.mark_id)
-      common.trail_mark_cursor = common.trail_mark_cursor - 1
+      stacks.trail_mark_cursor = stacks.trail_mark_cursor - 1
     end
 
-    common.trail_mark_cursor = common.trail_mark_cursor > 0 and common.trail_mark_cursor or 0
+    stacks.trail_mark_cursor = stacks.trail_mark_cursor > 0 and stacks.trail_mark_cursor or 0
     stacks.current_trail_mark_stack = {}
     stacks.ucid = 0
   else
@@ -143,13 +143,14 @@ function Actions.delete_all_trail_marks(buf)
       return mark.buf ~= buf
     end, stacks.current_trail_mark_stack)
 
-    common.trail_mark_cursor = #stacks.current_trail_mark_stack
+    stacks.trail_mark_cursor = #stacks.current_trail_mark_stack
   end
 end
 
 --- Set the trail mark selection mode to the given mode or toggle between the available modes.
 ---@param mode? string
-function Actions.set_trail_mark_select_mode(mode)
+---@param verbose? boolean
+function Actions.set_trail_mark_select_mode(mode, verbose)
   if mode == nil then
     config.custom.current_trail_mark_mode = config.custom.available_trail_mark_modes[
         (helpers.tbl_indexof(function(available_mode)
@@ -160,8 +161,10 @@ function Actions.set_trail_mark_select_mode(mode)
   elseif vim.tbl_contains(config.custom.available_trail_mark_modes, mode) then
     config.custom.current_trail_mark_mode = mode
   else
-    log.warn("invalid_trail_mark_select_mode",
-      table.concat(config.custom.available_trail_mark_modes, ", "))
+    if verbose == nil or verbose then
+      log.warn("invalid_trail_mark_select_mode",
+        table.concat(config.custom.available_trail_mark_modes, ", "))
+    end
     return
   end
 
@@ -169,7 +172,7 @@ function Actions.set_trail_mark_select_mode(mode)
   common.sort_trail_mark_stack()
   common.reregister_trail_marks()
 
-  if config.custom.verbose_trail_mark_select then
+  if config.custom.verbose_trail_mark_select and (verbose == nil or verbose) then
     log.info("current_trail_mark_select_mode", config.custom.current_trail_mark_mode)
   end
 end

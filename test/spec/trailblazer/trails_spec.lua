@@ -30,7 +30,7 @@ describe("Trails.actions.new_trail_mark:", function()
       local mark = tr.actions.new_trail_mark()
       if not mark then error("No trail mark was created.") end
       assert.are.same(true, mark ~= nil)
-      assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.common.trail_mark_cursor])
+      assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.stacks.trail_mark_cursor])
     end)
 end)
 
@@ -40,7 +40,7 @@ describe("Trails.actions.track_back:", function()
     local mark = tr.actions.new_trail_mark(nil, buf, nil)
     if not mark then error("No trail mark was created.") end
     assert.are.same(true, mark ~= nil)
-    assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.common.trail_mark_cursor])
+    assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.stacks.trail_mark_cursor])
     assert.are.same(true, tr.actions.track_back())
     assert.are.same(api.nvim_win_get_cursor(0), mark.pos)
   end)
@@ -52,7 +52,7 @@ describe("Trails.motions.peek_move_next_down:", function()
     local mark = tr.actions.new_trail_mark(nil, buf, nil)
     if not mark then error("No trail mark was created.") end
     assert.are.same(true, mark ~= nil)
-    assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.common.trail_mark_cursor])
+    assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.stacks.trail_mark_cursor])
     assert.are.same(true, tr.motions.peek_move_next_down())
     assert.are.same(true, tr.motions.peek_move_next_down())
     assert.are.same(api.nvim_win_get_cursor(0),
@@ -66,7 +66,7 @@ describe("Trails.motions.peek_move_previous_up:", function()
     local mark = tr.actions.new_trail_mark(nil, buf, nil)
     if not mark then error("No trail mark was created.") end
     assert.are.same(mark ~= nil, true)
-    assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.common.trail_mark_cursor])
+    assert.are.same(mark, tr.stacks.current_trail_mark_stack[tr.stacks.trail_mark_cursor])
     assert.are.same(true, tr.motions.peek_move_previous_up())
     assert.are.same(api.nvim_win_get_cursor(0),
       tr.stacks.current_trail_mark_stack[#tr.stacks.current_trail_mark_stack - 2].pos)

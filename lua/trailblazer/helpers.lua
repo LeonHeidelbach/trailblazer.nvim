@@ -165,9 +165,11 @@ end
 --- long as the character has a maximum width of 4 bytes as per the utf-8 standard.
 ---@param buf number
 ---@param pos table<number, number>
----@return string
+---@return string?
 function Helpers.buf_get_utf8_char_at_pos(buf, pos)
   local line = api.nvim_buf_get_lines(buf, pos[1] - 1, pos[1], false)[1]
+  if not line then return nil end
+
   local col = vim.str_utfindex(line:sub(1, pos[2])) + 1
 
   local char
@@ -219,6 +221,50 @@ function Helpers.buf_get_relative_file_path(buf)
   local workspace = vim.fn.getcwd()
   local file_name = vim.fn.fnamemodify(file_path, ":t")
   return file_path:gsub(workspace, ""):gsub(file_name, "") .. file_name
+end
+
+--- Extend tbl_base with tbl_extend.
+---@param tbl_base? table
+---@param tbl_extend? table
+---@return table?
+function Helpers.tbl_deep_extend(tbl_base, tbl_extend)
+  if tbl_extend == nil then return tbl_base end
+  if tbl_base == nil then return tbl_extend end
+  if tbl_base == nil and tbl_extend == nil then return nil end
+  for k, v in pairs(tbl_extend) do
+    if type(v) == "table" then
+      if type(tbl_base[k]) == "table" then
+        Helpers.tbl_deep_extend(tbl_base[k], v)
+      else
+        tbl_base[k] = v
+      end
+    else
+      tbl_base[k] = v
+    end
+  end
+  -- if tbl_extend == nil then return tbl_base end
+  -- if tbl_base == nil then return tbl_extend end
+  -- if tbl_base == nil and tbl_extend == nil then return nil end
+  --
+  -- local stack = { { tbl_base, tbl_extend } }
+  --
+  -- while #stack > 0 do
+  --   local t1, t2 = table.remove(stack), table.remove(stack)[2]
+  --
+  --   for k, v in pairs(t2) do
+  --     if type(v) == "table" then
+  --       if type(t1[k]) == "table" then
+  --         table.insert(stack, { t1[k], v })
+  --       else
+  --         t1[k] = v
+  --       end
+  --     else
+  --       t1[k] = v
+  --     end
+  --   end
+  -- end
+
+  return tbl_base
 end
 
 return Helpers

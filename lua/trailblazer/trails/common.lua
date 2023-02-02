@@ -16,8 +16,6 @@ local helpers = require("trailblazer.helpers")
 local stacks = require("trailblazer.trails.stacks")
 local log = require("trailblazer.log")
 
-Common.trail_mark_cursor = 0
-
 --- Paste the selected register contents at a specifi trail mark.
 ---@param buf? number
 ---@param trail_mark_index? number
@@ -38,7 +36,7 @@ function Common.paste_at_trail_mark(buf, trail_mark_index)
   api.nvim_paste(fn.getreg(api.nvim_get_vvar("register")), false, -1)
   api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
 
-  Common.trail_mark_cursor = #stacks.current_trail_mark_stack
+  stacks.trail_mark_cursor = #stacks.current_trail_mark_stack
   Common.reregister_trail_marks()
 
   return true
@@ -50,7 +48,7 @@ end
 function Common.set_cursor_to_previous_mark(buf, current_mark_index)
   local marks, cursor = Common.get_relative_marks_and_cursor(buf, current_mark_index)
 
-  if current_mark_index and current_mark_index == Common.trail_mark_cursor then
+  if current_mark_index and current_mark_index == stacks.trail_mark_cursor then
     cursor = cursor > 1 and cursor - 1 or #marks > 0 and 1 or 0
   end
 
@@ -63,7 +61,7 @@ end
 function Common.set_cursor_to_next_mark(buf, current_mark_index)
   local marks, cursor = Common.get_relative_marks_and_cursor(buf, current_mark_index)
 
-  if current_mark_index and current_mark_index == Common.trail_mark_cursor then
+  if current_mark_index and current_mark_index == stacks.trail_mark_cursor then
     cursor = cursor + 1 <= #marks and cursor + 1 or #marks
   end
 
@@ -205,7 +203,7 @@ end
 ---@param remove_trail_mark boolean
 ---@return boolean
 function Common.focus_win_and_buf_by_trail_mark_index(buf, trail_mark_index, remove_trail_mark)
-  local old_trail_mark_cursor = Common.trail_mark_cursor
+  local old_trail_mark_cursor = stacks.trail_mark_cursor
 
   if trail_mark_index and trail_mark_index > 0 then
     local trail_mark, ext_mark
@@ -216,14 +214,14 @@ function Common.focus_win_and_buf_by_trail_mark_index(buf, trail_mark_index, rem
       return false
     end
 
-    Common.trail_mark_cursor = trail_mark_index
+    stacks.trail_mark_cursor = trail_mark_index
 
     if Common.focus_win_and_buf(trail_mark, ext_mark) then
       return true
     end
   end
 
-  Common.trail_mark_cursor = old_trail_mark_cursor
+  stacks.trail_mark_cursor = old_trail_mark_cursor
   return false
 end
 
@@ -255,8 +253,8 @@ function Common.get_trail_mark_at_pos(win, buf, pos)
   end
 
   if trail_mark_index ~= nil then
-    if Common.trail_mark_cursor > #stacks.current_trail_mark_stack then
-      Common.trail_mark_cursor = trail_mark_index
+    if stacks.trail_mark_cursor > #stacks.current_trail_mark_stack then
+      stacks.trail_mark_cursor = trail_mark_index
     end
 
     Common.reregister_trail_marks()
@@ -344,12 +342,12 @@ function Common.get_relative_marks_and_cursor(buf, current_mark_index)
       return mark.buf == buf and stacks.current_trail_mark_stack[current_mark_index] and
           stacks.current_trail_mark_stack[current_mark_index].mark_id == mark.mark_id
     end, marks) or helpers.tbl_indexof(function(mark)
-      return mark.buf == buf and stacks.current_trail_mark_stack[Common.trail_mark_cursor] and
-          mark.timestamp == stacks.current_trail_mark_stack[Common.trail_mark_cursor].timestamp
+      return mark.buf == buf and stacks.current_trail_mark_stack[stacks.trail_mark_cursor] and
+          mark.timestamp == stacks.current_trail_mark_stack[stacks.trail_mark_cursor].timestamp
     end, marks) or #marks
   else
     marks = stacks.current_trail_mark_stack
-    cursor = Common.trail_mark_cursor or #stacks.current_trail_mark_stack
+    cursor = stacks.trail_mark_cursor or #stacks.current_trail_mark_stack
   end
 
   return marks, cursor
@@ -394,7 +392,7 @@ end
 function Common.translate_actual_cursor_from_relative_marks_and_cursor(buf, marks, cursor)
   local newest_mark_index, _ = Common.get_newest_and_oldest_mark_index_for_buf(buf)
 
-  Common.trail_mark_cursor = helpers.tbl_indexof(function(mark)
+  stacks.trail_mark_cursor = helpers.tbl_indexof(function(mark)
     return marks[cursor] and mark.timestamp == marks[cursor].timestamp
   end, stacks.current_trail_mark_stack) or newest_mark_index
 
@@ -426,7 +424,7 @@ function Common.remove_duplicate_pos_trail_marks()
     api.nvim_buf_del_extmark(item.buf, config.nsid, item.mark_id)
   end)
   if trail_count ~= #stacks.current_trail_mark_stack then
-    Common.trail_mark_cursor = #stacks.current_trail_mark_stack - 1
+    stacks.trail_mark_cursor = #stacks.current_trail_mark_stack - 1
   end
 end
 
@@ -470,11 +468,11 @@ function Common.delete_trail_mark_at_pos(win, buf, pos)
     local newest_mark_index, oldest_mark_index = Common.get_newest_and_oldest_mark_index_for_buf(
       buf)
 
-    if trail_mark_index <= Common.trail_mark_cursor and Common.trail_mark_cursor
-        >= oldest_mark_index and Common.trail_mark_cursor <= newest_mark_index then
-      Common.trail_mark_cursor = Common.trail_mark_cursor - 1
-    elseif Common.trail_mark_cursor - 1 <= oldest_mark_index then
-      Common.trail_mark_cursor = oldest_mark_index
+    if trail_mark_index <= stacks.trail_mark_cursor and stacks.trail_mark_cursor
+        >= oldest_mark_index and stacks.trail_mark_cursor <= newest_mark_index then
+      stacks.trail_mark_cursor = stacks.trail_mark_cursor - 1
+    elseif stacks.trail_mark_cursor - 1 <= oldest_mark_index then
+      stacks.trail_mark_cursor = oldest_mark_index
     end
 
     Common.reregister_trail_marks()
@@ -502,7 +500,7 @@ function Common.reregister_trail_marks()
   local ok, hl_group
   local newest_mark_index, _ = Common.get_newest_and_oldest_mark_index_for_buf(
     Common.default_buf_for_current_mark_select_mode(nil))
-  local current_cursor_mark = stacks.current_trail_mark_stack[Common.trail_mark_cursor] or
+  local current_cursor_mark = stacks.current_trail_mark_stack[stacks.trail_mark_cursor] or
       stacks.current_trail_mark_stack[#stacks.current_trail_mark_stack]
   local special_marks = {}
 
@@ -536,11 +534,11 @@ function Common.reregister_trail_marks()
           special_marks[mark.buf] = {}
         end
 
-        if i == Common.trail_mark_cursor + 1 then
+        if i == stacks.trail_mark_cursor + 1 then
           mark_options["sign_text"] = config.custom.next_mark_symbol
           mark_options["sign_hl_group"] = "TrailBlazerTrailMarkNext"
           table.insert(special_marks[mark.buf], mark.pos[1])
-        elseif i == Common.trail_mark_cursor - 1 then
+        elseif i == stacks.trail_mark_cursor - 1 then
           mark_options["sign_text"] = config.custom.previous_mark_symbol
           mark_options["sign_hl_group"] = "TrailBlazerTrailMarkPrevious"
           table.insert(special_marks[mark.buf], mark.pos[1])

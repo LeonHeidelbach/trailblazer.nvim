@@ -24,6 +24,8 @@ TrailBlazer.generated = {}
 local function set_defaults(opts)
   local defaults = {
     lang = "en",
+    auto_save_trailblazer_state_on_exit = false,
+    auto_load_trailblazer_state_on_enter = false, -- experimental, should run after TS highlights
     trail_options = {
       available_trail_mark_modes = { -- available modes to cycle through
         "global_chron",
@@ -287,6 +289,23 @@ end
 function TrailBlazer.set_trail_mark_stack_sort_mode(sort_mode)
   if not TrailBlazer.is_configured() then return end
   trails.actions.set_trail_mark_stack_sort_mode(sort_mode)
+end
+
+--- Save the current TrailBlazer state to a file.
+---@param path? string
+---@param trail_mark_stacks? table
+---@param verbose? boolean
+function TrailBlazer.save_trailblazer_state_to_file(path, trail_mark_stacks, verbose)
+  if not TrailBlazer.is_configured() then return end
+  trails.storage.save_trailblazer_state_to_file(path, trail_mark_stacks, verbose)
+end
+
+--- Restore the TrailBlazer state from a file.
+---@param path? string
+---@param verbose? boolean
+function TrailBlazer.load_trailblazer_state_from_file(path, verbose)
+  if not TrailBlazer.is_configured() then return end
+  trails.storage.load_trailblazer_state_from_file(path, verbose)
 end
 
 --- Check if TrailBlazer is configured.

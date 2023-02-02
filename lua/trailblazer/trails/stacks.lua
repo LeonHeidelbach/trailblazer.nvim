@@ -7,6 +7,7 @@
 --- This module is responsible for managing trail mark stacks.
 ---@brief ]]
 
+local api = vim.api
 local fn = vim.fn
 local Stacks = {}
 
@@ -14,6 +15,7 @@ local config = require("trailblazer.trails.config")
 local helpers = require("trailblazer.helpers")
 local log = require("trailblazer.log")
 
+Stacks.trail_mark_cursor = 0
 Stacks.ucid = 0
 Stacks.current_trail_mark_stack = {}
 Stacks.trail_mark_stack_list = {}
@@ -35,7 +37,7 @@ end
 ---@param name? string
 function Stacks.add_stack(name)
   if name == nil or fn.empty(name) == 1 then
-    name = "default"
+    name = Stacks.current_trail_mark_stack_name or "default"
   end
 
   if Stacks.trail_mark_stack_list[name] == nil then
@@ -54,7 +56,8 @@ end
 --- Deletes the trail mark stack under the given name or the current trail mark stack if no name
 --- is supplied.
 ---@param name? string | table
-function Stacks.delete_stack(name)
+---@param verbose? boolean
+function Stacks.delete_stack(name, verbose)
   if name == nil or fn.empty(name) == 1 then
     name = Stacks.current_trail_mark_stack_name
   end
@@ -77,7 +80,9 @@ function Stacks.delete_stack(name)
     end
   end
 
-  log.info("trail_mark_stack_deleted", name)
+  if verbose == nil or verbose then
+    log.info("trail_mark_stack_deleted", name)
+  end
 end
 
 --- Deletes all trail mark stacks.
@@ -89,9 +94,12 @@ end
 --- Move the current trail mark stack to the next trail mark stack in the trail mark stack list
 --- depending on the given sort mode.
 ---@param sort_mode? string
-function Stacks.switch_to_next_stack(sort_mode)
+---@param verbose? boolean
+function Stacks.switch_to_next_stack(sort_mode, verbose)
   if vim.tbl_count(Stacks.trail_mark_stack_list) <= 1 then
-    log.info("no_next_trail_mark_stack")
+    if verbose == nil or verbose then
+      log.info("no_next_trail_mark_stack")
+    end
     return
   end
 
@@ -112,9 +120,12 @@ end
 
 --- Move the current trail mark stack to the previous trail mark stack in the trail mark stack list
 ---@param sort_mode? string
-function Stacks.switch_to_previous_stack(sort_mode)
+---@param verbose? boolean
+function Stacks.switch_to_previous_stack(sort_mode, verbose)
   if vim.tbl_count(Stacks.trail_mark_stack_list) <= 1 then
-    log.info("no_previous_trail_mark_stack")
+    if verbose == nil or verbose then
+      log.info("no_previous_trail_mark_stack")
+    end
     return
   end
 
@@ -136,9 +147,10 @@ end
 --- Switches the current trail mark stack to the trail mark stack under the given name.
 ---@param name? string
 ---@param save? boolean
-function Stacks.switch_current_stack(name, save)
+---@param verbose? boolean
+function Stacks.switch_current_stack(name, save, verbose)
   if name == nil or fn.empty(name) == 1 then
-    name = "default"
+    name = Stacks.current_trail_mark_stack_name
   end
 
   if save == nil or save then
@@ -156,7 +168,9 @@ function Stacks.switch_current_stack(name, save)
 
   Stacks.current_trail_mark_stack = Stacks.trail_mark_stack_list[name].stack
 
-  log.info("trail_mark_stack_switched", name)
+  if verbose == nil or verbose then
+    log.info("trail_mark_stack_switched", name)
+  end
 end
 
 --- Returns a table of all trail mark stack names sorted by the given sort mode.
@@ -186,16 +200,19 @@ end
 
 --- Returns a valid sort mode for the given input.
 ---@param sort_mode? string
+---@param verbose? boolean
 ---@return string
-function Stacks.get_valid_sort_mode(sort_mode)
+function Stacks.get_valid_sort_mode(sort_mode, verbose)
   if sort_mode == nil or fn.empty(sort_mode) == 1 then
     sort_mode = config.custom.current_trail_mark_stack_sort_mode
   end
 
   if not vim.tbl_contains(config.custom.available_trail_mark_stack_sort_modes, sort_mode) then
     sort_mode = config.custom.available_trail_mark_stack_sort_modes[1]
-    log.warn("invalid_trail_mark_stack_sort_mode",
-      table.concat(config.custom.available_trail_mark_stack_sort_modes, ", "))
+    if verbose == nil or verbose then
+      log.warn("invalid_trail_mark_stack_sort_mode",
+        table.concat(config.custom.available_trail_mark_stack_sort_modes, ", "))
+    end
   end
 
   return sort_mode
@@ -203,7 +220,8 @@ end
 
 --- Set the trail mark stack sort mode to the given mode or toggle between the available modes.
 ---@param sort_mode? string
-function Stacks.set_trail_mark_stack_sort_mode(sort_mode)
+---@param verbose? boolean
+function Stacks.set_trail_mark_stack_sort_mode(sort_mode, verbose)
   if sort_mode == nil then
     config.custom.current_trail_mark_stack_sort_mode = config.custom
         .available_trail_mark_stack_sort_modes[
@@ -215,14 +233,72 @@ function Stacks.set_trail_mark_stack_sort_mode(sort_mode)
   elseif vim.tbl_contains(config.custom.available_trail_mark_stack_sort_modes, sort_mode) then
     config.custom.current_trail_mark_stack_sort_mode = sort_mode
   else
-    log.warn("invalid_trail_mark_stack_sort_mode",
-      table.concat(config.custom.available_trail_mark_stack_sort_modes, ", "))
+    if verbose == nil or verbose then
+      log.warn("invalid_trail_mark_stack_sort_mode",
+        table.concat(config.custom.available_trail_mark_stack_sort_modes, ", "))
+    end
     return
   end
 
-  if config.custom.verbose_trail_mark_select then
+  if config.custom.verbose_trail_mark_select and (verbose == nil or verbose) then
     log.info("current_trail_mark_stack_sort_mode", config.custom.current_trail_mark_stack_sort_mode)
   end
+end
+
+--- Update the buffer ids in the trail mark stack list with the given lookup table.
+---@param lookup_tbl table
+function Stacks.udpate_buffer_ids_with_filename_lookup_table(lookup_tbl)
+  local new_buf_id_lookup = {}
+
+  for k, v in pairs(lookup_tbl) do
+    local escaped_path = fn.fnameescape(k)
+    local buf = fn.bufnr(escaped_path, true)
+
+    if (buf == -1 or not api.nvim_buf_is_loaded(buf)) and fn.filereadable(escaped_path) == 1 then
+      buf = api.nvim_create_buf(true, false)
+      api.nvim_buf_set_name(buf, escaped_path)
+      api.nvim_buf_call(buf, vim.cmd.edit)
+      new_buf_id_lookup[v] = buf
+    elseif api.nvim_buf_is_loaded(buf) then
+      new_buf_id_lookup[v] = buf
+    end
+  end
+
+  for _, stack in pairs(Stacks.trail_mark_stack_list) do
+    for i = #stack.stack, 1, -1 do
+      if new_buf_id_lookup[stack.stack[i].buf] ~= nil then
+        Stacks.ucid = Stacks.ucid + 1
+        stack.stack[i].buf = new_buf_id_lookup[stack.stack[i].buf]
+        stack.stack[i].mark_id = Stacks.ucid
+      else
+        table.remove(stack.stack, i)
+      end
+    end
+  end
+
+  Stacks.switch_current_stack(nil, false, false)
+end
+
+--- Create a table that maps buffer numbers to file names.
+---@return table
+function Stacks.create_buf_file_lookup_table()
+  local file_buf_lookup_table = {}
+  local unique_bufs = {}
+
+  for _, stack in pairs(Stacks.trail_mark_stack_list) do
+    for _, mark in ipairs(stack.stack) do
+      unique_bufs[mark.buf] = true
+    end
+  end
+
+  for _, buf in ipairs(vim.tbl_keys(unique_bufs)) do
+    local buf_name = vim.api.nvim_buf_get_name(buf)
+    if buf_name ~= "" then
+      file_buf_lookup_table[buf_name] = buf
+    end
+  end
+
+  return file_buf_lookup_table
 end
 
 return Stacks
