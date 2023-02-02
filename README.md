@@ -164,7 +164,7 @@ available and set by default:
         -- available modes: alpha_asc, alpha_dsc, chron_asc, chron_dsc
         current_trail_mark_stack_sort_mode = "alpha_asc"
     },
-    mappings = {
+    mappings = { -- rename this to "force_mappings" to completely override default mappings and not merge with them
         nv = { -- Mode union: normal & visual mode. Can be extended by adding i, x, ...
             motions = {
                 new_trail_mark = '<A-l>',
