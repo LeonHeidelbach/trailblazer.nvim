@@ -102,7 +102,36 @@ api.nvim_create_user_command("TrailBlazerSetTrailMarkStackSortMode", function(ar
     args.args) and args.args or nil)
 end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACK_SORT_MODES" })
 
+api.nvim_create_user_command("TrailBlazerSaveSession", function(args)
+  tb.save_trailblazer_state_to_file(args.args)
+end, { nargs = "?", complete = "dir" })
+
+api.nvim_create_user_command("TrailBlazerLoadSession", function(args)
+  tb.load_trailblazer_state_from_file(args.args)
+end, { nargs = "?", complete = "dir" })
+
 -- Auto commands
+--
+api.nvim_create_autocmd("VimEnter", {
+  group = cfg.auto_groups.trailblazer,
+  pattern = "*",
+  callback = function()
+    if tb.options.auto_load_trailblazer_state_on_enter then
+      tb.load_trailblazer_state_from_file(nil, false)
+    end
+  end
+})
+
+api.nvim_create_autocmd("VimLeavePre", {
+  group = cfg.auto_groups.trailblazer,
+  pattern = "*",
+  callback = function()
+    if tb.options.auto_save_trailblazer_state_on_exit then
+      tb.save_trailblazer_state_to_file(nil, nil, false)
+    end
+  end
+})
+
 api.nvim_create_autocmd("BufEnter", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",
