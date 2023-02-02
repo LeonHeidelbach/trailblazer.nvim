@@ -8,6 +8,7 @@
 ---@brief ]]
 
 local api = vim.api
+local fn = vim.fn
 local log = require("trailblazer.log")
 local Helpers = {}
 
@@ -16,7 +17,7 @@ local Helpers = {}
 ---@param input? string | number
 ---@return number?
 function Helpers.get_buf_nr(input)
-  if not input then return input end
+  if not input or fn.empty(input) == 1 then return nil end
   if type(tonumber(input)) == "number" then return tonumber(input) end
   local buf = api.nvim_call_function("bufnr", { input })
   if buf == -1 then
