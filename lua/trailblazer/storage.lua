@@ -18,8 +18,9 @@ local common = require("trailblazer.trails.common")
 local actions = require("trailblazer.trails.actions")
 local list = require("trailblazer.trails.list")
 
-Storage.data_path = vim.fn.stdpath("data")
+Storage.data_path = fn.stdpath("data")
 Storage.trailblazer_storage_path = string.format("%s/trailblazer/", Storage.data_path)
+Storage.save_suffix = ".tbsv"
 Storage.trailblazer_cwd_storage = {}
 Storage.trailblazer_cwd_storage.cwd = fn.getcwd()
 Storage.trailblazer_cwd_storage.config = {}
@@ -29,8 +30,9 @@ Storage.trailblazer_cwd_storage.stacks = {}
 --- Setup the storage module.
 ---@param options? table
 function Storage.setup(options)
-  if options and options.custom_storage_path and fn.empty(options.custom_storage_path) == 0 then
-    Storage.trailblazer_storage_path = options.custom_storage_path
+  if options and options.custom_session_storage_dir and
+      fn.empty(options.custom_session_storage_dir) == 0 then
+    Storage.trailblazer_storage_path = fn.fnamemodify(options.custom_session_storage_dir, ":p")
   end
   Storage.ensure_storage_dir_exists()
 end
@@ -39,6 +41,9 @@ end
 ---@param path? string
 function Storage.ensure_storage_dir_exists(path)
   if not path or fn.empty(path) == 1 then path = Storage.trailblazer_storage_path end
+
+  if helpers.is_file_path(path) then path = fn.fnamemodify(path, ":h") end
+
   if fn.isdirectory(path) == 0 then
     if fn.empty(path) == 0 then
       fn.mkdir(path, "p")
@@ -46,6 +51,7 @@ function Storage.ensure_storage_dir_exists(path)
       log.error("invalid_storage_path", "[" .. path .. "]")
     end
   end
+
   return path
 end
 
@@ -54,7 +60,7 @@ end
 ---@param input? string
 ---@return table?
 function Storage.decode(input)
-  local ok, trail_marks_from_disk = pcall(vim.fn.json_decode, input)
+  local ok, trail_marks_from_disk = pcall(fn.json_decode, input)
   if not ok or trail_marks_from_disk == nil then return nil end
   return trail_marks_from_disk
 end
@@ -93,23 +99,32 @@ end
 
 --- Read the trail mark storage from disk.
 ---@param storage_dir? string
----@param clear_fname? string
+---@param name? string
 ---@param verbose? boolean
 ---@return string?
 ---@return string?
-function Storage.read_trailblazer_state_file_from_disk(storage_dir, clear_fname, verbose)
-  local hashed_file_name = clear_fname and fn.sha256(clear_fname) or nil
+function Storage.read_trailblazer_state_file_from_disk(storage_dir, name, verbose)
+  name = Storage.get_valid_file_name(name)
   if storage_dir and string.sub(storage_dir, -1) ~= "/" then storage_dir = storage_dir .. "/" end
-  return hashed_file_name, Storage.read_from_disk(storage_dir .. hashed_file_name, verbose)
+  return name, Storage.read_from_disk(storage_dir .. name, verbose)
 end
 
 --- Restore trail mark stacks from disk.
 ---@param path? string
 ---@param verbose? boolean
 function Storage.load_trailblazer_state_from_file(path, verbose)
-  path = Storage.ensure_storage_dir_exists(path)
+  local name, content
+  local should_auto_save = true
+  local valid_path = path and fn.empty(path) == 0
+  local cwd = fn.getcwd()
 
-  local name, content = Storage.read_trailblazer_state_file_from_disk(path, vim.fn.getcwd(), true)
+  path = valid_path and fn.fnamemodify(path, ":p") or nil
+  name = valid_path and fn.fnamemodify(path, ":t") or nil
+
+  if fn.empty(name) == 1 then name = nil end
+
+  path = Storage.ensure_storage_dir_exists(path)
+  name, content = Storage.read_trailblazer_state_file_from_disk(path, name, true)
 
   if content ~= nil and fn.empty(content) == 0 then
     local trail_marks_storage = Storage.decode(content)
@@ -128,9 +143,15 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
 
   Storage.trailblazer_cwd_storage.stacks = Storage.trailblazer_cwd_storage.stacks or {}
 
+  if Storage.trailblazer_cwd_storage.cwd ~= cwd then
+    should_auto_save = false
+    log.warn("tb_save_cwd_mismatch", Storage.trailblazer_cwd_storage.cwd .. " -> " .. cwd)
+  end
+
   stacks.add_stack()
+  stacks.udpate_buffer_ids_with_filename_lookup_table(Storage.trailblazer_cwd_storage.stacks,
+    Storage.trailblazer_cwd_storage.fb_lookup)
   helpers.tbl_deep_extend(stacks.trail_mark_stack_list, Storage.trailblazer_cwd_storage.stacks)
-  stacks.udpate_buffer_ids_with_filename_lookup_table(Storage.trailblazer_cwd_storage.fb_lookup)
 
 
   if Storage.trailblazer_cwd_storage.config and type(Storage.trailblazer_cwd_storage.config)
@@ -151,6 +172,8 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
 
   common.reregister_trail_marks()
   list.update_trail_mark_list()
+
+  config.runtime.should_auto_save = should_auto_save
 end
 
 --- Encode the input to be written to disk. This currently uses vim.fn.json_encode but could be
@@ -158,7 +181,7 @@ end
 ---@param input? table
 ---@return string?
 function Storage.encode(input)
-  local ok, trail_marks_to_disk = pcall(vim.fn.json_encode, input)
+  local ok, trail_marks_to_disk = pcall(fn.json_encode, input)
   if not ok or trail_marks_to_disk == nil then return nil end
   return trail_marks_to_disk
 end
@@ -198,14 +221,14 @@ end
 
 --- Write trail mark storage file to disk.
 ---@param storage_dir? string
----@param clear_fname? string
+---@param name? string
 ---@param content? string
 ---@param verbose? boolean
 ---@return boolean
-function Storage.write_trail_mark_storage_file_to_disk(storage_dir, clear_fname, content, verbose)
-  local hashed_file_name = clear_fname and fn.sha256(clear_fname) or nil
+function Storage.write_trail_mark_storage_file_to_disk(storage_dir, name, content, verbose)
+  name = Storage.get_valid_file_name(name)
   if storage_dir and string.sub(storage_dir, -1) ~= "/" then storage_dir = storage_dir .. "/" end
-  return Storage.write_to_disk(storage_dir .. hashed_file_name, content, verbose)
+  return Storage.write_to_disk(storage_dir .. name, content, verbose)
 end
 
 --- Save trail mark stacks to disk.
@@ -213,6 +236,14 @@ end
 ---@param trail_mark_stacks? table
 ---@param verbose? boolean
 function Storage.save_trailblazer_state_to_file(path, trail_mark_stacks, verbose)
+  local name
+  local valid_path = path and fn.empty(path) == 0
+
+  path = valid_path and fn.fnamemodify(path, ":p") or nil
+  name = valid_path and fn.fnamemodify(path, ":t") or nil
+
+  if fn.empty(name) == 1 then name = nil end
+
   path = Storage.ensure_storage_dir_exists(path)
 
   if not trail_mark_stacks or type(trail_mark_stacks) ~= "table" then
@@ -238,8 +269,28 @@ function Storage.save_trailblazer_state_to_file(path, trail_mark_stacks, verbose
     return
   end
 
-  Storage.write_trail_mark_storage_file_to_disk(
-    path or Storage.trailblazer_storage_path, vim.fn.getcwd(), trail_mark_storage, true)
+  Storage.write_trail_mark_storage_file_to_disk(path or Storage.trailblazer_storage_path, name,
+    trail_mark_storage, true)
+
+  config.runtime.should_auto_save = true
+end
+
+--- Returns a valid file name for the provided name. If no name is provided, the current working
+--- directory will be used and hashed.
+---@param name? string
+---@return string
+function Storage.get_valid_file_name(name)
+  local cwd = fn.getcwd()
+
+  if not name or fn.empty(name) == 1 or name == cwd then
+    name = fn.sha256(cwd)
+  end
+
+  if name and string.sub(name, - #Storage.save_suffix) ~= Storage.save_suffix then
+    name = name .. Storage.save_suffix
+  end
+
+  return name
 end
 
 return Storage

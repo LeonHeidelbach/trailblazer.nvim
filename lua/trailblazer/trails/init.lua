@@ -22,7 +22,6 @@ Trails.list = require("trailblazer.trails.list")
 function Trails.setup(options)
   Trails.config.setup(options)
   Trails.stacks.setup(Trails.config.custom)
-  Trails.storage.setup(Trails.config.custom)
 end
 
 return Trails

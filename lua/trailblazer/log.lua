@@ -54,6 +54,9 @@ Log.langs = {
       could_not_write_to_file = "Could not write to file: ",
       no_path_or_content_provided = "Could not write to file. No path or content provided " ..
           "[Path | Content] is -> ",
+      tb_save_cwd_mismatch = "The current working directory from the loaded trail mark save file "
+          .. "does not match the current working directory. Trail marks might not be loaded. " ..
+          "[Save CWD | CWD] is -> ",
     },
     errors = {
       not_configured = "TrailBlazer is not configured. Please call `require('trailblazer').setup()`"

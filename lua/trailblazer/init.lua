@@ -10,6 +10,7 @@
 
 local log = require("trailblazer.log")
 local trails = require("trailblazer.trails")
+local storage = require("trailblazer.storage")
 local highlights = require("trailblazer.highlights")
 local helpers = require("trailblazer.helpers")
 local keymaps = require("trailblazer.keymaps")
@@ -25,7 +26,8 @@ local function set_defaults(opts)
   local defaults = {
     lang = "en",
     auto_save_trailblazer_state_on_exit = false,
-    auto_load_trailblazer_state_on_enter = false, -- experimental, should run after TS highlights
+    auto_load_trailblazer_state_on_enter = false, -- experimental
+    custom_session_storage_dir = "",
     trail_options = {
       available_trail_mark_modes = { -- available modes to cycle through
         "global_chron",
@@ -157,6 +159,7 @@ function TrailBlazer.setup(options)
   TrailBlazer.options = set_defaults(options)
   TrailBlazer.generated.hl_groups = highlights.register(TrailBlazer.options.hl_groups, true)
   trails.setup(TrailBlazer.options.trail_options)
+  storage.setup(TrailBlazer.options)
   log.setup(TrailBlazer.options.lang)
   if TrailBlazer.options.force_mappings then
     keymaps.register_api_maps(TrailBlazer.options.force_mappings, TrailBlazer)

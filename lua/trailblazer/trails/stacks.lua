@@ -246,17 +246,17 @@ function Stacks.set_trail_mark_stack_sort_mode(sort_mode, verbose)
 end
 
 --- Update the buffer ids in the trail mark stack list with the given lookup table.
+---@param stack_list table
 ---@param lookup_tbl table
-function Stacks.udpate_buffer_ids_with_filename_lookup_table(lookup_tbl)
+function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_tbl)
   local new_buf_id_lookup = {}
 
   for k, v in pairs(lookup_tbl) do
-    local escaped_path = fn.fnameescape(k)
-    local buf = fn.bufnr(escaped_path, true)
+    local buf = fn.bufnr(k, true)
 
-    if (buf == -1 or not api.nvim_buf_is_loaded(buf)) and fn.filereadable(escaped_path) == 1 then
+    if (buf == -1 or not api.nvim_buf_is_loaded(buf)) and fn.filereadable(k) == 1 then
       buf = api.nvim_create_buf(true, false)
-      api.nvim_buf_set_name(buf, escaped_path)
+      api.nvim_buf_set_name(buf, k)
       api.nvim_buf_call(buf, vim.cmd.edit)
       new_buf_id_lookup[v] = buf
     elseif api.nvim_buf_is_loaded(buf) then
@@ -264,7 +264,7 @@ function Stacks.udpate_buffer_ids_with_filename_lookup_table(lookup_tbl)
     end
   end
 
-  for _, stack in pairs(Stacks.trail_mark_stack_list) do
+  for _, stack in pairs(stack_list) do
     for i = #stack.stack, 1, -1 do
       if new_buf_id_lookup[stack.stack[i].buf] ~= nil then
         Stacks.ucid = Stacks.ucid + 1
@@ -292,7 +292,7 @@ function Stacks.create_buf_file_lookup_table()
   end
 
   for _, buf in ipairs(vim.tbl_keys(unique_bufs)) do
-    local buf_name = vim.api.nvim_buf_get_name(buf)
+    local buf_name = fn.fnamemodify(api.nvim_buf_get_name(buf), ":~:.")
     if buf_name ~= "" then
       file_buf_lookup_table[buf_name] = buf
     end

@@ -104,11 +104,11 @@ end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACK_
 
 api.nvim_create_user_command("TrailBlazerSaveSession", function(args)
   tb.save_trailblazer_state_to_file(args.args)
-end, { nargs = "?", complete = "dir" })
+end, { nargs = "?", complete = "file" })
 
 api.nvim_create_user_command("TrailBlazerLoadSession", function(args)
   tb.load_trailblazer_state_from_file(args.args)
-end, { nargs = "?", complete = "dir" })
+end, { nargs = "?", complete = "file" })
 
 -- Auto commands
 --
@@ -126,7 +126,8 @@ api.nvim_create_autocmd("VimLeavePre", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",
   callback = function()
-    if tb.options.auto_save_trailblazer_state_on_exit then
+    if tb.options.auto_save_trailblazer_state_on_exit and
+        require("trailblazer.trails.config").runtime.should_auto_save then
       tb.save_trailblazer_state_to_file(nil, nil, false)
     end
   end

@@ -242,29 +242,15 @@ function Helpers.tbl_deep_extend(tbl_base, tbl_extend)
       tbl_base[k] = v
     end
   end
-  -- if tbl_extend == nil then return tbl_base end
-  -- if tbl_base == nil then return tbl_extend end
-  -- if tbl_base == nil and tbl_extend == nil then return nil end
-  --
-  -- local stack = { { tbl_base, tbl_extend } }
-  --
-  -- while #stack > 0 do
-  --   local t1, t2 = table.remove(stack), table.remove(stack)[2]
-  --
-  --   for k, v in pairs(t2) do
-  --     if type(v) == "table" then
-  --       if type(t1[k]) == "table" then
-  --         table.insert(stack, { t1[k], v })
-  --       else
-  --         t1[k] = v
-  --       end
-  --     else
-  --       t1[k] = v
-  --     end
-  --   end
-  -- end
-
   return tbl_base
+end
+
+--- Returns true if the supplied path is a file path.
+---@param path? string
+---@return boolean
+function Helpers.is_file_path(path)
+  if not path then return false end
+  return path:gsub("\\", "/"):match(".*/.*%.%w+$") ~= nil
 end
 
 return Helpers
