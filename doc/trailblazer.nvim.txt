@@ -113,10 +113,7 @@ Helpers.buf_get_utf8_char_at_pos({buf}, {pos})
 
     Parameters: ~
         {buf}  (number)
-        {pos}  (table<number,number>)
-
-    Returns: ~
-        (string)
+        {pos}  (table<number,number>)  @return string?
 
 
                                             *Helpers.buf_get_absolute_file_path*
@@ -139,6 +136,25 @@ Helpers.buf_get_relative_file_path({buf})
 
     Returns: ~
         (string)
+
+
+                                                       *Helpers.tbl_deep_extend*
+Helpers.tbl_deep_extend({tbl_base?}, {tbl_extend?})
+     Extend tbl_base with tbl_extend.
+
+    Parameters: ~
+        {tbl_base?}    (table)
+        {tbl_extend?}  (table)  @return table?
+
+
+Helpers.is_file_path({path?})                             *Helpers.is_file_path*
+     Returns true if the supplied path is a file path.
+
+    Parameters: ~
+        {path?}  (string)
+
+    Returns: ~
+        (boolean)
 
 
                                                                     *highlights*
@@ -353,6 +369,25 @@ TrailBlazer.set_trail_mark_stack_sort_mode({sort_mode?})
         {sort_mode?}  (string)
 
 
+                                    *TrailBlazer.save_trailblazer_state_to_file*
+TrailBlazer.save_trailblazer_state_to_file({path?}, {trail_mark_stacks?}, {verbose?})
+     Save the current TrailBlazer state to a file.
+
+    Parameters: ~
+        {path?}               (string)
+        {trail_mark_stacks?}  (table)
+        {verbose?}            (boolean)
+
+
+                                  *TrailBlazer.load_trailblazer_state_from_file*
+TrailBlazer.load_trailblazer_state_from_file({path?}, {verbose?})
+     Restore the TrailBlazer state from a file.
+
+    Parameters: ~
+        {path?}     (string)
+        {verbose?}  (boolean)
+
+
 TrailBlazer.is_configured()                          *TrailBlazer.is_configured*
      Check if TrailBlazer is configured.
 
@@ -440,6 +475,120 @@ Log.error({name}, {additional_info?})                                *Log.error*
         {additional_info?}  (string)
 
 
+                                                                       *storage*
+==============================================================================
+                                                           *trailblazer.storage*
+
+ This module is responsible for managing TrailBlazer local storage and persistence.
+
+Storage.setup({options?})                                        *Storage.setup*
+     Setup the storage module.
+
+    Parameters: ~
+        {options?}  (table)
+
+
+                                             *Storage.ensure_storage_dir_exists*
+Storage.ensure_storage_dir_exists({path?})
+     Ensure that the storage directory exists. If no path is provided, the default path will be used.
+
+    Parameters: ~
+        {path?}  (string)
+
+
+Storage.decode({input?})                                        *Storage.decode*
+     Decode the raw input from the disk. This currently uses vim.fn.json_decode but could be replaced
+     with a custom implementation.
+
+    Parameters: ~
+        {input?}  (string)  @return table?
+
+
+                                                        *Storage.read_from_disk*
+Storage.read_from_disk({path}, {verbose?})
+     Try to read the provided file from disk.
+
+    Parameters: ~
+        {path}      (string)
+        {verbose?}  (boolean)  @return string?
+
+
+                                 *Storage.read_trailblazer_state_file_from_disk*
+Storage.read_trailblazer_state_file_from_disk({storage_dir?}, {name?}, {verbose?})
+     Read the trail mark storage from disk.
+
+    Parameters: ~
+        {storage_dir?}  (string)
+        {name?}         (string)
+        {verbose?}      (boolean)  @return string?
+                                   @return string?
+
+
+                                      *Storage.load_trailblazer_state_from_file*
+Storage.load_trailblazer_state_from_file({path?}, {verbose?})
+     Restore trail mark stacks from disk.
+
+    Parameters: ~
+        {path?}     (string)
+        {verbose?}  (boolean)
+
+
+Storage.encode({input?})                                        *Storage.encode*
+     Encode the input to be written to disk. This currently uses vim.fn.json_encode but could be
+     replaced with a custom implementation.
+
+    Parameters: ~
+        {input?}  (table)  @return string?
+
+
+                                                         *Storage.write_to_disk*
+Storage.write_to_disk({path?}, {content?}, {verbose?})
+     Write content to disk under the provided path.
+
+    Parameters: ~
+        {path?}     (string)
+        {content?}  (string)
+        {verbose?}  (boolean)
+
+    Returns: ~
+        (boolean)
+
+
+                                 *Storage.write_trail_mark_storage_file_to_disk*
+Storage.write_trail_mark_storage_file_to_disk({storage_dir?}, {name?}, {content?}, {verbose?})
+     Write trail mark storage file to disk.
+
+    Parameters: ~
+        {storage_dir?}  (string)
+        {name?}         (string)
+        {content?}      (string)
+        {verbose?}      (boolean)
+
+    Returns: ~
+        (boolean)
+
+
+                                        *Storage.save_trailblazer_state_to_file*
+Storage.save_trailblazer_state_to_file({path?}, {trail_mark_stacks?}, {verbose?})
+     Save trail mark stacks to disk.
+
+    Parameters: ~
+        {path?}               (string)
+        {trail_mark_stacks?}  (table)
+        {verbose?}            (boolean)
+
+
+Storage.get_valid_file_name({name?})               *Storage.get_valid_file_name*
+     Returns a valid file name for the provided name. If no name is provided, the current working
+     directory will be used and hashed.
+
+    Parameters: ~
+        {name?}  (string)
+
+    Returns: ~
+        (string)
+
+
                                                                 *trails.actions*
 ==============================================================================
                                                     *trailblazer.trails.actions*
@@ -491,11 +640,12 @@ Actions.delete_all_trail_marks({buf?})          *Actions.delete_all_trail_marks*
 
 
                                             *Actions.set_trail_mark_select_mode*
-Actions.set_trail_mark_select_mode({mode?})
+Actions.set_trail_mark_select_mode({mode?}, {verbose?})
      Set the trail mark selection mode to the given mode or toggle between the available modes.
 
     Parameters: ~
-        {mode?}  (string)
+        {mode?}     (string)
+        {verbose?}  (boolean)
 
 
 Actions.switch_trail_mark_stack({name?})       *Actions.switch_trail_mark_stack*
@@ -903,12 +1053,13 @@ Stacks.add_stack({name?})                                     *Stacks.add_stack*
         {name?}  (string)
 
 
-Stacks.delete_stack({name?})                               *Stacks.delete_stack*
+Stacks.delete_stack({name?}, {verbose?})                   *Stacks.delete_stack*
      Deletes the trail mark stack under the given name or the current trail mark stack if no name
      is supplied.
 
     Parameters: ~
-        {name?}  (string|table)
+        {name?}     (string|table)
+        {verbose?}  (boolean)
 
 
 Stacks.delte_all_stacks()                              *Stacks.delte_all_stacks*
@@ -916,29 +1067,32 @@ Stacks.delte_all_stacks()                              *Stacks.delte_all_stacks*
 
 
                                                    *Stacks.switch_to_next_stack*
-Stacks.switch_to_next_stack({sort_mode?})
+Stacks.switch_to_next_stack({sort_mode?}, {verbose?})
      Move the current trail mark stack to the next trail mark stack in the trail mark stack list
      depending on the given sort mode.
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
 
 
                                                *Stacks.switch_to_previous_stack*
-Stacks.switch_to_previous_stack({sort_mode?})
+Stacks.switch_to_previous_stack({sort_mode?}, {verbose?})
      Move the current trail mark stack to the previous trail mark stack in the trail mark stack list
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
 
 
                                                    *Stacks.switch_current_stack*
-Stacks.switch_current_stack({name?}, {save?})
+Stacks.switch_current_stack({name?}, {save?}, {verbose?})
      Switches the current trail mark stack to the trail mark stack under the given name.
 
     Parameters: ~
-        {name?}  (string)
-        {save?}  (boolean)
+        {name?}     (string)
+        {save?}     (boolean)
+        {verbose?}  (boolean)
 
 
                                                  *Stacks.get_sorted_stack_names*
@@ -949,22 +1103,41 @@ Stacks.get_sorted_stack_names({sort_mode?})
         {sort_mode?}  (string)  @return table<string>
 
 
-Stacks.get_valid_sort_mode({sort_mode?})            *Stacks.get_valid_sort_mode*
+                                                    *Stacks.get_valid_sort_mode*
+Stacks.get_valid_sort_mode({sort_mode?}, {verbose?})
      Returns a valid sort mode for the given input.
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
 
     Returns: ~
         (string)
 
 
                                          *Stacks.set_trail_mark_stack_sort_mode*
-Stacks.set_trail_mark_stack_sort_mode({sort_mode?})
+Stacks.set_trail_mark_stack_sort_mode({sort_mode?}, {verbose?})
      Set the trail mark stack sort mode to the given mode or toggle between the available modes.
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
+
+
+                           *Stacks.udpate_buffer_ids_with_filename_lookup_table*
+Stacks.udpate_buffer_ids_with_filename_lookup_table({stack_list}, {lookup_tbl})
+     Update the buffer ids in the trail mark stack list with the given lookup table.
+
+    Parameters: ~
+        {stack_list}  (table)
+        {lookup_tbl}  (table)
+
+
+Stacks.create_buf_file_lookup_table()      *Stacks.create_buf_file_lookup_table*
+     Create a table that maps buffer numbers to file names.
+
+    Returns: ~
+        (table)
 
 
 vim:tw=78:ts=8:noet:ft=help:norl:
