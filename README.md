@@ -44,6 +44,7 @@ to come. If you have any suggestions or find any bugs, please open an issue.**
     * [📦 Installation](#-installation)
     * [⚙️ Configuration](#%EF%B8%8F-configuration)
         * [Trail Mark Stacks](#trail-mark-stacks)
+        * [Trail Mark Sessions](#trail-mark-sessions)
         * [Trail Mark Selection Modes](#trail-mark-selection-modes)
         * [Trail Mark Symbols](#trail-mark-symbols)
             * [Multiple Mark Symbol Counters](#multiple-mark-symbol-counters)
@@ -120,6 +121,9 @@ available and set by default:
 -- Adjust these values to your liking
 {
     lang = "en",
+    auto_save_trailblazer_state_on_exit = false,
+    auto_load_trailblazer_state_on_enter = false, -- experimental
+    custom_session_storage_dir = "", -- i.e. "~/trail_blazer_sessions/"
     trail_options = {
         -- Available modes to cycle through. Remove any you don't need.
         available_trail_mark_modes = {
@@ -277,6 +281,36 @@ trail marks will always be added to the currently selected trail mark stack.
 | `chron_asc` | Trail mark stacks are cycled through in chronological ascending order depending on their creation time.                         |
 | `chron_dsc` | Trail mark stacks are cycled through in chronological descending order depending on their creation time.                        |
 
+### Trail Mark Sessions
+
+Trail mark sessions allow you to save and restore your trail mark stacks and current mode
+configuration. You can either save a session in TrailBlazer's default session directory which is
+located within Neovim's `data` directory or with a given name in any directory you like and restore
+it from there. You can find out where Neovim's `data` directory is located on your machine by
+calling `:echo stdpath('data')` from the commandline. If you run `:TrailBlazerSaveSession` without
+any arguments, the current session will be saved in the default session directory and running
+`:TrailBlazerLoadSession` without any arguments will load this session from the default session
+directory. All sessions in the default session directory are automatically associtated with the
+current working directory. This means that if you change your working directory and run
+`:TrailBlazerLoadSession` without any arguments again, the corresponding session for the new working
+directory will be loaded. If you pass either a directory or file name to `:TrailBlazerSaveSession`
+or `:TrailBlazerLoadSession`, the session will be saved into or loaded from the given directory or
+file. Note that you have to append any file extension (e.g. ".tbsv") to the file name argument when
+saving a session. Otherwise TrailBlazer will create a directory with the given name and save the
+session file under the hashed path of the current working directory. Passing a directory name to
+`:TrailBlazerLoadSession` will cause TrailBlazer to search for a session file which matches the name
+of the hashed path of the current working directory.
+
+With trail mark sessions you can enable the following options in your configuration:
+
+* `auto_save_trailblazer_state_on_exit = false`
+* `auto_load_trailblazer_state_on_enter = false` (experimental)
+
+If you set `auto_save_trailblazer_state_on_exit` to `true`, TrailBlazer will automatically save the
+current session when you exit Neovim, but only if you have previously loaded or saved a session. If
+you set `auto_load_trailblazer_state_on_enter` to `true`, TrailBlazer will automatically load the
+session which matches the current working directory when you enter Neovim, but only if you have a
+session saved for the current working directory.
 
 ### Trail mark selection modes
 
@@ -381,6 +415,8 @@ require("trailblazer").<function_name>(<args>)
 | `TrailBlazerSwitchNextTrailMarkStack`     | `<sort_mode? string>`                                                                                          | Switch to the next trail mark stack using the specified sorting mode. If no arguments are specified the current default sort mode will be used.                                                                                                        |
 | `TrailBlazerSwitchPreviousTrailMarkStack` | `<sort_mode? string>`                                                                                          | Switch to the previous trail mark stack using the specified sorting mode. If no arguments are specified the current default sort mode will be used.                                                                                                    |
 | `TrailBlazerSetTrailMarkStackSortMode`    | `<sort_mode? string>`                                                                                          | Cycle through or set the current trail mark stack sort mode.                                                                                                                                                                                           |
+| `TrailBlazerSaveSession`                  | `<session_name? string>`                                                                                       | Save all trail mark stacks and and the current configuration to a session file. If no arguments are specified the session will be saved in the default session directory. You will find more information [here](#trail-mark-sessions).                 |
+| `TrailBlazerLoadSession`                  | `<session_name? string>`                                                                                       | Load a previous session from a session file. If no arguments are specified the session will be loaded from the default session directory. You will find more information [here](#trail-mark-sessions).                                                 |
 
 ## 📚 Documentation
 
