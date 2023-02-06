@@ -302,4 +302,92 @@ function Stacks.create_buf_file_lookup_table()
   return file_buf_lookup_table
 end
 
+--[[
+{
+  ["stack_name"] = {
+      created_at = <timestamp>,
+      stack = {
+          {
+              win = <win_id>,
+              buf = <bufnr>,
+              mark_id = <mark_id>,
+              pos = { <lnum>, <col> },
+              timestamp = <number>, -- generated from vim.loop.hrtime
+          }, ... -- more trail marks
+      },
+  }, ... -- more stacks
+}
+--]]
+--- Validate the integrity of the given trail mark stack list.
+---@param stack_list? table
+---@param verbose? boolean
+---@return boolean
+function Stacks.validate_trail_mark_stack_list_integrity(stack_list, verbose)
+  if not stack_list or type(stack_list) ~= "table" then
+    if verbose then
+      log.warn("invalid_trail_mark_stack_list", "[ - | " .. vim.inspect(stack_list) .. " ]")
+    end
+    return false
+  end
+
+  local ok, err
+
+  for _, stack in pairs(stack_list) do
+    if type(stack) ~= "table" then
+      if verbose then
+        log.warn("invalid_trail_mark_stack", "[ - | " .. vim.inspect(stack) .. " ]")
+      end
+      return false
+    end
+
+    ok, err = pcall(vim.validate, {
+      created_at = { stack.created_at, "number" },
+      stack = { stack.stack, "table" },
+    })
+
+    if not ok then
+      if verbose then
+        log.warn("invalid_trail_mark_stack", "[ " .. err .. " | " .. vim.inspect(stack) .. " ]")
+      end
+      return false
+    end
+
+    for _, mark in ipairs(stack.stack) do
+      if type(mark) ~= "table" then
+        if verbose then log.warn("invalid_trail_mark", "[ - | " .. vim.inspect(mark) .. " ]") end
+        return false
+      end
+
+      ok, err = pcall(vim.validate, {
+        win = { mark.win, "number" },
+        buf = { mark.buf, "number" },
+        mark_id = { mark.mark_id, "number" },
+        pos = { mark.pos, "table" },
+        timestamp = { mark.timestamp, "number" },
+      })
+
+      if not ok then
+        if verbose then
+          log.warn("invalid_trail_mark", "[ " .. err .. " | " .. vim.inspect(mark) .. " ]")
+        end
+        return false
+      end
+
+      ok, err = pcall(vim.validate, {
+        lnum = { mark.pos[1], "number" },
+        col = { mark.pos[2], "number" },
+      })
+
+      if not ok then
+        if verbose then
+          log.warn("invalid_trail_mark_pos", "[ " .. err .. " | " .. vim.inspect(mark.pos) .. " ]")
+        end
+        return false
+      end
+    end
+  end
+
+  return true
+end
+
 return Stacks

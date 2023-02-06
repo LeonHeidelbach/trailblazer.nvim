@@ -57,6 +57,18 @@ Log.langs = {
       tb_save_cwd_mismatch = "The current working directory from the loaded trail mark save file "
           .. "does not match the current working directory. Trail marks might not be loaded. " ..
           "[Save CWD | CWD] is -> ",
+      could_not_verify_trail_mark_save_file_integrity = "Could not verify trail mark save file "
+          .. "integrity. Trail marks have not been loaded.",
+      invalid_trailblazer_config = "Invalid TrailBlazer config. Please make sure that the config "
+          .. "is a valid table. [Error | Config] is -> ",
+      invalid_trail_mark_stack_list = "Invalid trail mark stack list. Please make sure that the "
+          .. "list is a valid table. [Error | Stack] is -> ",
+      invalid_trail_mark_stack = "Invalid trail mark stack. Please make sure that the stack is a "
+          .. "valid table. [Error | Stack] is -> ",
+      invalid_trail_mark = "Invalid trail mark. Please make sure that the trail mark is a valid "
+          .. "table. [Error | Trail Mark] is -> ",
+      invalid_trail_mark_pos = "Invalid trail mark position. Please make sure that the position "
+          .. "is a valid table. [Error | Position] is -> ",
     },
     errors = {
       not_configured = "TrailBlazer is not configured. Please call `require('trailblazer').setup()`"

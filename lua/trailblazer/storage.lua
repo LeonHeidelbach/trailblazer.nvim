@@ -135,7 +135,13 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
       return
     end
 
-    Storage.trailblazer_cwd_storage = trail_marks_storage
+    if Storage.validate_save_file_content_integrity(trail_marks_storage) then
+      Storage.trailblazer_cwd_storage = trail_marks_storage
+    else
+      log.warn("could_not_verify_trail_mark_save_file_integrity")
+      Storage.trailblazer_cwd_storage = {}
+      return
+    end
   else
     Storage.trailblazer_cwd_storage = {}
     return
@@ -291,6 +297,42 @@ function Storage.get_valid_file_name(name)
   end
 
   return name
+end
+
+--[[
+{
+    fb_lookup = {
+        ["/path/to/file"] = <bufnr>,
+    },
+    cwd = "/path/to/cwd",
+    stacks = {
+      -- list of TrailMarkStacks
+    },
+    config = {
+        -- current TrailBlazer state
+    },
+}
+--]]
+--- Validate the integrity of the provided save file content.
+---@param cfg? table
+---@param verbose? boolean
+---@return boolean
+function Storage.validate_save_file_content_integrity(cfg, verbose)
+  if type(cfg) ~= "table" then return false end
+
+  local ok, err = pcall(vim.validate, {
+    fb_lookup = { cfg.fb_lookup, "table" },
+    cwd = { cfg.cwd, "string" },
+    stacks = { cfg.stacks, "table" },
+    config = { cfg.config, "table" }
+  })
+
+  if not ok and verbose then
+    log.warn("invalid_trailblazer_config", "[ " .. err .. " | " .. vim.inspect(cfg) .. " ]")
+    return false
+  end
+
+  return ok and stacks.validate_trail_mark_stack_list_integrity(cfg.stacks, verbose)
 end
 
 return Storage
