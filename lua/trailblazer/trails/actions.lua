@@ -8,7 +8,7 @@
 ---@brief ]]
 
 local api = vim.api
-local fn = vim.fn
+local loop = vim.loop
 local Actions = {}
 
 local config = require("trailblazer.trails.config")
@@ -44,7 +44,7 @@ function Actions.new_trail_mark(win, buf, pos)
   end
 
   local new_mark = {
-    timestamp = fn.reltimefloat(fn.reltime()),
+    timestamp = loop.hrtime(),
     win = current_win, buf = current_buf,
     pos = current_cursor, mark_id = stacks.ucid + 1,
   }
