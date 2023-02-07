@@ -253,4 +253,16 @@ function Helpers.is_file_path(path)
   return path:gsub("\\", "/"):match(".*/.*%.%w+$") ~= nil
 end
 
+--- Returns the current time in milliseconds if no resolution is provided. The resolution will add
+--- more precision to the returned time. The resolution parameter can be any multiple of 10
+--- otherwise it will be set to 1.
+---@param res? number
+---@return number
+function Helpers.time(res)
+  if not res or res % 10 ~= 0 then res = 1 end
+  local base_time = os.time() * 1000 * res
+  local high_res_time = vim.loop.hrtime() / 1000000 / res
+  return math.floor(base_time + high_res_time)
+end
+
 return Helpers

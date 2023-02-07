@@ -9,7 +9,6 @@
 
 local api = vim.api
 local fn = vim.fn
-local loop = vim.loop
 local Stacks = {}
 
 local config = require("trailblazer.trails.config")
@@ -43,7 +42,7 @@ function Stacks.add_stack(name)
 
   if Stacks.trail_mark_stack_list[name] == nil then
     Stacks.trail_mark_stack_list[name] = {
-      created_at = loop.hrtime(),
+      created_at = helpers.time(),
       stack = vim.deepcopy(Stacks.current_trail_mark_stack)
     }
   else
@@ -162,7 +161,7 @@ function Stacks.switch_current_stack(name, save, verbose)
 
   if Stacks.trail_mark_stack_list[name] == nil then
     Stacks.trail_mark_stack_list[name] = {
-      created_at = loop.hrtime(),
+      created_at = helpers.time(),
       stack = {}
     }
   end
@@ -312,7 +311,7 @@ end
               buf = <bufnr>,
               mark_id = <mark_id>,
               pos = { <lnum>, <col> },
-              timestamp = <number>, -- generated from vim.loop.hrtime
+              timestamp = <number>, -- generated from helpers.time()
           }, ... -- more trail marks
       },
   }, ... -- more stacks
