@@ -157,6 +157,18 @@ Helpers.is_file_path({path?})                             *Helpers.is_file_path*
         (boolean)
 
 
+Helpers.time({res?})                                              *Helpers.time*
+     Returns the current time in milliseconds if no resolution is provided. The resolution will add
+     more precision to the returned time. The resolution parameter can be any multiple of 10
+     otherwise it will be set to 1.
+
+    Parameters: ~
+        {res?}  (number)
+
+    Returns: ~
+        (number)
+
+
                                                                     *highlights*
 ==============================================================================
                                                         *trailblazer.highlights*
