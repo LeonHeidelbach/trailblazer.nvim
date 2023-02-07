@@ -261,7 +261,7 @@ end
 function Helpers.time(res)
   if not res or res % 10 ~= 0 then res = 1 end
   local base_time = os.time() * 1000 * res
-  local high_res_time = vim.loop.hrtime() / 1000000 / res
+  local high_res_time = vim.loop.hrtime() / (1000000 / res)
   return math.floor(base_time + high_res_time)
 end
 
