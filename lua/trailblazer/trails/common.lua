@@ -180,6 +180,12 @@ end
 ---@return boolean
 function Common.focus_win_and_buf(trail_mark, ext_mark)
   local ok
+  local win_ids = api.nvim_list_wins()
+
+  if trail_mark.win == nil or not vim.tbl_contains(win_ids, trail_mark.win) then
+    trail_mark.win = win_ids[1] or api.nvim_get_current_win()
+  end
+
   ok, _ = pcall(api.nvim_set_current_win, trail_mark.win)
   if not ok then
     api.nvim_set_current_win(0)
