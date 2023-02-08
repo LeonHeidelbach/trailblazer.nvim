@@ -252,11 +252,12 @@ function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_
   local new_buf_id_lookup = {}
 
   for k, v in pairs(lookup_tbl) do
-    local buf = fn.bufnr(k, true)
+    local expanded_path = fn.expand(k)
+    local buf = fn.bufnr(expanded_path, true)
 
-    if (buf == -1 or not api.nvim_buf_is_loaded(buf)) and fn.filereadable(k) == 1 then
+    if (buf == -1 or not api.nvim_buf_is_loaded(buf)) and fn.filereadable(expanded_path) == 1 then
       buf = api.nvim_create_buf(true, false)
-      api.nvim_buf_set_name(buf, k)
+      api.nvim_buf_set_name(buf, expanded_path)
       api.nvim_buf_call(buf, vim.cmd.edit)
       new_buf_id_lookup[v] = buf
     elseif api.nvim_buf_is_loaded(buf) then
