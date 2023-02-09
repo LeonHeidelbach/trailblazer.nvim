@@ -266,7 +266,7 @@ function Helpers.open_file(file_path, focus, win, win_opts)
 
   if (buf == -1 or not api.nvim_buf_is_loaded(buf)) and fn.filereadable(expanded_path) == 1 then
     buf = api.nvim_create_buf(true, false)
-    api.nvim_buf_set_name(buf, file_path)
+    api.nvim_buf_set_name(buf, expanded_path)
     api.nvim_buf_call(buf, vim.cmd.edit)
 
     if win and buf then
