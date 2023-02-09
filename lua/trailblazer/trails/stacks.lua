@@ -248,21 +248,22 @@ end
 --- Update the buffer ids in the trail mark stack list with the given lookup table.
 ---@param stack_list table
 ---@param lookup_tbl table
-function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_tbl)
+---@param saved_cwd? string
+function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_tbl, saved_cwd)
   local new_buf_id_lookup = {}
+  local fp_sep = fn.has("win32") == 1 and "\\" or "/"
+  local cwd_match = saved_cwd and fn.getcwd() == saved_cwd or nil
 
   for k, v in pairs(lookup_tbl) do
-    local expanded_path = fn.expand(k)
-    local buf = fn.bufnr(expanded_path, true)
+    local buf
 
-    if (buf == -1 or not api.nvim_buf_is_loaded(buf)) and fn.filereadable(expanded_path) == 1 then
-      buf = api.nvim_create_buf(true, false)
-      api.nvim_buf_set_name(buf, expanded_path)
-      api.nvim_buf_call(buf, vim.cmd.edit)
-      new_buf_id_lookup[v] = buf
-    elseif api.nvim_buf_is_loaded(buf) then
-      new_buf_id_lookup[v] = buf
+    if cwd_match or string.match(k, "^[" .. fp_sep .. "~]") then
+      buf = helpers.open_file(k)
+    elseif string.match(k, "^%a") then
+      buf = helpers.open_file(saved_cwd .. fp_sep .. k)
     end
+
+    if buf then new_buf_id_lookup[v] = buf end
   end
 
   for _, stack in pairs(stack_list) do

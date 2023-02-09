@@ -156,7 +156,7 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
 
   stacks.add_stack()
   stacks.udpate_buffer_ids_with_filename_lookup_table(Storage.trailblazer_cwd_storage.stacks,
-    Storage.trailblazer_cwd_storage.fb_lookup)
+    Storage.trailblazer_cwd_storage.fb_lookup, Storage.trailblazer_cwd_storage.cwd)
   helpers.tbl_deep_extend(stacks.trail_mark_stack_list, Storage.trailblazer_cwd_storage.stacks)
 
 

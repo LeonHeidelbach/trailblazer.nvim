@@ -54,9 +54,10 @@ Log.langs = {
       could_not_write_to_file = "Could not write to file: ",
       no_path_or_content_provided = "Could not write to file. No path or content provided " ..
           "[Path | Content] is -> ",
-      tb_save_cwd_mismatch = "The current working directory from the loaded trail mark save file "
-          .. "does not match the current working directory. Trail marks might not be loaded. " ..
-          "[Save CWD | CWD] is -> ",
+      tb_save_cwd_mismatch = "The working directory from the loaded trail mark save file does not "
+          .. "match the current working directory. Trail marks might not be properly loaded. " ..
+          "Auto-saving is disabled until you manually save this session. [Saved CWD | Current CWD] "
+          .. "is -> ",
       could_not_verify_trail_mark_save_file_integrity = "Could not verify trail mark save file "
           .. "integrity. Trail marks have not been loaded.",
       invalid_trailblazer_config = "Invalid TrailBlazer config. Please make sure that the config "

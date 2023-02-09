@@ -253,6 +253,43 @@ function Helpers.is_file_path(path)
   return path:gsub("\\", "/"):match(".*/.*%.%w+$") ~= nil
 end
 
+--- Opens the supplied file path in a new buffer and optionally in the specified window and returns
+--- the buffer id. If the window is not valid then a new window will be opened.
+---@param file_path any
+---@param focus? boolean
+---@param win? number
+---@param win_opts? table
+---@return number?
+function Helpers.open_file(file_path, focus, win, win_opts)
+  local expanded_path = fn.expand(file_path)
+  local buf = fn.bufnr(expanded_path, true)
+
+  if (buf == -1 or not api.nvim_buf_is_loaded(buf)) and fn.filereadable(expanded_path) == 1 then
+    buf = api.nvim_create_buf(true, false)
+    api.nvim_buf_set_name(buf, file_path)
+    api.nvim_buf_call(buf, vim.cmd.edit)
+
+    if win and buf then
+      if not vim.tbl_contains(api.nvim_list_wins(), win) then
+        win = api.nvim_open_win(buf, focus == true, win_opts or {
+          width = math.floor(api.nvim_win_get_width(0) / 2),
+          height = math.floor(api.nvim_win_get_height(0) / 2),
+        })
+      end
+
+      if win ~= 0 then
+        api.nvim_win_set_buf(win, buf)
+      end
+    end
+
+    return buf
+  elseif api.nvim_buf_is_loaded(buf) then
+    return buf
+  end
+
+  return nil
+end
+
 --- Returns the current time in milliseconds if no resolution is provided. The resolution will add
 --- more precision to the returned time. The resolution parameter can be any multiple of 10
 --- otherwise it will be set to 1.
