@@ -251,13 +251,15 @@ end
 ---@param saved_cwd? string
 function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_tbl, saved_cwd)
   local new_buf_id_lookup = {}
-  local fp_sep = fn.has("win32") == 1 and "\\" or "/"
+  local is_windows = fn.has("win32") == 1
+  local fp_sep = is_windows and "\\" or "/"
   local cwd_match = saved_cwd and fn.getcwd() == saved_cwd or nil
 
   for k, v in pairs(lookup_tbl) do
     local buf
 
-    if cwd_match or string.match(k, "^[" .. fp_sep .. "~]") then
+    if cwd_match or string.match(k, "^[" .. fp_sep .. "~]") or
+        (is_windows and string.match(k, "^%a+:\\")) then
       buf = helpers.open_file(k)
     elseif string.match(k, "^%a") then
       buf = helpers.open_file(saved_cwd .. fp_sep .. k)
