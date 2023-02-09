@@ -157,6 +157,18 @@ Helpers.is_file_path({path?})                             *Helpers.is_file_path*
         (boolean)
 
 
+                                                             *Helpers.open_file*
+Helpers.open_file({file_path}, {focus?}, {win?}, {win_opts?})
+     Opens the supplied file path in a new buffer and optionally in the specified window and returns
+     the buffer id. If the window is not valid then a new window will be opened.
+
+    Parameters: ~
+        {file_path}  (any)
+        {focus?}     (boolean)
+        {win?}       (number)
+        {win_opts?}  (table)    @return number?
+
+
 Helpers.time({res?})                                              *Helpers.time*
      Returns the current time in milliseconds if no resolution is provided. The resolution will add
      more precision to the returned time. The resolution parameter can be any multiple of 10
@@ -1149,12 +1161,13 @@ Stacks.set_trail_mark_stack_sort_mode({sort_mode?}, {verbose?})
 
 
                            *Stacks.udpate_buffer_ids_with_filename_lookup_table*
-Stacks.udpate_buffer_ids_with_filename_lookup_table({stack_list}, {lookup_tbl})
+Stacks.udpate_buffer_ids_with_filename_lookup_table({stack_list}, {lookup_tbl}, {saved_cwd?})
      Update the buffer ids in the trail mark stack list with the given lookup table.
 
     Parameters: ~
         {stack_list}  (table)
         {lookup_tbl}  (table)
+        {saved_cwd?}  (string)
 
 
 Stacks.create_buf_file_lookup_table()      *Stacks.create_buf_file_lookup_table*
