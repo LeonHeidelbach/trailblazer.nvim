@@ -22,7 +22,7 @@ local log = require("trailblazer.log")
 ---@param pos? table<number, number>
 ---@return table?
 function Actions.new_trail_mark(win, buf, pos)
-  if common.delete_trail_mark_at_pos(win, buf, pos) then return nil end
+  if common.delete_trail_mark_at_pos(win or -1, buf, pos) then return nil end
 
   local current_win = win or api.nvim_get_current_win()
   local current_buf = buf or api.nvim_get_current_buf()
