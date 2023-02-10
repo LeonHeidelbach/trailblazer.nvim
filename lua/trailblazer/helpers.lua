@@ -257,11 +257,11 @@ end
 --- Opens the supplied file path in a new buffer and optionally in the specified window and returns
 --- the buffer id. If the window is not valid then a new window will be opened.
 ---@param file_path any
----@param focus? boolean
 ---@param win? number
----@param win_opts? table
+---@param split_type? table
 ---@return number?
-function Helpers.open_file(file_path, focus, win, win_opts)
+---@return number?
+function Helpers.open_file(file_path, win, split_type)
   local expanded_path = fn.expand(file_path)
   local buf = fn.bufnr(expanded_path, true)
 
@@ -272,10 +272,8 @@ function Helpers.open_file(file_path, focus, win, win_opts)
 
     if win and buf then
       if not vim.tbl_contains(api.nvim_list_wins(), win) then
-        win = api.nvim_open_win(buf, focus == true, win_opts or {
-          width = math.floor(api.nvim_win_get_width(0) / 2),
-          height = math.floor(api.nvim_win_get_height(0) / 2),
-        })
+        vim.cmd(split_type or "vsplit")
+        win = api.nvim_get_current_win()
       end
 
       if win ~= 0 then
@@ -283,12 +281,12 @@ function Helpers.open_file(file_path, focus, win, win_opts)
       end
     end
 
-    return buf
+    return win, buf
   elseif api.nvim_buf_is_loaded(buf) then
-    return buf
+    return win, buf
   end
 
-  return nil
+  return nil, nil
 end
 
 --- Returns the current time in milliseconds if no resolution is provided. The resolution will add

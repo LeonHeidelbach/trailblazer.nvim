@@ -260,9 +260,9 @@ function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_
 
     if cwd_match or string.match(k, "^[" .. fp_sep .. "~]") or
         (is_windows and string.match(k, "^%a+:")) then
-      buf = helpers.open_file(k)
+      _, buf = helpers.open_file(k)
     elseif string.match(k, "^%a") then
-      buf = helpers.open_file(saved_cwd .. fp_sep .. k)
+      _, buf = helpers.open_file(saved_cwd .. fp_sep .. k)
     end
 
     if buf then new_buf_id_lookup[v] = buf end
