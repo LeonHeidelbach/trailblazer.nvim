@@ -231,17 +231,18 @@ function Helpers.tbl_deep_extend(tbl_base, tbl_extend)
   if tbl_extend == nil then return tbl_base end
   if tbl_base == nil then return tbl_extend end
   if tbl_base == nil and tbl_extend == nil then return nil end
+
   for k, v in pairs(tbl_extend) do
     if type(v) == "table" then
-      if type(tbl_base[k]) == "table" then
-        Helpers.tbl_deep_extend(tbl_base[k], v)
-      else
-        tbl_base[k] = v
-      end
+      if tonumber(k) then table.insert(tbl_base, v)
+      elseif type(tbl_base[k]) == "table" then Helpers.tbl_deep_extend(tbl_base[k], v)
+      else tbl_base[k] = v end
     else
-      tbl_base[k] = v
+      if tonumber(k) then table.insert(tbl_base, v)
+      else tbl_base[k] = v end
     end
   end
+
   return tbl_base
 end
 
