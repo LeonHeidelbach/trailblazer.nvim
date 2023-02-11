@@ -512,14 +512,14 @@ function Common.reregister_trail_marks()
 
   for i, mark in ipairs(stacks.current_trail_mark_stack) do
     if api.nvim_buf_is_loaded(mark.buf) and api.nvim_buf_is_valid(mark.buf) then
-      local pos_text = helpers.buf_get_utf8_char_at_pos(mark.buf, mark.pos)
+      local char, char_w = helpers.buf_get_utf8_char_at_pos(mark.buf, mark.pos)
 
       local mark_options = {
         id = mark.mark_id,
         virt_text_pos = "overlay",
         hl_mode = "combine",
         strict = true,
-        priority = i,
+        priority = 10001,
       }
 
       if i == newest_mark_index then
@@ -584,7 +584,12 @@ function Common.reregister_trail_marks()
       end
 
       if config.custom.trail_mark_in_text_highlights_enabled then
-        mark_options["virt_text"] = { { pos_text ~= "" and pos_text or " ", hl_group } }
+        if char == "" then
+          mark_options["virt_text"] = { { " ", hl_group } }
+          mark.pos[2] = mark.pos[2] - 1
+        else mark_options["hl_group"] = hl_group
+          mark_options["end_col"] = mark.pos[2] + char_w
+        end
       end
 
       ok, mark.mark_id = pcall(api.nvim_buf_set_extmark, mark.buf, config.nsid,

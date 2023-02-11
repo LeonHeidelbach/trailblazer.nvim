@@ -161,18 +161,20 @@ function Helpers.sub(s, i, j)
   return s:sub(str + 1, e)
 end
 
---- Returns the character at the provided position. This function will return the correct value as
---- long as the character has a maximum width of 4 bytes as per the utf-8 standard.
+--- Returns the character and its byte width at the provided position. This function will return the
+--- correct value as long as the character has a maximum width of 4 bytes as per the utf-8 standard.
 ---@param buf number
 ---@param pos table<number, number>
 ---@return string?
+---@return number?
 function Helpers.buf_get_utf8_char_at_pos(buf, pos)
   local line = api.nvim_buf_get_lines(buf, pos[1] - 1, pos[1], false)[1]
-  if not line then return nil end
+  if not line then return nil, nil end
 
   local col = vim.str_utfindex(line:sub(1, pos[2])) + 1
 
   local char
+  local char_w = 1
   local i = 1
 
   while i <= #line do
@@ -180,26 +182,30 @@ function Helpers.buf_get_utf8_char_at_pos(buf, pos)
 
     if byte >= 240 then
       char = line:sub(i, i + 3)
-      i = i + 4
+      char_w = 4
+      i = i + char_w
     elseif byte >= 225 then
       char = line:sub(i, i + 2)
-      i = i + 3
+      char_w = 3
+      i = i + char_w
     elseif byte >= 192 then
       char = line:sub(i, i + 1)
-      i = i + 2
+      char_w = 2
+      i = i + char_w
     else
       char = line:sub(i, i)
-      i = i + 1
+      char_w = 1
+      i = i + char_w
     end
 
     if col == 1 then
-      return char
+      return char, char_w
     end
 
     col = col - 1
   end
 
-  return ""
+  return "", char_w
 end
 
 --- Returns the absolute file path for the supplied buffer.
