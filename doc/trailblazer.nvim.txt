@@ -108,12 +108,13 @@ Helpers.sub({s}, {i}, {j})                                         *Helpers.sub*
 
                                               *Helpers.buf_get_utf8_char_at_pos*
 Helpers.buf_get_utf8_char_at_pos({buf}, {pos})
-     Returns the character at the provided position. This function will return the correct value as
-     long as the character has a maximum width of 4 bytes as per the utf-8 standard.
+     Returns the character and its byte width at the provided position. This function will return the
+     correct value as long as the character has a maximum width of 4 bytes as per the utf-8 standard.
 
     Parameters: ~
         {buf}  (number)
         {pos}  (table<number,number>)  @return string?
+                                       @return number?
 
 
                                             *Helpers.buf_get_absolute_file_path*
@@ -158,15 +159,15 @@ Helpers.is_file_path({path?})                             *Helpers.is_file_path*
 
 
                                                              *Helpers.open_file*
-Helpers.open_file({file_path}, {focus?}, {win?}, {win_opts?})
+Helpers.open_file({file_path}, {win?}, {split_type?})
      Opens the supplied file path in a new buffer and optionally in the specified window and returns
      the buffer id. If the window is not valid then a new window will be opened.
 
     Parameters: ~
-        {file_path}  (any)
-        {focus?}     (boolean)
-        {win?}       (number)
-        {win_opts?}  (table)    @return number?
+        {file_path}    (any)
+        {win?}         (number)
+        {split_type?}  (table)   @return number?
+                                 @return number?
 
 
 Helpers.time({res?})                                              *Helpers.time*
