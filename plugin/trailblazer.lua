@@ -74,6 +74,14 @@ api.nvim_create_user_command("TrailBlazerToggleTrailMarkList", function(args)
   tb.toggle_trail_mark_list(args.fargs[1], args.fargs[2])
 end, { nargs = "*", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_LIST_MODES" })
 
+api.nvim_create_user_command("TrailBlazerOpenTrailMarkList", function(args)
+  tb.open_trail_mark_list(args.fargs[1], args.fargs[2])
+end, { nargs = "*", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_LIST_MODES" })
+
+api.nvim_create_user_command("TrailBlazerCloseTrailMarkList", function(args)
+  tb.close_trail_mark_list(args.fargs[1])
+end, { nargs = "*", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_LIST_MODES" })
+
 api.nvim_create_user_command("TrailBlazerSwitchTrailMarkStack", function(args)
   tb.switch_trail_mark_stack(args.args)
 end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACKS" })

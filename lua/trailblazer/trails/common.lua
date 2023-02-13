@@ -589,7 +589,8 @@ function Common.reregister_trail_marks()
           mark_options["virt_text"] = { { " ", hl_group } }
           mark.pos[2] = curr_line and mark.pos[2] >= #curr_line and
               math.max(0, #curr_line - 1) or mark.pos[2]
-        else mark_options["hl_group"] = hl_group
+        else
+          mark_options["hl_group"] = hl_group
           mark_options["end_col"] = mark.pos[2] + char_w
         end
       end

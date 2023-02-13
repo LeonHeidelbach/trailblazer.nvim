@@ -242,6 +242,21 @@ function TrailBlazer.toggle_trail_mark_list(type, buf)
   trails.list.toggle_trail_mark_list(type, helpers.get_buf_nr(buf))
 end
 
+--- Open a list of all trail marks for the specified buffer in the specified list type.
+---@param type string
+---@param buf? number | string
+function TrailBlazer.open_trail_mark_list(type, buf)
+  if not TrailBlazer.is_configured() then return end
+  trails.list.open_trail_mark_list(type, helpers.get_buf_nr(buf))
+end
+
+--- Close a list of all trail marks for the specified buffer in the specified list type.
+---@param type string
+function TrailBlazer.close_trail_mark_list(type)
+  if not TrailBlazer.is_configured() then return end
+  trails.list.close_trail_mark_list(type)
+end
+
 --- Switch the trail mark stack to the specified stack.
 ---@param name? string
 function TrailBlazer.switch_trail_mark_stack(name)

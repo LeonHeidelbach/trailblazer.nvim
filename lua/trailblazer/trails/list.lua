@@ -46,8 +46,37 @@ function List.toggle_trail_mark_list(type, buf)
   buf = common.default_buf_for_current_mark_select_mode(buf)
 
   if type == "quickfix" then
-    List.toggle_quick_fix_list(buf,
-      common.get_trail_mark_stack_subset_for_buf(buf))
+    List.toggle_quick_fix_list(buf, common.get_trail_mark_stack_subset_for_buf(buf))
+    return
+  end
+
+  log.warn("invalid_trailblazer_list_type",
+    table.concat(config.custom.available_trail_mark_lists, ", "))
+end
+
+--- Open a list of all trail marks for the specified buffer in the specified list type.
+---@param type? string
+---@param buf? number
+function List.open_trail_mark_list(type, buf)
+  type = type or config.custom.current_trail_mark_list_type
+  buf = common.default_buf_for_current_mark_select_mode(buf)
+
+  if type == "quickfix" then
+    List.open_quick_fix_list(buf, common.get_trail_mark_stack_subset_for_buf(buf))
+    return
+  end
+
+  log.warn("invalid_trailblazer_list_type",
+    table.concat(config.custom.available_trail_mark_lists, ", "))
+end
+
+--- Close a list of all trail marks for the specified buffer in the specified list type.
+---@param type? string
+function List.close_trail_mark_list(type)
+  type = type or config.custom.current_trail_mark_list_type
+
+  if type == "quickfix" then
+    List.close_quick_fix_list()
     return
   end
 
@@ -74,23 +103,39 @@ function List.update_trail_mark_list(type, buf)
     table.concat(config.custom.available_trail_mark_lists, ", "))
 end
 
---- Toggle a quick fix list with specified trail mark list.
+--- Toggle a quick fix list with the specified trail mark list.
 ---@param buf? number
 ---@param trail_mark_list? table
 function List.toggle_quick_fix_list(buf, trail_mark_list)
+  if List.close_quick_fix_list() then return end
+  List.open_quick_fix_list(buf, trail_mark_list)
+end
 
-  local qf_buf = List.get_trailblazer_quickfix_buf()
-  if qf_buf then
-    pcall(api.nvim_command, "bdelete! " .. qf_buf)
-    return
-  end
-
+--- Open a quick fix list with the specified trail mark list.
+---@param buf any
+---@param trail_mark_list any
+---@return number?
+function List.open_quick_fix_list(buf, trail_mark_list)
   if trail_mark_list then
     List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
   end
 
   vim.cmd("copen")
   List.register_quickfix_keybindings(List.config.quickfix_mappings)
+
+  return List.get_trailblazer_quickfix_buf()
+end
+
+--- Close a trail mark quick fix list.
+---@return boolean
+function List.close_quick_fix_list()
+  local qf_buf = List.get_trailblazer_quickfix_buf()
+  if qf_buf then
+    pcall(api.nvim_command, "bdelete! " .. qf_buf)
+    return true
+  end
+
+  return false
 end
 
 --- Populate the quick fix list with the specified trail mark list.
