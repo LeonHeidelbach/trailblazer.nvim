@@ -176,6 +176,7 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
       .current_trail_mark_stack_sort_mode, false)
   end
 
+  common.remove_duplicate_pos_trail_marks()
   common.reregister_trail_marks()
   list.update_trail_mark_list()
 
