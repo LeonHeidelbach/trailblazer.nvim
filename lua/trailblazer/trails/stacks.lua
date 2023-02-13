@@ -59,7 +59,7 @@ end
 ---@param verbose? boolean
 function Stacks.delete_stack(name, verbose)
   if name == nil or fn.empty(name) == 1 then
-    name = Stacks.current_trail_mark_stack_name
+    name = Stacks.current_trail_mark_stack_name or "default"
   end
 
   if type(name) == "table" then
@@ -68,7 +68,7 @@ function Stacks.delete_stack(name, verbose)
     end
 
     if vim.tbl_contains(name, Stacks.current_trail_mark_stack_name) then
-      Stacks.switch_current_stack(nil, false)
+      Stacks.switch_to_previous_stack(nil, false)
     end
 
     name = table.concat(name, ", ")
@@ -76,7 +76,7 @@ function Stacks.delete_stack(name, verbose)
     Stacks.trail_mark_stack_list[name] = nil
 
     if name == Stacks.current_trail_mark_stack_name then
-      Stacks.switch_current_stack(nil, false)
+      Stacks.switch_to_previous_stack(nil, false)
     end
   end
 
@@ -88,14 +88,15 @@ end
 --- Deletes all trail mark stacks.
 function Stacks.delte_all_stacks()
   Stacks.trail_mark_stack_list = {}
-  Stacks.switch_current_stack(nil, false)
+  Stacks.switch_to_previous_stack(nil, false)
 end
 
 --- Move the current trail mark stack to the next trail mark stack in the trail mark stack list
 --- depending on the given sort mode.
 ---@param sort_mode? string
+---@param save_current? boolean
 ---@param verbose? boolean
-function Stacks.switch_to_next_stack(sort_mode, verbose)
+function Stacks.switch_to_next_stack(sort_mode, save_current, verbose)
   if vim.tbl_count(Stacks.trail_mark_stack_list) <= 1 then
     if verbose == nil or verbose then
       log.info("no_next_trail_mark_stack")
@@ -115,13 +116,14 @@ function Stacks.switch_to_next_stack(sort_mode, verbose)
   end
 
   Stacks.switch_current_stack(stack_names[current_stack_index >= #stack_names and 1
-      or current_stack_index + 1])
+      or current_stack_index + 1], save_current)
 end
 
 --- Move the current trail mark stack to the previous trail mark stack in the trail mark stack list
 ---@param sort_mode? string
+---@param save_current? boolean
 ---@param verbose? boolean
-function Stacks.switch_to_previous_stack(sort_mode, verbose)
+function Stacks.switch_to_previous_stack(sort_mode, save_current, verbose)
   if vim.tbl_count(Stacks.trail_mark_stack_list) <= 1 then
     if verbose == nil or verbose then
       log.info("no_previous_trail_mark_stack")
@@ -141,7 +143,7 @@ function Stacks.switch_to_previous_stack(sort_mode, verbose)
   end
 
   Stacks.switch_current_stack(stack_names[current_stack_index <= 1 and #stack_names
-      or current_stack_index - 1])
+      or current_stack_index - 1], save_current)
 end
 
 --- Switches the current trail mark stack to the trail mark stack under the given name.
