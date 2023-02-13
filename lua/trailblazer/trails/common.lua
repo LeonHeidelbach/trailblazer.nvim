@@ -446,14 +446,18 @@ function Common.update_all_trail_mark_positions()
     return { [buf] = api.nvim_buf_get_extmarks(buf, config.nsid, 0, -1, {}) }
   end, vim.tbl_keys(buf_list), true)
 
-  for _, trail_mark in ipairs(stacks.current_trail_mark_stack) do
+  for i = #stacks.current_trail_mark_stack, 1, -1 do
+    local trail_mark = stacks.current_trail_mark_stack[i]
     if ext_marks[trail_mark.buf] then
       local ext_mark = helpers.tbl_find(function(ext_mark)
         return ext_mark[1] == trail_mark.mark_id
       end, ext_marks[trail_mark.buf])
 
-      if ext_mark ~= nil and buf_list[trail_mark.buf] > ext_mark[2] + 1 then
+      if ext_mark ~= nil and ext_mark[3] > 0 then
         trail_mark.pos = { ext_mark[2] + 1, ext_mark[3] }
+      elseif ext_mark ~= nil and trail_mark.pos[2] ~= 0 then
+        api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
+        table.remove(stacks.current_trail_mark_stack, i)
       end
     end
   end
@@ -587,8 +591,8 @@ function Common.reregister_trail_marks()
         if char == "" then
           local curr_line = api.nvim_buf_get_lines(mark.buf, mark.pos[1] - 1, mark.pos[1], false)[1]
           mark_options["virt_text"] = { { " ", hl_group } }
-          mark.pos[2] = curr_line and mark.pos[2] >= #curr_line and
-              math.max(0, #curr_line - 1) or mark.pos[2]
+          mark.pos[2] = curr_line and mark.pos[2] >= #curr_line and math.max(0, #curr_line - 1)
+              or mark.pos[2]
         else
           mark_options["hl_group"] = hl_group
           mark_options["end_col"] = mark.pos[2] + char_w
