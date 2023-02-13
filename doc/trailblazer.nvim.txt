@@ -339,6 +339,23 @@ TrailBlazer.toggle_trail_mark_list({type}, {buf?})
         {buf?}  (number|string)
 
 
+                                              *TrailBlazer.open_trail_mark_list*
+TrailBlazer.open_trail_mark_list({type}, {buf?})
+     Open a list of all trail marks for the specified buffer in the specified list type.
+
+    Parameters: ~
+        {type}  (string)
+        {buf?}  (number|string)
+
+
+                                             *TrailBlazer.close_trail_mark_list*
+TrailBlazer.close_trail_mark_list({type})
+     Close a list of all trail marks for the specified buffer in the specified list type.
+
+    Parameters: ~
+        {type}  (string)
+
+
                                            *TrailBlazer.switch_trail_mark_stack*
 TrailBlazer.switch_trail_mark_stack({name?})
      Switch the trail mark stack to the specified stack.
@@ -974,6 +991,22 @@ List.toggle_trail_mark_list({type?}, {buf?})
         {buf?}   (number)
 
 
+                                                     *List.open_trail_mark_list*
+List.open_trail_mark_list({type?}, {buf?})
+     Open a list of all trail marks for the specified buffer in the specified list type.
+
+    Parameters: ~
+        {type?}  (string)
+        {buf?}   (number)
+
+
+List.close_trail_mark_list({type?})                 *List.close_trail_mark_list*
+     Close a list of all trail marks for the specified buffer in the specified list type.
+
+    Parameters: ~
+        {type?}  (string)
+
+
                                                    *List.update_trail_mark_list*
 List.update_trail_mark_list({type?}, {buf?})
      Update the specified list type with the trail marks for the specified buffer.
@@ -985,11 +1018,27 @@ List.update_trail_mark_list({type?}, {buf?})
 
                                                     *List.toggle_quick_fix_list*
 List.toggle_quick_fix_list({buf?}, {trail_mark_list?})
-     Toggle a quick fix list with specified trail mark list.
+     Toggle a quick fix list with the specified trail mark list.
 
     Parameters: ~
         {buf?}              (number)
         {trail_mark_list?}  (table)
+
+
+                                                      *List.open_quick_fix_list*
+List.open_quick_fix_list({buf}, {trail_mark_list})
+     Open a quick fix list with the specified trail mark list.
+
+    Parameters: ~
+        {buf}              (any)
+        {trail_mark_list}  (any)  @return number?
+
+
+List.close_quick_fix_list()                          *List.close_quick_fix_list*
+     Close a trail mark quick fix list.
+
+    Returns: ~
+        (boolean)
 
 
                                   *List.populate_quickfix_list_with_trail_marks*
@@ -1104,22 +1153,24 @@ Stacks.delte_all_stacks()                              *Stacks.delte_all_stacks*
 
 
                                                    *Stacks.switch_to_next_stack*
-Stacks.switch_to_next_stack({sort_mode?}, {verbose?})
+Stacks.switch_to_next_stack({sort_mode?}, {save_current?}, {verbose?})
      Move the current trail mark stack to the next trail mark stack in the trail mark stack list
      depending on the given sort mode.
 
     Parameters: ~
-        {sort_mode?}  (string)
-        {verbose?}    (boolean)
+        {sort_mode?}     (string)
+        {save_current?}  (boolean)
+        {verbose?}       (boolean)
 
 
                                                *Stacks.switch_to_previous_stack*
-Stacks.switch_to_previous_stack({sort_mode?}, {verbose?})
+Stacks.switch_to_previous_stack({sort_mode?}, {save_current?}, {verbose?})
      Move the current trail mark stack to the previous trail mark stack in the trail mark stack list
 
     Parameters: ~
-        {sort_mode?}  (string)
-        {verbose?}    (boolean)
+        {sort_mode?}     (string)
+        {save_current?}  (boolean)
+        {verbose?}       (boolean)
 
 
                                                    *Stacks.switch_current_stack*
