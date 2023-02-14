@@ -125,6 +125,11 @@ available and set by default:
     auto_load_trailblazer_state_on_enter = false, -- experimental
     custom_session_storage_dir = "", -- i.e. "~/trail_blazer_sessions/"
     trail_options = {
+        -- The trail mark priority sets the global render priority of trail marks in the sign/number
+        -- column as well as the highlights within the text (e.g. Treesitter sets a value of 100).
+        -- Make sure this value is higher than any other plugin you use to ensure that trail marks
+        -- are always visible and don't get overshadowed.
+        trail_mark_priority = 10001,
         -- Available modes to cycle through. Remove any you don't need.
         available_trail_mark_modes = {
             "global_chron",
