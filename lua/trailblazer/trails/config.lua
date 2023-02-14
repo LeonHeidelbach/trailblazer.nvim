@@ -11,6 +11,7 @@ local api = vim.api
 local Config = {}
 
 Config.custom = {}
+Config.custom.trail_mark_priority = 10001
 Config.custom.available_trail_mark_modes = {
   "global_chron",
   "global_buf_line_sorted",

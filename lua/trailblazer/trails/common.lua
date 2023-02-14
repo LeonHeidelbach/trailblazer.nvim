@@ -523,7 +523,7 @@ function Common.reregister_trail_marks()
         virt_text_pos = "overlay",
         hl_mode = "combine",
         strict = true,
-        priority = 10001,
+        priority = config.custom.trail_mark_priority,
       }
 
       if i == newest_mark_index then

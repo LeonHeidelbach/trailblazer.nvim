@@ -29,6 +29,7 @@ local function set_defaults(opts)
     auto_load_trailblazer_state_on_enter = false, -- experimental
     custom_session_storage_dir = "",
     trail_options = {
+      trail_mark_priority = 10001,
       available_trail_mark_modes = { -- available modes to cycle through
         "global_chron",
         "global_buf_line_sorted",
