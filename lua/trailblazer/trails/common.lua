@@ -191,6 +191,11 @@ function Common.focus_win_and_buf(trail_mark, ext_mark)
     api.nvim_set_current_win(0)
   end
 
+  if trail_mark.buf == nil or not api.nvim_buf_is_loaded(trail_mark.buf) or
+      not api.nvim_buf_is_valid(trail_mark.buf) then
+    return false
+  end
+
   ok, _ = pcall(api.nvim_set_current_buf, trail_mark.buf)
   if ok then
     ok, _ = pcall(api.nvim_win_set_cursor, 0, { ext_mark[1][2] + 1, ext_mark[1][3] })
@@ -285,19 +290,27 @@ function Common.get_marks_for_trail_mark_index(buf, newest_mark_index, remove_tr
     if newest_mark_index then
       last_mark = stacks.current_trail_mark_stack[newest_mark_index]
 
-      if last_mark then
+      if last_mark and last_mark.buf and api.nvim_buf_is_loaded(last_mark.buf)
+          and api.nvim_buf_is_valid(last_mark.buf) then
         ok, extracted_ext_mark, _ = pcall(api.nvim_buf_get_extmarks, last_mark.buf,
           config.nsid, last_mark.mark_id, last_mark.mark_id, {})
-      end
 
-      if remove_trail_mark then
-        table.remove(stacks.current_trail_mark_stack, newest_mark_index)
-      end
+        if remove_trail_mark then
+          table.remove(stacks.current_trail_mark_stack, newest_mark_index)
+        end
 
-      if ok then break end
-    else
-      return nil, nil, nil
+        if ok then
+          break
+        else
+          log.error("unable_to_get_extmarks", "[" .. last_mark.buf .. " | " .. newest_mark_index
+          .. "]")
+          return nil, nil, nil
+        end
+      else
+        return nil, nil, nil
+      end
     end
+
     newest_mark_index, _ = Common.get_newest_and_oldest_mark_index_for_buf(buf)
   end
 
@@ -345,12 +358,12 @@ function Common.get_relative_marks_and_cursor(buf, current_mark_index)
       return mark.buf == buf
     end, stacks.current_trail_mark_stack)
     cursor = helpers.tbl_indexof(function(mark)
-      return mark.buf == buf and stacks.current_trail_mark_stack[current_mark_index] and
-          stacks.current_trail_mark_stack[current_mark_index].mark_id == mark.mark_id
-    end, marks) or helpers.tbl_indexof(function(mark)
-      return mark.buf == buf and stacks.current_trail_mark_stack[stacks.trail_mark_cursor] and
-          mark.timestamp == stacks.current_trail_mark_stack[stacks.trail_mark_cursor].timestamp
-    end, marks) or #marks
+          return mark.buf == buf and stacks.current_trail_mark_stack[current_mark_index] and
+              stacks.current_trail_mark_stack[current_mark_index].mark_id == mark.mark_id
+        end, marks) or helpers.tbl_indexof(function(mark)
+          return mark.buf == buf and stacks.current_trail_mark_stack[stacks.trail_mark_cursor] and
+              mark.timestamp == stacks.current_trail_mark_stack[stacks.trail_mark_cursor].timestamp
+        end, marks) or #marks
   else
     marks = stacks.current_trail_mark_stack
     cursor = stacks.trail_mark_cursor or #stacks.current_trail_mark_stack
@@ -399,8 +412,8 @@ function Common.translate_actual_cursor_from_relative_marks_and_cursor(buf, mark
   local newest_mark_index, _ = Common.get_newest_and_oldest_mark_index_for_buf(buf)
 
   stacks.trail_mark_cursor = helpers.tbl_indexof(function(mark)
-    return marks[cursor] and mark.timestamp == marks[cursor].timestamp
-  end, stacks.current_trail_mark_stack) or newest_mark_index
+        return marks[cursor] and mark.timestamp == marks[cursor].timestamp
+      end, stacks.current_trail_mark_stack) or newest_mark_index
 
   Common.reregister_trail_marks()
 end
@@ -423,9 +436,9 @@ function Common.remove_duplicate_pos_trail_marks()
   local trail_count = #stacks.current_trail_mark_stack
   stacks.current_trail_mark_stack = helpers.dedupe(function(item, dedupe_tbl)
     return helpers.tbl_find(function(dedupe_item)
-      return item.win == dedupe_item.win and item.buf == dedupe_item.buf and
-          item.pos[1] == dedupe_item.pos[1] and item.pos[2] == dedupe_item.pos[2]
-    end, dedupe_tbl) ~= nil
+          return item.win == dedupe_item.win and item.buf == dedupe_item.buf and
+              item.pos[1] == dedupe_item.pos[1] and item.pos[2] == dedupe_item.pos[2]
+        end, dedupe_tbl) ~= nil
   end, stacks.current_trail_mark_stack, function(item)
     api.nvim_buf_del_extmark(item.buf, config.nsid, item.mark_id)
   end)
@@ -624,8 +637,10 @@ function Common.get_trail_mark_stack_subset_for_buf(buf)
     return vim.tbl_filter(function(mark)
       return mark.buf == buf
     end, stacks.current_trail_mark_stack)
-
-  else return stacks.current_trail_mark_stack end
+  else
+    return stacks.current_trail_mark_stack
+  end
 end
 
 return Common
+

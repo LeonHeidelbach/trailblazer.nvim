@@ -212,8 +212,8 @@ end
 ---@param buf number
 ---@return string
 function Helpers.buf_get_absolute_file_path(buf)
-  local name = api.nvim_buf_get_name(buf)
-  if name == "" then
+  local ok, name = pcall(api.nvim_buf_get_name, buf)
+  if not ok or name == "" then
     return "[No Name]"
   end
   return name
@@ -224,8 +224,8 @@ end
 ---@return string
 function Helpers.buf_get_relative_file_path(buf)
   local file_path = Helpers.buf_get_absolute_file_path(buf)
-  local workspace = vim.fn.getcwd()
-  local file_name = vim.fn.fnamemodify(file_path, ":t")
+  local workspace = fn.getcwd()
+  local file_name = fn.fnamemodify(file_path, ":t")
   return file_path:gsub(workspace, ""):gsub(file_name, "") .. file_name
 end
 
@@ -240,12 +240,19 @@ function Helpers.tbl_deep_extend(tbl_base, tbl_extend)
 
   for k, v in pairs(tbl_extend) do
     if type(v) == "table" then
-      if tonumber(k) then table.insert(tbl_base, v)
-      elseif type(tbl_base[k]) == "table" then Helpers.tbl_deep_extend(tbl_base[k], v)
-      else tbl_base[k] = v end
+      if tonumber(k) then
+        table.insert(tbl_base, v)
+      elseif type(tbl_base[k]) == "table" then
+        Helpers.tbl_deep_extend(tbl_base[k], v)
+      else
+        tbl_base[k] = v
+      end
     else
-      if tonumber(k) then table.insert(tbl_base, v)
-      else tbl_base[k] = v end
+      if tonumber(k) then
+        table.insert(tbl_base, v)
+      else
+        tbl_base[k] = v
+      end
     end
   end
 

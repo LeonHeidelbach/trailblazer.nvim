@@ -190,10 +190,12 @@ end
 --- Move the trail mark stack cursor on selecting a trail mark from the quickfix list.
 function List.qf_motion_move_trail_mark_stack_cursor()
   if List.restore_default_quickfix_keybindings_if_needed(function()
-    api.nvim_feedkeys(api.nvim_replace_termcodes(
-      List.config.quickfix_mappings.nv.motions.qf_motion_move_trail_mark_stack_cursor, true,
-      true, true), "n", true)
-  end) then return end
+        api.nvim_feedkeys(api.nvim_replace_termcodes(
+          List.config.quickfix_mappings.nv.motions.qf_motion_move_trail_mark_stack_cursor, true,
+          true, true), "n", true)
+      end) then
+    return
+  end
 
   local qf = fn.getqflist({ id = 0, items = 1 })
 
@@ -205,7 +207,12 @@ function List.qf_motion_move_trail_mark_stack_cursor()
 
     if fn.mode() == 'V' then api.nvim_command('normal! V') end
 
-    common.focus_win_and_buf_by_trail_mark_index(buf, mark, false)
+    if mark and not common.focus_win_and_buf_by_trail_mark_index(buf, mark, false) then
+      helpers.open_file(api.nvim_buf_get_name(item.bufnr), api.nvim_get_current_win())
+      common.focus_win_and_buf_by_trail_mark_index(buf, mark, false)
+      common.reregister_trail_marks()
+    end
+
     List.update_trail_mark_list()
   end
 end
@@ -229,7 +236,7 @@ function List.qf_action_delete_trail_mark_selection()
     for i = start_idx, end_idx do
       local item = qf.items[i]
       local buf = item.bufnr
-      common.delete_trail_mark_at_pos(-1, buf, { item.lnum, item.col - 1 })
+      common.delete_trail_mark_at_pos( -1, buf, { item.lnum, item.col - 1 })
     end
 
     List.update_trail_mark_list()
