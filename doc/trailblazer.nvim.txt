@@ -164,7 +164,7 @@ Helpers.open_file({file_path}, {win?}, {split_type?})
      the buffer id. If the window is not valid then a new window will be opened.
 
     Parameters: ~
-        {file_path}    (any)
+        {file_path}    (string)
         {win?}         (number)
         {split_type?}  (table)   @return number?
                                  @return number?
@@ -931,14 +931,31 @@ Common.delete_trail_mark_at_pos({win?}, {buf?}, {pos?})
         (boolean)
 
 
-Common.delete_all_ext_marks()                      *Common.delete_all_ext_marks*
+Common.delete_all_ext_marks({buf?})                *Common.delete_all_ext_marks*
      Delete extmarks from all buffers.
 
+    Parameters: ~
+        {buf?}  (number|table)
 
-Common.reregister_trail_marks()                  *Common.reregister_trail_marks*
-     Reregister all trail marks on the stack. This function can also be used to restore trail marks
-     after calling `vim.lsp.formatting` which currently causes extmarks to be moved out of the
-     buffer range.
+
+                                *Common.get_reregister_buf_list_and_trail_marks*
+Common.get_reregister_buf_list_and_trail_marks()
+     Returns a list of buffers and a list of trail marks that are currently visible in any window
+     and have to be reregistered.
+
+    Returns: ~
+        (table)
+        (table)
+
+
+                                                 *Common.reregister_trail_marks*
+Common.reregister_trail_marks({visible_only?})
+     Reregister all or only currently visible trail marks on the stack. This function can also be
+     used to restore trail marks after calling `vim.lsp.formatting` which currently causes extmarks
+     to be moved out of the buffer range.
+
+    Parameters: ~
+        {visible_only?}  (boolean)
 
 
                                     *Common.get_trail_mark_stack_subset_for_buf*
