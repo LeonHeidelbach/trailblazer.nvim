@@ -638,12 +638,12 @@ function Common.reregister_trail_marks(visible_only)
       end
 
       if config.custom.trail_mark_in_text_highlights_enabled then
-        if char == "" then
-          local curr_line = api.nvim_buf_get_lines(mark.buf, mark.pos[1] - 1, mark.pos[1], false)[1]
+        local curr_line = api.nvim_buf_get_lines(mark.buf, mark.pos[1] - 1, mark.pos[1], false)[1]
+        if char == "" and curr_line and #curr_line - 1 <= 0 then
           mark_options["virt_text"] = { { " ", hl_group } }
-          mark.pos[2] = curr_line and mark.pos[2] >= #curr_line and math.max(0, #curr_line - 1)
-              or mark.pos[2]
+          mark.pos[2] = math.max(0, #curr_line - 1)
         else
+          mark.pos[2] = mark.pos[2] >= #curr_line and #curr_line - 1 or mark.pos[2]
           mark_options["hl_group"] = hl_group
           mark_options["end_col"] = mark.pos[2] + char_w
         end
@@ -680,4 +680,3 @@ function Common.get_trail_mark_stack_subset_for_buf(buf)
 end
 
 return Common
-
