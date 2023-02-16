@@ -269,7 +269,7 @@ end
 
 --- Opens the supplied file path in a new buffer and optionally in the specified window and returns
 --- the buffer id. If the window is not valid then a new window will be opened.
----@param file_path any
+---@param file_path string
 ---@param win? number
 ---@param split_type? table
 ---@return number?

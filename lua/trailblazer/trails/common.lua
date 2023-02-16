@@ -37,7 +37,7 @@ function Common.paste_at_trail_mark(buf, trail_mark_index)
   api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
 
   stacks.trail_mark_cursor = #stacks.current_trail_mark_stack
-  Common.reregister_trail_marks()
+  Common.reregister_trail_marks(true)
 
   return true
 end
@@ -268,11 +268,11 @@ function Common.get_trail_mark_at_pos(win, buf, pos)
       stacks.trail_mark_cursor = trail_mark_index
     end
 
-    Common.reregister_trail_marks()
+    Common.reregister_trail_marks(true)
     return trail_mark_index, stacks.current_trail_mark_stack[trail_mark_index]
   end
 
-  Common.reregister_trail_marks()
+  Common.reregister_trail_marks(true)
 
   return nil, nil
 end
@@ -292,7 +292,7 @@ function Common.get_marks_for_trail_mark_index(buf, newest_mark_index, remove_tr
 
       if last_mark and last_mark.buf and api.nvim_buf_is_loaded(last_mark.buf)
           and api.nvim_buf_is_valid(last_mark.buf) then
-        ok, extracted_ext_mark, _ = pcall(api.nvim_buf_get_extmarks, last_mark.buf,
+        ok, extracted_ext_mark = pcall(api.nvim_buf_get_extmarks, last_mark.buf,
           config.nsid, last_mark.mark_id, last_mark.mark_id, {})
 
         if remove_trail_mark then
@@ -415,7 +415,7 @@ function Common.translate_actual_cursor_from_relative_marks_and_cursor(buf, mark
         return marks[cursor] and mark.timestamp == marks[cursor].timestamp
       end, stacks.current_trail_mark_stack) or newest_mark_index
 
-  Common.reregister_trail_marks()
+  Common.reregister_trail_marks(true)
 end
 
 --- Return the default buffer for the currently selected trail mark selection mode or the given
@@ -506,17 +506,50 @@ function Common.delete_trail_mark_at_pos(win, buf, pos)
 end
 
 --- Delete extmarks from all buffers.
-function Common.delete_all_ext_marks()
-  for _, buf in ipairs(api.nvim_list_bufs()) do
+---@param buf? number | table
+function Common.delete_all_ext_marks(buf)
+  if type(buf) == "number" then
     api.nvim_buf_clear_namespace(buf, config.nsid, 0, -1)
+    return
+  end
+
+  local buf_list = type(buf) == "table" and buf or api.nvim_list_bufs()
+
+  for _, b in ipairs(buf_list) do
+    api.nvim_buf_clear_namespace(b, config.nsid, 0, -1)
   end
 end
 
---- Reregister all trail marks on the stack. This function can also be used to restore trail marks
---- after calling `vim.lsp.formatting` which currently causes extmarks to be moved out of the
---- buffer range.
-function Common.reregister_trail_marks()
-  Common.delete_all_ext_marks()
+--- Returns a list of buffers and a list of trail marks that are currently visible in any window
+--- and have to be reregistered.
+---@return table
+---@return table
+function Common.get_reregister_buf_list_and_trail_marks()
+  local buf_list = vim.tbl_map(function(win)
+    return api.nvim_win_get_buf(win)
+  end, api.nvim_list_wins())
+
+  local trail_marks = vim.tbl_filter(function(mark)
+    return vim.tbl_contains(buf_list, mark.buf)
+  end, stacks.current_trail_mark_stack)
+
+  return buf_list, trail_marks
+end
+
+--- Reregister all or only currently visible trail marks on the stack. This function can also be
+--- used to restore trail marks after calling `vim.lsp.formatting` which currently causes extmarks
+--- to be moved out of the buffer range.
+---@param visible_only? boolean
+function Common.reregister_trail_marks(visible_only)
+  local buf_list, trail_marks
+
+  if visible_only then
+    buf_list, trail_marks = Common.get_reregister_buf_list_and_trail_marks()
+  else
+    trail_marks = stacks.current_trail_mark_stack
+  end
+
+  Common.delete_all_ext_marks(buf_list)
 
   if #stacks.current_trail_mark_stack <= 0 then return end
 
@@ -527,7 +560,7 @@ function Common.reregister_trail_marks()
       stacks.current_trail_mark_stack[#stacks.current_trail_mark_stack]
   local special_marks = {}
 
-  for i, mark in ipairs(stacks.current_trail_mark_stack) do
+  for i, mark in ipairs(trail_marks) do
     if api.nvim_buf_is_loaded(mark.buf) and api.nvim_buf_is_valid(mark.buf) then
       local char, char_w = helpers.buf_get_utf8_char_at_pos(mark.buf, mark.pos)
 
@@ -539,7 +572,7 @@ function Common.reregister_trail_marks()
         priority = config.custom.trail_mark_priority,
       }
 
-      if i == newest_mark_index then
+      if mark.mark_id == stacks.current_trail_mark_stack[newest_mark_index].mark_id then
         hl_group = "TrailBlazerTrailMarkNewest"
       elseif current_cursor_mark and current_cursor_mark.pos[1] == mark.pos[1]
           and current_cursor_mark.pos[2] == mark.pos[2] then
@@ -557,17 +590,21 @@ function Common.reregister_trail_marks()
           special_marks[mark.buf] = {}
         end
 
-        if i == stacks.trail_mark_cursor + 1 then
+        if stacks.current_trail_mark_stack[stacks.trail_mark_cursor + 1] and
+            mark.mark_id == stacks.current_trail_mark_stack[stacks.trail_mark_cursor + 1].mark_id
+        then
           mark_options["sign_text"] = config.custom.next_mark_symbol
           mark_options["sign_hl_group"] = "TrailBlazerTrailMarkNext"
           table.insert(special_marks[mark.buf], mark.pos[1])
-        elseif i == stacks.trail_mark_cursor - 1 then
+        elseif stacks.current_trail_mark_stack[stacks.trail_mark_cursor - 1] and
+            mark.mark_id == stacks.current_trail_mark_stack[stacks.trail_mark_cursor - 1].mark_id
+        then
           mark_options["sign_text"] = config.custom.previous_mark_symbol
           mark_options["sign_hl_group"] = "TrailBlazerTrailMarkPrevious"
           table.insert(special_marks[mark.buf], mark.pos[1])
         end
 
-        if i == newest_mark_index then
+        if mark.mark_id == stacks.current_trail_mark_stack[newest_mark_index].mark_id then
           mark_options["sign_text"] = config.custom.newest_mark_symbol
           mark_options["sign_hl_group"] = hl_group .. "Inverted"
           table.insert(special_marks[mark.buf], mark.pos[1])

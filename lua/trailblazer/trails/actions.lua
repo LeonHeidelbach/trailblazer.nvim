@@ -53,7 +53,7 @@ function Actions.new_trail_mark(win, buf, pos)
   stacks.ucid = stacks.ucid + 1
   common.sort_trail_mark_stack()
   stacks.trail_mark_cursor, _ = common.get_newest_and_oldest_mark_index_for_buf(buf)
-  common.reregister_trail_marks()
+  common.reregister_trail_marks(true)
 
   return stacks.current_trail_mark_stack[stacks.trail_mark_cursor]
 end
@@ -78,7 +78,7 @@ function Actions.track_back(buf)
     api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
 
     stacks.trail_mark_cursor, _ = common.get_newest_and_oldest_mark_index_for_buf(buf)
-    common.reregister_trail_marks()
+    common.reregister_trail_marks(true)
 
     return true
   end
@@ -169,7 +169,7 @@ function Actions.set_trail_mark_select_mode(mode, verbose)
 
   common.update_all_trail_mark_positions()
   common.sort_trail_mark_stack()
-  common.reregister_trail_marks()
+  common.reregister_trail_marks(true)
 
   if config.custom.verbose_trail_mark_select and (verbose == nil or verbose) then
     log.info("current_trail_mark_select_mode", config.custom.current_trail_mark_mode)
