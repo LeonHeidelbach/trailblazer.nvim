@@ -248,6 +248,11 @@ available and set by default:
             guibg = "LightBlue",
             gui = "bold",
         },
+        TrailBlazerTrailMarkCustomOrd = {
+            guifg = "Black",
+            guibg = "LightSlateBlue",
+            gui = "bold",
+        },
         TrailBlazerTrailMarkGlobalChron = {
             guifg = "Black",
             guibg = "Red",
