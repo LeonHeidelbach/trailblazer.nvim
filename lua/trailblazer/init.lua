@@ -83,6 +83,26 @@ local function set_defaults(opts)
         },
       },
     },
+    quickfix_mappings = {
+      nv = {
+        motions = {
+          qf_motion_move_trail_mark_stack_cursor = "<CR>",
+        },
+        actions = {
+          qf_action_delete_trail_mark_selection = "d",
+          qf_action_save_visual_selection_start_line = "v",
+        },
+        alt_actions = {
+          qf_action_save_visual_selection_start_line = "V",
+        }
+      },
+      v = {
+        actions = {
+          qf_action_move_selected_trail_marks_down = "<C-j>",
+          qf_action_move_selected_trail_marks_up = "<C-k>",
+        }
+      }
+    },
     hl_groups = {
       TrailBlazerTrailMark = {
         guifg = "White",
@@ -107,6 +127,11 @@ local function set_defaults(opts)
       TrailBlazerTrailMarkNewest = {
         guifg = "Black",
         guibg = "LightBlue",
+        gui = "bold",
+      },
+      TrailBlazerTrailMarkCustomOrd = {
+        guifg = "Black",
+        guibg = "LightSlateBlue",
         gui = "bold",
       },
       TrailBlazerTrailMarkGlobalChron = {
@@ -159,7 +184,7 @@ end
 function TrailBlazer.setup(options)
   TrailBlazer.options = set_defaults(options)
   TrailBlazer.generated.hl_groups = highlights.register(TrailBlazer.options.hl_groups, true)
-  trails.setup(TrailBlazer.options.trail_options)
+  trails.setup(TrailBlazer.options)
   storage.setup(TrailBlazer.options)
   log.setup(TrailBlazer.options.lang)
   if TrailBlazer.options.force_mappings then

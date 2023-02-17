@@ -57,8 +57,8 @@ Config.runtime.should_auto_save = false
 --- Setup the TrailBlazer config module.
 ---@param options? table
 function Config.setup(options)
-  if options then
-    Config.custom = vim.tbl_deep_extend("force", Config.custom, options)
+  if options and options.trail_options then
+    Config.custom = vim.tbl_deep_extend("force", Config.custom, options.trail_options)
   end
 end
 

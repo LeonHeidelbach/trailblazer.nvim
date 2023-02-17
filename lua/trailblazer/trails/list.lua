@@ -32,11 +32,23 @@ List.config = {
         qf_action_save_visual_selection_start_line = "v",
       },
       alt_action_maps = {
+      alt_actions = {
         qf_action_save_visual_selection_start_line = "V",
       }
+    },
     }
   }
 }
+
+--- Setup the list module.
+---@param options? table
+function List.setup(options)
+  if options.force_quickfix_mappings then
+    List.config.quickfix_mappings = options.force_quickfix_mappings
+  elseif options.quickfix_mappings then
+    helpers.tbl_deep_extend(List.config.quickfix_mappings, options.quickfix_mappings)
+  end
+end
 
 --- Toggle a list of all trail marks for the specified buffer in the specified list type.
 ---@param type? string
