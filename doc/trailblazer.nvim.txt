@@ -182,6 +182,19 @@ Helpers.time({res?})                                              *Helpers.time*
         (number)
 
 
+                                             *Helpers.set_visual_line_selection*
+Helpers.set_visual_line_selection({start_pos}, {end_pos})
+     Sets visual line selection for the supplied start and end lines.
+
+    Parameters: ~
+        {start_pos}  (table<number,number>)
+        {end_pos}    (table<number,number>)
+
+
+Helpers.signum()                                                *Helpers.signum*
+     Returns the signum of the supplied number.
+
+
                                                                     *highlights*
 ==============================================================================
                                                         *trailblazer.highlights*
@@ -999,6 +1012,13 @@ Trails.setup({options?})                                          *Trails.setup*
 
  This module is responsible for handling TrailBlazer trail list view.
 
+List.setup({options?})                                              *List.setup*
+     Setup the list module.
+
+    Parameters: ~
+        {options?}  (table)
+
+
                                                    *List.toggle_trail_mark_list*
 List.toggle_trail_mark_list({type?}, {buf?})
      Toggle a list of all trail marks for the specified buffer in the specified list type.
@@ -1043,12 +1063,12 @@ List.toggle_quick_fix_list({buf?}, {trail_mark_list?})
 
 
                                                       *List.open_quick_fix_list*
-List.open_quick_fix_list({buf}, {trail_mark_list})
+List.open_quick_fix_list({buf?}, {trail_mark_list?})
      Open a quick fix list with the specified trail mark list.
 
     Parameters: ~
-        {buf}              (any)
-        {trail_mark_list}  (any)  @return number?
+        {buf?}              (number)
+        {trail_mark_list?}  (table)   @return number?
 
 
 List.close_quick_fix_list()                          *List.close_quick_fix_list*
@@ -1088,6 +1108,20 @@ List.qf_action_delete_trail_mark_selection()
                                *List.qf_action_save_visual_selection_start_line*
 List.qf_action_save_visual_selection_start_line()
      Save the visual selection start line number for the quickfix list.
+
+
+                                   *List.qf_action_move_selected_trail_marks_up*
+List.qf_action_move_selected_trail_marks_up()
+     Move the selected trail marks up in the current stack order. This automatically switches to
+     the `custom_ord` trail mark sort mode if it was not already selected and overrides the previous
+     custom order.
+
+
+                                 *List.qf_action_move_selected_trail_marks_down*
+List.qf_action_move_selected_trail_marks_down()
+     Move the selected trail marks down in the current stack order. This automatically switches to
+     the `custom_ord` trail mark sort mode if it was not already selected and overrides the previous
+     custom order.
 
 
                            *List.restore_default_quickfix_keybindings_if_needed*
