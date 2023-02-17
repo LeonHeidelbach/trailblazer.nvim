@@ -13,6 +13,7 @@ local List = {}
 
 local config = require("trailblazer.trails.config")
 local common = require("trailblazer.trails.common")
+local actions = require("trailblazer.trails.actions")
 local stacks = require("trailblazer.trails.stacks")
 local helpers = require("trailblazer.helpers")
 local keymaps = require("trailblazer.keymaps")
@@ -31,11 +32,15 @@ List.config = {
         qf_action_delete_trail_mark_selection = "d",
         qf_action_save_visual_selection_start_line = "v",
       },
-      alt_action_maps = {
       alt_actions = {
         qf_action_save_visual_selection_start_line = "V",
       }
     },
+    v = {
+      actions = {
+        qf_action_move_selected_trail_marks_down = "<C-j>",
+        qf_action_move_selected_trail_marks_up = "<C-k>",
+      }
     }
   }
 }
@@ -124,8 +129,8 @@ function List.toggle_quick_fix_list(buf, trail_mark_list)
 end
 
 --- Open a quick fix list with the specified trail mark list.
----@param buf any
----@param trail_mark_list any
+---@param buf? number
+---@param trail_mark_list? table
 ---@return number?
 function List.open_quick_fix_list(buf, trail_mark_list)
   if trail_mark_list then
@@ -260,6 +265,116 @@ function List.qf_action_save_visual_selection_start_line()
   if List.restore_default_quickfix_keybindings_if_needed() then return end
   List.config.visual_selection_start_line = api.nvim_win_get_cursor(0)[1]
   api.nvim_command("normal! V")
+end
+
+--- Move the selected trail marks up in the current stack order. This automatically switches to
+--- the `custom_ord` trail mark sort mode if it was not already selected and overrides the previous
+--- custom order.
+function List.qf_action_move_selected_trail_marks_up()
+  if List.restore_default_quickfix_keybindings_if_needed() then return end
+
+  local qf = fn.getqflist({ id = 0, items = 1 })
+
+  if qf and qf.items and #qf.items > 0 then
+    local current_cursor = api.nvim_win_get_cursor(0)
+    local current_idx = current_cursor[1]
+    local start_idx, end_idx = current_idx, current_idx
+
+    if fn.mode() == 'V' and current_idx ~= List.config.visual_selection_start_line then
+      start_idx = math.min(List.config.visual_selection_start_line, current_idx)
+      end_idx = math.max(List.config.visual_selection_start_line, current_idx)
+    end
+
+    for i, trail_mark in ipairs(stacks.current_trail_mark_stack) do
+      if i >= start_idx and i <= end_idx then
+        trail_mark.custom_ord = i - 1
+      elseif i == start_idx - 1 then
+        trail_mark.custom_ord = end_idx
+      else
+        trail_mark.custom_ord = i
+      end
+    end
+
+    if not vim.tbl_contains(config.custom.available_trail_mark_modes, "custom_ord") then
+      table.insert(config.custom.available_trail_mark_modes, 1, "custom_ord")
+    end
+
+    if config.custom.current_trail_mark_mode ~= "custom_ord" then
+      actions.set_trail_mark_select_mode("custom_ord")
+    end
+
+    common.sort_trail_mark_stack("custom_ord")
+
+    if stacks.trail_mark_cursor >= start_idx and stacks.trail_mark_cursor <= end_idx then
+      stacks.trail_mark_cursor = math.max(stacks.trail_mark_cursor - 1, 1)
+    elseif stacks.trail_mark_cursor == start_idx - 1 then
+      stacks.trail_mark_cursor = end_idx
+    end
+
+    List.update_trail_mark_list()
+
+    local selection_start = helpers.signum(current_idx - start_idx) == 1 and start_idx or end_idx
+    helpers.set_visual_line_selection(
+      { math.max(selection_start - 1, 1), current_cursor[2] },
+      { math.max(current_idx - 1, 1), current_cursor[2] })
+
+    List.config.visual_selection_start_line = math.max(selection_start - 1, 1)
+  end
+end
+
+--- Move the selected trail marks down in the current stack order. This automatically switches to
+--- the `custom_ord` trail mark sort mode if it was not already selected and overrides the previous
+--- custom order.
+function List.qf_action_move_selected_trail_marks_down()
+  if List.restore_default_quickfix_keybindings_if_needed() then return end
+
+  local qf = fn.getqflist({ id = 0, items = 1 })
+
+  if qf and qf.items and #qf.items > 0 then
+    local current_cursor = api.nvim_win_get_cursor(0)
+    local current_idx = current_cursor[1]
+    local start_idx, end_idx = current_idx, current_idx
+
+    if fn.mode() == 'V' and current_idx ~= List.config.visual_selection_start_line then
+      start_idx = math.min(List.config.visual_selection_start_line, current_idx)
+      end_idx = math.max(List.config.visual_selection_start_line, current_idx)
+    end
+
+    for i, trail_mark in ipairs(stacks.current_trail_mark_stack) do
+      if i >= start_idx and i <= end_idx then
+        trail_mark.custom_ord = i + 1
+      elseif i == end_idx + 1 then
+        trail_mark.custom_ord = start_idx
+      else
+        trail_mark.custom_ord = i
+      end
+    end
+
+    if not vim.tbl_contains(config.custom.available_trail_mark_modes, "custom_ord") then
+      table.insert(config.custom.available_trail_mark_modes, 1, "custom_ord")
+    end
+
+    if config.custom.current_trail_mark_mode ~= "custom_ord" then
+      actions.set_trail_mark_select_mode("custom_ord")
+    end
+
+    common.sort_trail_mark_stack("custom_ord")
+
+    if stacks.trail_mark_cursor >= start_idx and stacks.trail_mark_cursor <= end_idx then
+      stacks.trail_mark_cursor = math.min(stacks.trail_mark_cursor + 1, #stacks.current_trail_mark_stack)
+    elseif stacks.trail_mark_cursor == end_idx + 1 then
+      stacks.trail_mark_cursor = start_idx
+    end
+
+    List.update_trail_mark_list()
+
+    local selection_start = helpers.signum(current_idx - start_idx) == 1 and start_idx or end_idx
+    helpers.set_visual_line_selection(
+      { math.min(selection_start + 1, #qf.items), current_cursor[2] },
+      { math.min(current_idx + 1, #qf.items), current_cursor[2] })
+
+    List.config.visual_selection_start_line = math.min(selection_start + 1, #qf.items)
+  end
 end
 
 --- Restore the default quickfix list behavior if the current quickfix list is not a TrailBlazer

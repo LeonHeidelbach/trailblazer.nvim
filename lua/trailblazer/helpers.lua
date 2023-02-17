@@ -314,4 +314,24 @@ function Helpers.time(res)
   return math.floor(base_time + high_res_time)
 end
 
+--- Sets visual line selection for the supplied start and end lines.
+---@param start_pos table<number, number>
+---@param end_pos table<number, number>
+function Helpers.set_visual_line_selection(start_pos, end_pos)
+  if vim.fn.mode() == "v" then
+    vim.cmd("normal! v")
+  elseif vim.fn.mode() == "V" then
+    vim.cmd("normal! V")
+  end
+
+  api.nvim_win_set_cursor(0, start_pos)
+  vim.cmd("normal! V")
+  api.nvim_win_set_cursor(0, end_pos)
+end
+
+--- Returns the signum of the supplied number.
+function Helpers.signum(x)
+  return x > 0 and 1 or x < 0 and -1 or 0
+end
+
 return Helpers

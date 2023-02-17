@@ -75,7 +75,11 @@ function Common.sort_trail_mark_stack(mode)
     mode = config.custom.current_trail_mark_mode
   end
 
-  if mode == "global_chron" then
+  if mode == "custom_ord" then
+    table.sort(stacks.current_trail_mark_stack, function(a, b)
+      return a.custom_ord and b.custom_ord and a.custom_ord < b.custom_ord
+    end)
+  elseif mode == "global_chron" then
     table.sort(stacks.current_trail_mark_stack, function(a, b)
       return a.timestamp < b.timestamp
     end)

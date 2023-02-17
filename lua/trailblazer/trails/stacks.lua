@@ -116,7 +116,7 @@ function Stacks.switch_to_next_stack(sort_mode, save_current, verbose)
   end
 
   Stacks.switch_current_stack(stack_names[current_stack_index >= #stack_names and 1
-      or current_stack_index + 1], save_current)
+  or current_stack_index + 1], save_current)
 end
 
 --- Move the current trail mark stack to the previous trail mark stack in the trail mark stack list
@@ -143,7 +143,7 @@ function Stacks.switch_to_previous_stack(sort_mode, save_current, verbose)
   end
 
   Stacks.switch_current_stack(stack_names[current_stack_index <= 1 and #stack_names
-      or current_stack_index - 1], save_current)
+  or current_stack_index - 1], save_current)
 end
 
 --- Switches the current trail mark stack to the trail mark stack under the given name.
@@ -230,7 +230,7 @@ function Stacks.set_trail_mark_stack_sort_mode(sort_mode, verbose)
         (helpers.tbl_indexof(function(available_mode)
           return available_mode == config.custom.current_trail_mark_stack_sort_mode
         end, config.custom.available_trail_mark_stack_sort_modes)) %
-            #config.custom.available_trail_mark_stack_sort_modes + 1
+        #config.custom.available_trail_mark_stack_sort_modes + 1
         ]
   elseif vim.tbl_contains(config.custom.available_trail_mark_stack_sort_modes, sort_mode) then
     config.custom.current_trail_mark_stack_sort_mode = sort_mode
@@ -335,7 +335,7 @@ function Stacks.validate_trail_mark_stack_list_integrity(stack_list, verbose)
     return false
   end
 
-  local ok, err
+  local ok, err, custom_ord_set
 
   for _, stack in pairs(stack_list) do
     if type(stack) ~= "table" then
@@ -368,8 +368,14 @@ function Stacks.validate_trail_mark_stack_list_integrity(stack_list, verbose)
         buf = { mark.buf, "number" },
         mark_id = { mark.mark_id, "number" },
         pos = { mark.pos, "table" },
+        custom_ord = { mark.custom_ord, { "number", "nil" } },
         timestamp = { mark.timestamp, "number" },
       })
+
+      if not custom_ord_set and mark.custom_ord then
+        table.insert(config.custom.available_trail_mark_modes, 1, "custom_ord")
+        custom_ord_set = true
+      end
 
       if not ok then
         if verbose then
