@@ -1265,12 +1265,17 @@ Stacks.set_trail_mark_stack_sort_mode({sort_mode?}, {verbose?})
 
                            *Stacks.udpate_buffer_ids_with_filename_lookup_table*
 Stacks.udpate_buffer_ids_with_filename_lookup_table({stack_list}, {lookup_tbl}, {saved_cwd?})
-     Update the buffer ids in the trail mark stack list with the given lookup table.
+     Update the buffer ids in the trail mark stack list with the given lookup table. This also
+     returns a new buffer id lookup table where the old buffer ids are the keys and the new buffer
+     ids are the values.
 
     Parameters: ~
         {stack_list}  (table)
         {lookup_tbl}  (table)
         {saved_cwd?}  (string)
+
+    Returns: ~
+        (table)
 
 
 Stacks.create_buf_file_lookup_table()      *Stacks.create_buf_file_lookup_table*
