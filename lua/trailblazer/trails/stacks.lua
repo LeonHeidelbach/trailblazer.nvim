@@ -44,11 +44,13 @@ function Stacks.add_stack(name)
   if Stacks.trail_mark_stack_list[name] == nil then
     Stacks.trail_mark_stack_list[name] = {
       created_at = helpers.time(),
+      custom_ord_local_buf = Stacks.custom_ord_local_buf,
       stack = vim.deepcopy(Stacks.current_trail_mark_stack)
     }
   else
     Stacks.trail_mark_stack_list[name] = {
       created_at = Stacks.trail_mark_stack_list[name].created_at,
+      custom_ord_local_buf = Stacks.custom_ord_local_buf,
       stack = vim.deepcopy(Stacks.current_trail_mark_stack)
     }
   end
@@ -153,7 +155,7 @@ end
 ---@param verbose? boolean
 function Stacks.switch_current_stack(name, save, verbose)
   if name == nil or fn.empty(name) == 1 then
-    name = Stacks.current_trail_mark_stack_name
+    name = Stacks.current_trail_mark_stack_name or "default"
   end
 
   if save == nil or save then
@@ -165,11 +167,13 @@ function Stacks.switch_current_stack(name, save, verbose)
   if Stacks.trail_mark_stack_list[name] == nil then
     Stacks.trail_mark_stack_list[name] = {
       created_at = helpers.time(),
+      custom_ord_local_buf = Stacks.custom_ord_local_buf,
       stack = {}
     }
   end
 
   Stacks.current_trail_mark_stack = Stacks.trail_mark_stack_list[name].stack
+  Stacks.custom_ord_local_buf = Stacks.trail_mark_stack_list[name].custom_ord_local_buf
 
   if verbose == nil or verbose then
     log.info("trail_mark_stack_switched", name)
@@ -275,6 +279,8 @@ function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_
   end
 
   for _, stack in pairs(stack_list) do
+    stack.custom_ord_local_buf = new_buf_id_lookup[stack.custom_ord_local_buf]
+
     for i = #stack.stack, 1, -1 do
       if new_buf_id_lookup[stack.stack[i].buf] ~= nil then
         Stacks.ucid = Stacks.ucid + 1
@@ -353,6 +359,7 @@ function Stacks.validate_trail_mark_stack_list_integrity(stack_list, verbose)
 
     ok, err = pcall(vim.validate, {
       created_at = { stack.created_at, "number" },
+      custom_ord_local_buf = { stack.custom_ord_local_buf, { "number", "nil" } },
       stack = { stack.stack, "table" },
     })
 

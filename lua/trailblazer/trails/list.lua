@@ -310,7 +310,6 @@ function List.qf_action_move_selected_trail_marks_up()
 
     actions.set_trail_mark_select_mode("custom_ord",
       config.custom.current_trail_mark_mode ~= "custom_ord")
-    config.custom.current_trail_mark_mode = "custom_ord"
 
     if stacks.trail_mark_cursor >= start_idx and stacks.trail_mark_cursor <= end_idx then
       stacks.trail_mark_cursor = math.max(stacks.trail_mark_cursor - 1, 1)
@@ -372,7 +371,6 @@ function List.qf_action_move_selected_trail_marks_down()
 
     actions.set_trail_mark_select_mode("custom_ord",
       config.custom.current_trail_mark_mode ~= "custom_ord")
-    config.custom.current_trail_mark_mode = "custom_ord"
 
     if stacks.trail_mark_cursor >= start_idx and stacks.trail_mark_cursor <= end_idx then
       stacks.trail_mark_cursor = math.min(stacks.trail_mark_cursor + 1,
