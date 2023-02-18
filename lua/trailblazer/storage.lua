@@ -113,7 +113,7 @@ end
 ---@param path? string
 ---@param verbose? boolean
 function Storage.load_trailblazer_state_from_file(path, verbose)
-  local name, content
+  local name, content, new_buf_id_lookup
   local should_auto_save = true
   local valid_path = path and fn.empty(path) == 0
   local cwd = fn.getcwd()
@@ -155,25 +155,27 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
   end
 
   stacks.add_stack()
-  stacks.udpate_buffer_ids_with_filename_lookup_table(Storage.trailblazer_cwd_storage.stacks,
-    Storage.trailblazer_cwd_storage.fb_lookup, Storage.trailblazer_cwd_storage.cwd)
+  new_buf_id_lookup = stacks.udpate_buffer_ids_with_filename_lookup_table(
+    Storage.trailblazer_cwd_storage.stacks, Storage.trailblazer_cwd_storage.fb_lookup,
+    Storage.trailblazer_cwd_storage.cwd)
   helpers.tbl_deep_extend(stacks.trail_mark_stack_list, Storage.trailblazer_cwd_storage.stacks)
 
 
   if Storage.trailblazer_cwd_storage.config and type(Storage.trailblazer_cwd_storage.config)
       == "table" then
-
     if Storage.trailblazer_cwd_storage.config.trail_mark_cursor and
         type(Storage.trailblazer_cwd_storage.config.trail_mark_cursor) == "number" then
       stacks.trail_mark_cursor = Storage.trailblazer_cwd_storage.config.trail_mark_cursor
     end
 
+    stacks.custom_ord_local_buf = new_buf_id_lookup[Storage.trailblazer_cwd_storage.config
+    .custom_ord_local_buf]
     actions.set_trail_mark_select_mode(Storage.trailblazer_cwd_storage.config
-      .current_trail_mark_mode, false)
+    .current_trail_mark_mode, false)
     stacks.switch_current_stack(Storage.trailblazer_cwd_storage.config
-      .current_trail_mark_stack_name, false, false)
+    .current_trail_mark_stack_name, false, false)
     stacks.set_trail_mark_stack_sort_mode(Storage.trailblazer_cwd_storage.config
-      .current_trail_mark_stack_sort_mode, false)
+    .current_trail_mark_stack_sort_mode, false)
   end
 
   common.remove_duplicate_pos_trail_marks()
@@ -219,8 +221,9 @@ function Storage.write_to_disk(path, content, verbose)
     return true
   end
 
-  if verbose then log.warn("no_path_or_content_provided", "[" .. tostring(path) .. " | " ..
-      tostring(content) .. "]")
+  if verbose then
+    log.warn("no_path_or_content_provided", "[" .. tostring(path) .. " | " ..
+    tostring(content) .. "]")
   end
 
   return false
@@ -259,6 +262,7 @@ function Storage.save_trailblazer_state_to_file(path, trail_mark_stacks, verbose
   end
 
   Storage.trailblazer_cwd_storage.config = {
+    custom_ord_local_buf = stacks.custom_ord_local_buf,
     trail_mark_cursor = stacks.trail_mark_cursor,
     current_trail_mark_stack_name = stacks.current_trail_mark_stack_name,
     current_trail_mark_mode = config.custom.current_trail_mark_mode,
@@ -293,7 +297,7 @@ function Storage.get_valid_file_name(name)
     name = fn.sha256(cwd)
   end
 
-  if name and string.sub(name, - #Storage.save_suffix) ~= Storage.save_suffix then
+  if name and string.sub(name, -#Storage.save_suffix) ~= Storage.save_suffix then
     name = name .. Storage.save_suffix
   end
 

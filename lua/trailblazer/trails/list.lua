@@ -285,6 +285,15 @@ function List.qf_action_move_selected_trail_marks_up()
       end_idx = math.max(List.config.visual_selection_start_line, current_idx)
     end
 
+    if config.custom.current_trail_mark_mode ~= "custom_ord" then
+      if vim.startswith(config.custom.current_trail_mark_mode, "buffer_local") then
+        stacks.custom_ord_local_buf = qf.items[current_idx].bufnr
+        common.sort_trail_mark_stack("custom_ord")
+      else
+        stacks.custom_ord_local_buf = nil
+      end
+    end
+
     for i, trail_mark in ipairs(stacks.current_trail_mark_stack) do
       if i >= start_idx and i <= end_idx then
         trail_mark.custom_ord = i - 1
@@ -299,11 +308,9 @@ function List.qf_action_move_selected_trail_marks_up()
       table.insert(config.custom.available_trail_mark_modes, 1, "custom_ord")
     end
 
-    if config.custom.current_trail_mark_mode ~= "custom_ord" then
-      actions.set_trail_mark_select_mode("custom_ord")
-    end
-
-    common.sort_trail_mark_stack("custom_ord")
+    actions.set_trail_mark_select_mode("custom_ord",
+      config.custom.current_trail_mark_mode ~= "custom_ord")
+    config.custom.current_trail_mark_mode = "custom_ord"
 
     if stacks.trail_mark_cursor >= start_idx and stacks.trail_mark_cursor <= end_idx then
       stacks.trail_mark_cursor = math.max(stacks.trail_mark_cursor - 1, 1)
@@ -311,7 +318,7 @@ function List.qf_action_move_selected_trail_marks_up()
       stacks.trail_mark_cursor = end_idx
     end
 
-    List.update_trail_mark_list()
+    List.update_trail_mark_list(nil, stacks.custom_ord_local_buf)
 
     local selection_start = helpers.signum(current_idx - start_idx) == 1 and start_idx or end_idx
     helpers.set_visual_line_selection(
@@ -340,6 +347,15 @@ function List.qf_action_move_selected_trail_marks_down()
       end_idx = math.max(List.config.visual_selection_start_line, current_idx)
     end
 
+    if config.custom.current_trail_mark_mode ~= "custom_ord" then
+      if vim.startswith(config.custom.current_trail_mark_mode, "buffer_local") then
+        stacks.custom_ord_local_buf = qf.items[current_idx].bufnr
+        common.sort_trail_mark_stack("custom_ord")
+      else
+        stacks.custom_ord_local_buf = nil
+      end
+    end
+
     for i, trail_mark in ipairs(stacks.current_trail_mark_stack) do
       if i >= start_idx and i <= end_idx then
         trail_mark.custom_ord = i + 1
@@ -354,19 +370,18 @@ function List.qf_action_move_selected_trail_marks_down()
       table.insert(config.custom.available_trail_mark_modes, 1, "custom_ord")
     end
 
-    if config.custom.current_trail_mark_mode ~= "custom_ord" then
-      actions.set_trail_mark_select_mode("custom_ord")
-    end
-
-    common.sort_trail_mark_stack("custom_ord")
+    actions.set_trail_mark_select_mode("custom_ord",
+      config.custom.current_trail_mark_mode ~= "custom_ord")
+    config.custom.current_trail_mark_mode = "custom_ord"
 
     if stacks.trail_mark_cursor >= start_idx and stacks.trail_mark_cursor <= end_idx then
-      stacks.trail_mark_cursor = math.min(stacks.trail_mark_cursor + 1, #stacks.current_trail_mark_stack)
+      stacks.trail_mark_cursor = math.min(stacks.trail_mark_cursor + 1,
+        #stacks.current_trail_mark_stack)
     elseif stacks.trail_mark_cursor == end_idx + 1 then
       stacks.trail_mark_cursor = start_idx
     end
 
-    List.update_trail_mark_list()
+    List.update_trail_mark_list(nil, stacks.custom_ord_local_buf)
 
     local selection_start = helpers.signum(current_idx - start_idx) == 1 and start_idx or end_idx
     helpers.set_visual_line_selection(

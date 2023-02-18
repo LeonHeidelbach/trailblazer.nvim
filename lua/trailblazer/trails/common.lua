@@ -76,9 +76,25 @@ function Common.sort_trail_mark_stack(mode)
   end
 
   if mode == "custom_ord" then
-    table.sort(stacks.current_trail_mark_stack, function(a, b)
-      return a.custom_ord and b.custom_ord and a.custom_ord < b.custom_ord
-    end)
+    if stacks.custom_ord_local_buf ~= nil then
+      table.sort(stacks.current_trail_mark_stack, function(a, b)
+        if a.buf == stacks.custom_ord_local_buf then
+          if b.buf == stacks.custom_ord_local_buf then
+            return a.custom_ord and b.custom_ord and a.custom_ord < b.custom_ord
+          else
+            return true
+          end
+        elseif b.buf == stacks.custom_ord_local_buf then
+          return false
+        else
+          return a.custom_ord and b.custom_ord and a.custom_ord < b.custom_ord
+        end
+      end)
+    else
+      table.sort(stacks.current_trail_mark_stack, function(a, b)
+        return a.custom_ord and b.custom_ord and a.custom_ord < b.custom_ord
+      end)
+    end
   elseif mode == "global_chron" then
     table.sort(stacks.current_trail_mark_stack, function(a, b)
       return a.timestamp < b.timestamp
@@ -427,7 +443,9 @@ end
 ---@param buf? number
 ---@return number?
 function Common.default_buf_for_current_mark_select_mode(buf)
-  if buf == nil and (config.custom.current_trail_mark_mode == "buffer_local_chron" or
+  if config.custom.current_trail_mark_mode == "custom_ord" then
+    buf = stacks.custom_ord_local_buf
+  elseif buf == nil and (config.custom.current_trail_mark_mode == "buffer_local_chron" or
       config.custom.current_trail_mark_mode == "buffer_local_line_sorted") then
     buf = api.nvim_get_current_buf()
   end

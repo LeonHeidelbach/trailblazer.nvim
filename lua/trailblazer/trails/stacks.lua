@@ -15,6 +15,7 @@ local config = require("trailblazer.trails.config")
 local helpers = require("trailblazer.helpers")
 local log = require("trailblazer.log")
 
+Stacks.custom_ord_local_buf = nil
 Stacks.trail_mark_cursor = 0
 Stacks.ucid = 0
 Stacks.current_trail_mark_stack = {}
@@ -247,10 +248,13 @@ function Stacks.set_trail_mark_stack_sort_mode(sort_mode, verbose)
   end
 end
 
---- Update the buffer ids in the trail mark stack list with the given lookup table.
+--- Update the buffer ids in the trail mark stack list with the given lookup table. This also
+--- returns a new buffer id lookup table where the old buffer ids are the keys and the new buffer
+--- ids are the values.
 ---@param stack_list table
 ---@param lookup_tbl table
 ---@param saved_cwd? string
+---@return table
 function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_tbl, saved_cwd)
   local new_buf_id_lookup = {}
   local is_windows = fn.has("win32") == 1
@@ -283,6 +287,8 @@ function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_
   end
 
   Stacks.switch_current_stack(nil, false, false)
+
+  return new_buf_id_lookup
 end
 
 --- Create a table that maps buffer numbers to file names.
