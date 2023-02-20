@@ -221,76 +221,104 @@ available and set by default:
             }
         }
     },
-    hl_groups = {
-        TrailBlazerTrailMark = {
-            -- You can add any valid highlight group attribute to this table
-            guifg = "White",
-            guibg = "none",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkNext = {
-            guifg = "Green",
-            guibg = "none",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkPrevious = {
-            guifg = "Red",
-            guibg = "none",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkCursor = {
-            guifg = "Black",
-            guibg = "Orange",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkNewest = {
-            guifg = "Black",
-            guibg = "LightBlue",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkCustomOrd = {
-            guifg = "Black",
-            guibg = "LightSlateBlue",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkGlobalChron = {
-            guifg = "Black",
-            guibg = "Red",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkGlobalBufLineSorted = {
-            guifg = "Black",
-            guibg = "LightRed",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkGlobalChronBufLineSorted = {
-            guifg = "Black",
-            guibg = "Olive",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkGlobalChronBufSwitchGroupChron = {
-            guifg = "Black",
-            guibg = "VioletRed",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkGlobalChronBufSwitchGroupLineSorted = {
-            guifg = "Black",
-            guibg = "MediumSpringGreen",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkBufferLocalChron = {
-            guifg = "Black",
-            guibg = "Green",
-            gui = "bold",
-        },
-        TrailBlazerTrailMarkBufferLocalLineSorted = {
-            guifg = "Black",
-            guibg = "LightGreen",
-            gui = "bold",
-        },
+    -- Your custom highlight group overrides go here
+    -- hl_groups = {} 
+}
+```
+
+### Highlight Groups
+
+You can customize the default highlight groups directly from within your configuration table. Since
+there are quite a few of them, you will find a complete list in the collapsed section below. You can
+use any valid highlight group attribute as a table key to customize them. Once you are done, simply
+add the highlight groups you would like to change to your configuration table using the `hl_groups`
+key as shown above.
+
+<details>
+    <summary>Available highlight groups</summary>
+
+```lua
+hl_groups = {
+    TrailBlazerTrailMark = {
+        -- You can add any valid highlight group attribute to this table
+        guifg = "White",
+        guibg = "none",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkNext = {
+        guifg = "Green",
+        guibg = "none",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkPrevious = {
+        guifg = "Red",
+        guibg = "none",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkCursor = {
+        guifg = "Black",
+        guibg = "Orange",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkNewest = {
+        guifg = "Black",
+        guibg = "LightBlue",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkCustomOrd = {
+        guifg = "Black",
+        guibg = "LightSlateBlue",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkGlobalChron = {
+        guifg = "Black",
+        guibg = "Red",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkGlobalBufLineSorted = {
+        guifg = "Black",
+        guibg = "LightRed",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkGlobalFpathLineSorted = {
+        guifg = "Black",
+        guibg = "LightRed",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkGlobalChronBufLineSorted = {
+        guifg = "Black",
+        guibg = "Olive",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkGlobalChronFpathLineSorted = {
+        guifg = "Black",
+        guibg = "Olive",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkGlobalChronBufSwitchGroupChron = {
+        guifg = "Black",
+        guibg = "VioletRed",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkGlobalChronBufSwitchGroupLineSorted = {
+        guifg = "Black",
+        guibg = "MediumSpringGreen",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkBufferLocalChron = {
+        guifg = "Black",
+        guibg = "Green",
+        gui = "bold",
+    },
+    TrailBlazerTrailMarkBufferLocalLineSorted = {
+        guifg = "Black",
+        guibg = "LightGreen",
+        gui = "bold",
     },
 }
 ```
+
+</details>
 
 ### Trail mark stacks
 
@@ -357,7 +385,9 @@ default all modes are enabled. Thus far you can choose between the following mod
 | `custom_ord`                                | This is a dynamic mode which will only be available and switched to once the trail mark order in any other selection mode has been manually changed from inside the trail mark list. |
 | `global_chron`                              | This is the default mode. Marks are traversed globally in chronological order.                                                                                                       |
 | `global_buf_line_sorted`                    | Marks are sorted by their buffer id and globally traversed from BOF to EOF.                                                                                                          |
-| `global_chron_buf_line_sorted`              | Marks are sorted chronologically, then by their buffer id and globally traversed from BOF to EOF.                                                                                    |
+| `global_fpath_line_sorted`                  | Marks are sorted by their file path and globally traversed from BOF to EOF.                                                                                                          |
+| `global_chron_buf_line_sorted`              | Marks are sorted chronologically, then by their buffer id and globally traversed from lowest to highest line number.                                                                 |
+| `global_chron_fpath_line_sorted`            | Marks are sorted chronologically, then by their file path and globally traversed from lowest to highest line number.                                                                 |
 | `global_chron_buf_switch_group_chron`       | Marks are sorted chronologically, then by their buffer id and grouped by buffer switch events. Each group switch event is then traversed in chronological order.                     |
 | `global_chron_buf_switch_group_line_sorted` | Marks are sorted chronologically, then by their buffer id and grouped by buffer switch events. Each group switch event is then sorted from BOF to EOF within the respective buffer.  |
 | `buffer_local_chron`                        | Only current buffer marks are traversed chronologically.                                                                                                                             |
