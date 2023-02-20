@@ -298,8 +298,9 @@ function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_
 end
 
 --- Create a table that maps buffer numbers to file names.
+---@param buf_as_key boolean
 ---@return table
-function Stacks.create_buf_file_lookup_table()
+function Stacks.create_buf_file_lookup_table(buf_as_key)
   local file_buf_lookup_table = {}
   local unique_bufs = {}
 
@@ -312,7 +313,11 @@ function Stacks.create_buf_file_lookup_table()
   for _, buf in ipairs(vim.tbl_keys(unique_bufs)) do
     local buf_name = fn.fnamemodify(api.nvim_buf_get_name(buf), ":~:.")
     if buf_name ~= "" then
-      file_buf_lookup_table[buf_name] = buf
+      if buf_as_key then
+        file_buf_lookup_table[buf] = buf_name
+      else
+        file_buf_lookup_table[buf_name] = buf
+      end
     end
   end
 

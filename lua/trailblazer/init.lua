@@ -33,7 +33,9 @@ local function set_defaults(opts)
       available_trail_mark_modes = { -- available modes to cycle through
         "global_chron",
         "global_buf_line_sorted",
+        "global_fpath_line_sorted",
         "global_chron_buf_line_sorted",
+        "global_chron_fpath_line_sorted",
         "global_chron_buf_switch_group_chron",
         "global_chron_buf_switch_group_line_sorted",
         "buffer_local_chron",
@@ -144,7 +146,17 @@ local function set_defaults(opts)
         guibg = "LightRed",
         gui = "bold",
       },
+      TrailBlazerTrailMarkGlobalFpathLineSorted = {
+        guifg = "Black",
+        guibg = "LightRed",
+        gui = "bold",
+      },
       TrailBlazerTrailMarkGlobalChronBufLineSorted = {
+        guifg = "Black",
+        guibg = "Olive",
+        gui = "bold",
+      },
+      TrailBlazerTrailMarkGlobalChronFpathLineSorted = {
         guifg = "Black",
         guibg = "Olive",
         gui = "bold",
