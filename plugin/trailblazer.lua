@@ -55,6 +55,10 @@ api.nvim_create_user_command("TrailBlazerPeekMoveNextDown", function(args)
   tb.peek_move_next_down(args.args)
 end, { nargs = "?", complete = "buffer" })
 
+api.nvim_create_user_command("TrailBlazerMoveToNearest", function(args)
+  tb.move_to_nearest(args.args)
+end, { nargs = "?", complete = "buffer" })
+
 api.nvim_create_user_command("TrailBlazerDeleteAllTrailMarks", function(args)
   tb.delete_all_trail_marks(args.args)
 end, { nargs = "?", complete = "buffer" })
