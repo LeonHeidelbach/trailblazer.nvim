@@ -334,4 +334,12 @@ function Helpers.signum(x)
   return x > 0 and 1 or x < 0 and -1 or 0
 end
 
+--- Returns the Manhattan Distance between the supplied points.
+---@param a table<number, number>
+---@param b table<number, number>
+---@return number
+function Helpers.manhattan_distance(a, b)
+  return math.abs(a[1] - b[1]) + math.abs(a[2] - b[2])
+end
+
 return Helpers

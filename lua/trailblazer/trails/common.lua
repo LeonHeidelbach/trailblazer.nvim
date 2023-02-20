@@ -317,6 +317,34 @@ function Common.get_trail_mark_at_pos(win, buf, pos)
   return nil, nil
 end
 
+--- Returns the trail mark nearest to the provided position (or the current cursor position if pos
+--- is omitted) and its index within the trail mark stack. The minimum distance is found by
+--- calculating the Manhattan Distance between the provided pos and the respective trail mark
+--- positions. If buf is omitted the minimum distance of pos in all buffers will be returned.
+---@param buf? number
+---@param pos? table<number, number>
+---@return number?
+---@return table?
+function Common.get_nearest_trail_mark_for_pos(buf, pos)
+  local closest_mark_index = nil
+  local closest_mark = nil
+  local closest_mark_distance = math.huge
+  pos = pos or api.nvim_win_get_cursor(0)
+
+  for i, trail_mark in ipairs(stacks.current_trail_mark_stack) do
+    if not buf or trail_mark.buf == buf then
+      local manhattan_distance = helpers.manhattan_distance(trail_mark.pos, pos)
+      if manhattan_distance < closest_mark_distance then
+        closest_mark_distance = manhattan_distance
+        closest_mark_index = i
+        closest_mark = trail_mark
+      end
+    end
+  end
+
+  return closest_mark_index, closest_mark
+end
+
 --- Return the trail mark at the given position as well as the corresponding extmark.
 ---@param buf? number
 ---@param newest_mark_index? number

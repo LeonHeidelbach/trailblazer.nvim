@@ -72,6 +72,7 @@ local function set_defaults(opts)
           track_back = '<A-b>',
           peek_move_next_down = '<A-J>',
           peek_move_previous_up = '<A-K>',
+          move_to_nearest = '<A-n>',
           toggle_trail_mark_list = '<A-m>',
         },
         actions = {
@@ -237,6 +238,14 @@ end
 function TrailBlazer.peek_move_next_down(buf)
   if not TrailBlazer.is_configured() then return end
   trails.motions.peek_move_next_down(helpers.get_buf_nr(buf))
+  trails.list.update_trail_mark_list()
+end
+
+--- Move to the nearest trail mark relative to the current cursor position if one exists in buf.
+---@param buf? number | string
+function TrailBlazer.move_to_nearest(buf)
+  if not TrailBlazer.is_configured() then return end
+  trails.motions.move_to_nearest(helpers.get_buf_nr(buf))
   trails.list.update_trail_mark_list()
 end
 
