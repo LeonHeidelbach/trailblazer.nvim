@@ -121,7 +121,7 @@ function Common.sort_trail_mark_stack(mode)
           return a.pos[1] < b.pos[1]
         end
       else
-        return buf_lookup_table[a.buf] < buf_lookup_table[b.buf]
+        return (buf_lookup_table[a.buf] or "") < (buf_lookup_table[b.buf] or "")
       end
     end)
   elseif mode == "global_chron_buf_line_sorted" or mode == "global_chron_fpath_line_sorted" then
@@ -136,7 +136,7 @@ function Common.sort_trail_mark_stack(mode)
     else
       local buf_lookup_table = stacks.create_buf_file_lookup_table(true)
       table.sort(stacks.current_trail_mark_stack, function(a, b)
-        return buf_lookup_table[a.buf] < buf_lookup_table[b.buf]
+        return (buf_lookup_table[a.buf] or "") < (buf_lookup_table[b.buf] or "")
       end)
     end
 
