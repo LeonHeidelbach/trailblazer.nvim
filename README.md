@@ -147,6 +147,7 @@ available and set by default:
         -- buffer_local_chron, buffer_local_line_sorted
         current_trail_mark_mode = "global_chron",
         current_trail_mark_list_type = "quickfix", -- currently only quickfix lists are supported
+        trail_mark_list_rows = 10, -- number of rows to show in the trail mark list
         verbose_trail_mark_select = true, -- print current mode notification on mode change
         mark_symbol = "•", --  will only be used if trail_mark_symbol_line_indicators_enabled = true
         newest_mark_symbol = "⬤", -- disable this mark symbol by setting its value to ""
