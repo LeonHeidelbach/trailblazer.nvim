@@ -371,12 +371,13 @@ TrailBlazer.toggle_trail_mark_list({type}, {buf?})
 
 
                                               *TrailBlazer.open_trail_mark_list*
-TrailBlazer.open_trail_mark_list({type}, {buf?})
+TrailBlazer.open_trail_mark_list({type}, {buf?}, {rows?})
      Open a list of all trail marks for the specified buffer in the specified list type.
 
     Parameters: ~
-        {type}  (string)
-        {buf?}  (number|string)
+        {type}   (string)
+        {buf?}   (number|string)
+        {rows?}  (number)
 
 
                                              *TrailBlazer.close_trail_mark_list*
@@ -1060,12 +1061,13 @@ List.toggle_trail_mark_list({type?}, {buf?})
 
 
                                                      *List.open_trail_mark_list*
-List.open_trail_mark_list({type?}, {buf?})
+List.open_trail_mark_list({type?}, {buf?}, {rows?})
      Open a list of all trail marks for the specified buffer in the specified list type.
 
     Parameters: ~
         {type?}  (string)
         {buf?}   (number)
+        {rows?}  (number)
 
 
 List.close_trail_mark_list({type?})                 *List.close_trail_mark_list*
@@ -1094,12 +1096,13 @@ List.toggle_quick_fix_list({buf?}, {trail_mark_list?})
 
 
                                                       *List.open_quick_fix_list*
-List.open_quick_fix_list({buf?}, {trail_mark_list?})
+List.open_quick_fix_list({buf?}, {trail_mark_list?}, {rows?})
      Open a quick fix list with the specified trail mark list.
 
     Parameters: ~
         {buf?}              (number)
-        {trail_mark_list?}  (table)   @return number?
+        {trail_mark_list?}  (table)
+        {rows?}             (number)  @return number?
 
 
 List.close_quick_fix_list()                          *List.close_quick_fix_list*
