@@ -43,6 +43,7 @@ local function set_defaults(opts)
       },
       current_trail_mark_mode = "global_chron", -- current / initial mode
       current_trail_mark_list_type = "quickfix", -- currently only quickfix lists are supported
+      trail_mark_list_rows = 10, -- number of rows to show in the trail mark list
       verbose_trail_mark_select = true, -- print current mode notification on mode change
       mark_symbol = "•",
       newest_mark_symbol = "⬤",
@@ -292,9 +293,10 @@ end
 --- Open a list of all trail marks for the specified buffer in the specified list type.
 ---@param type string
 ---@param buf? number | string
-function TrailBlazer.open_trail_mark_list(type, buf)
+---@param rows? number
+function TrailBlazer.open_trail_mark_list(type, buf, rows)
   if not TrailBlazer.is_configured() then return end
-  trails.list.open_trail_mark_list(type, helpers.get_buf_nr(buf))
+  trails.list.open_trail_mark_list(type, helpers.get_buf_nr(buf), rows)
 end
 
 --- Close a list of all trail marks for the specified buffer in the specified list type.

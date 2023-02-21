@@ -26,6 +26,7 @@ Config.custom.available_trail_mark_lists = {
   "quickfix",
 }
 Config.custom.current_trail_mark_list_type = "quickfix"
+Config.custom.trail_mark_list_rows = 10
 Config.custom.verbose_trail_mark_select = true
 Config.mark_symbol = "•"
 Config.custom.newest_mark_symbol = "⬤"

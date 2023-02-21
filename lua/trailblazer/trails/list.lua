@@ -74,12 +74,13 @@ end
 --- Open a list of all trail marks for the specified buffer in the specified list type.
 ---@param type? string
 ---@param buf? number
-function List.open_trail_mark_list(type, buf)
+---@param rows? number
+function List.open_trail_mark_list(type, buf, rows)
   type = type or config.custom.current_trail_mark_list_type
   buf = common.default_buf_for_current_mark_select_mode(buf)
 
   if type == "quickfix" then
-    List.open_quick_fix_list(buf, common.get_trail_mark_stack_subset_for_buf(buf))
+    List.open_quick_fix_list(buf, common.get_trail_mark_stack_subset_for_buf(buf), rows)
     return
   end
 
@@ -131,13 +132,16 @@ end
 --- Open a quick fix list with the specified trail mark list.
 ---@param buf? number
 ---@param trail_mark_list? table
+---@param rows? number
 ---@return number?
-function List.open_quick_fix_list(buf, trail_mark_list)
+function List.open_quick_fix_list(buf, trail_mark_list, rows)
   if trail_mark_list then
     List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
   end
 
-  vim.cmd("copen")
+  rows = rows or config.custom.trail_mark_list_rows
+
+  vim.cmd("copen" .. (type(rows) == "number" and " " .. tostring(rows) or ""))
   List.register_quickfix_keybindings(List.config.quickfix_mappings)
 
   return List.get_trailblazer_quickfix_buf()
