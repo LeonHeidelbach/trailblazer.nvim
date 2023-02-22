@@ -48,6 +48,12 @@ Config.custom.available_trail_mark_stack_sort_modes = {
   "chron_dsc",
 }
 Config.custom.current_trail_mark_stack_sort_mode = "alpha_asc"
+Config.custom.available_move_to_nearest_directives = {
+  "up",
+  "down",
+  "fpath_up",
+  "fpath_down",
+}
 
 Config.ns_name = "trailblazer"
 Config.nsid = api.nvim_create_namespace(Config.ns_name)

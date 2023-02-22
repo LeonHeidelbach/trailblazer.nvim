@@ -244,9 +244,10 @@ end
 
 --- Move to the nearest trail mark relative to the current cursor position if one exists in buf.
 ---@param buf? number | string
-function TrailBlazer.move_to_nearest(buf)
+---@param directive? string
+function TrailBlazer.move_to_nearest(buf, directive)
   if not TrailBlazer.is_configured() then return end
-  trails.motions.move_to_nearest(helpers.get_buf_nr(buf))
+  trails.motions.move_to_nearest(helpers.get_buf_nr(buf), directive)
   trails.list.update_trail_mark_list()
 end
 

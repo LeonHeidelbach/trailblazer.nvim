@@ -120,6 +120,38 @@ function Helpers.tbl_count(lambda, tbl)
   return counter
 end
 
+--- Returns the maximum value of the supplied table using the supplied predicate. If no predicate is
+--- supplied, the table's values are used.
+---@param tbl table
+---@param lambda? function
+---@return any?
+function Helpers.tbl_max(tbl, lambda)
+  local max = nil
+  for _, v in ipairs(tbl) do
+    local c_val = lambda and lambda(v) or v
+    if max == nil or c_val > max then
+      max = c_val
+    end
+  end
+  return max
+end
+
+--- Returns the minimum value of the supplied table using the supplied predicate. If no predicate is
+--- supplied, the table's values are used.
+---@param tbl table
+---@param lambda? function
+---@return any?
+function Helpers.tbl_min(tbl, lambda)
+  local min = nil
+  for _, v in ipairs(tbl) do
+    local c_val = lambda and lambda(v) or v
+    if min == nil or c_val < min then
+      min = c_val
+    end
+  end
+  return min
+end
+
 --- Remove duplicates from the supplied table using the supplied predicate and calling the
 --- optionally supplied action on each duplicate.
 ---@param lambda function<any> @return function

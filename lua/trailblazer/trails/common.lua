@@ -323,26 +323,90 @@ end
 --- positions. If buf is omitted the minimum distance of pos in all buffers will be returned.
 ---@param buf? number
 ---@param pos? table<number, number>
+---@param directive? string
 ---@return number?
 ---@return table?
-function Common.get_nearest_trail_mark_for_pos(buf, pos)
-  local closest_mark_index = nil
-  local closest_mark = nil
-  local closest_mark_distance = math.huge
+function Common.get_nearest_trail_mark_for_pos(buf, pos, directive)
+  local nearest_mark_index = nil
+  local nearest_mark = nil
+  local nearest_mark_distance = math.huge
+  local buf_file_path_lookup = nil
+  local file_paths = nil
+
   pos = pos or api.nvim_win_get_cursor(0)
+  buf = buf and buf > 0 and buf or api.nvim_get_current_buf()
+
+  if directive and not vim.tbl_contains(config.custom.available_move_to_nearest_directives,
+        directive) then
+    log.warn("invalid_move_to_nearest_directive", table.concat(
+      config.custom.available_move_to_nearest_directives, ", "))
+  elseif directive == "fpath_up" or directive == "fpath_down" then
+    buf_file_path_lookup = stacks.create_buf_file_lookup_table(true,
+      { stacks.current_trail_mark_stack_name })
+    buf_file_path_lookup[buf] = fn.expand(api.nvim_buf_get_name(buf))
+    file_paths = vim.tbl_values(buf_file_path_lookup)
+
+    table.sort(file_paths)
+  end
+
+  if directive == "fpath_up" then
+    if helpers.tbl_min(stacks.current_trail_mark_stack, function(trail_mark)
+          return trail_mark.buf == buf and trail_mark.pos[1] or math.huge
+        end) < pos[1] then
+      directive = "up"
+    else
+      local previous_fpath = file_paths[math.max((helpers.tbl_indexof(function(file_path)
+        return file_path == buf_file_path_lookup[buf]
+      end, file_paths) or 0) - 1, 1)]
+
+      local previous_buf = helpers.tbl_find(function(bufnr)
+        return buf_file_path_lookup[bufnr] == previous_fpath
+      end, vim.tbl_keys(buf_file_path_lookup))
+
+      nearest_mark_index = math.max(#stacks.current_trail_mark_stack + 1 - (helpers.tbl_indexof(
+        function(trail_mark)
+          return trail_mark.buf == previous_buf
+        end, helpers.tbl_reverse(stacks.current_trail_mark_stack)) or 1), 1)
+
+      return nearest_mark_index, stacks.current_trail_mark_stack[nearest_mark_index]
+    end
+  elseif directive == "fpath_down" then
+    if helpers.tbl_max(stacks.current_trail_mark_stack, function(trail_mark)
+          return trail_mark.buf == buf and trail_mark.pos[1] or -1
+        end) > pos[1] then
+      directive = "down"
+    else
+      local next_fpath = file_paths[math.min((helpers.tbl_indexof(function(file_path)
+        return file_path == buf_file_path_lookup[buf]
+      end, file_paths) or #file_paths) + 1, #file_paths)]
+
+      local next_buf = helpers.tbl_find(function(bufnr)
+        return buf_file_path_lookup[bufnr] == next_fpath
+      end, vim.tbl_keys(buf_file_path_lookup))
+
+      nearest_mark_index = helpers.tbl_indexof(function(trail_mark)
+            return trail_mark.buf == next_buf
+          end, stacks.current_trail_mark_stack) or #stacks.current_trail_mark_stack
+
+      return nearest_mark_index, stacks.current_trail_mark_stack[nearest_mark_index]
+    end
+  end
 
   for i, trail_mark in ipairs(stacks.current_trail_mark_stack) do
     if not buf or trail_mark.buf == buf then
-      local manhattan_distance = helpers.manhattan_distance(trail_mark.pos, pos)
-      if manhattan_distance < closest_mark_distance then
-        closest_mark_distance = manhattan_distance
-        closest_mark_index = i
-        closest_mark = trail_mark
+      if not directive or (directive == "up" and trail_mark.pos[1] < pos[1] or directive == "down"
+          and trail_mark.pos[1] > pos[1]) then
+        local manhattan_distance = helpers.manhattan_distance(trail_mark.pos, pos)
+        if manhattan_distance < nearest_mark_distance then
+          nearest_mark_distance = manhattan_distance
+          nearest_mark_index = i
+          nearest_mark = trail_mark
+        end
       end
     end
   end
 
-  return closest_mark_index, closest_mark
+  return nearest_mark_index, nearest_mark
 end
 
 --- Return the trail mark at the given position as well as the corresponding extmark.

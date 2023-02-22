@@ -47,6 +47,8 @@ Log.langs = {
       .. "following: ",
       invalid_trail_mark_stack_sort_mode = "Invalid trail mark stack sort mode. Please use one of "
       .. "the following: ",
+      invalid_move_to_nearest_directive = "Invalid move_to_nearest directive. Please use one of "
+      .. "the following: ",
       could_not_open_file = "Could not open file: ",
       could_not_read_file = "Could not read file: ",
       could_not_decode_trail_mark_save_file = "Could not decode trail mark save file: ",
