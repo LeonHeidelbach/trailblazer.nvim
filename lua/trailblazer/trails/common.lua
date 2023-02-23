@@ -346,7 +346,9 @@ function Common.get_nearest_trail_mark_for_pos(buf, pos, directive)
     buf_file_path_lookup[buf] = fn.expand(api.nvim_buf_get_name(buf))
     file_paths = vim.tbl_values(buf_file_path_lookup)
 
-    table.sort(file_paths)
+    table.sort(file_paths, function(a, b)
+      return a < b
+    end)
   end
 
   if directive == "fpath_up" then
@@ -363,10 +365,14 @@ function Common.get_nearest_trail_mark_for_pos(buf, pos, directive)
         return buf_file_path_lookup[bufnr] == previous_fpath
       end, vim.tbl_keys(buf_file_path_lookup))
 
-      nearest_mark_index = math.max(#stacks.current_trail_mark_stack + 1 - (helpers.tbl_indexof(
-        function(trail_mark)
-          return trail_mark.buf == previous_buf
-        end, helpers.tbl_reverse(stacks.current_trail_mark_stack)) or 1), 1)
+      if previous_buf == buf then return nil, nil end
+
+      for i = #stacks.current_trail_mark_stack, 1, -1 do
+        if stacks.current_trail_mark_stack[i].buf == previous_buf then
+          nearest_mark_index = i
+          break
+        end
+      end
 
       return nearest_mark_index, stacks.current_trail_mark_stack[nearest_mark_index]
     end
@@ -383,6 +389,8 @@ function Common.get_nearest_trail_mark_for_pos(buf, pos, directive)
       local next_buf = helpers.tbl_find(function(bufnr)
         return buf_file_path_lookup[bufnr] == next_fpath
       end, vim.tbl_keys(buf_file_path_lookup))
+
+      if next_buf == buf then return nil, nil end
 
       nearest_mark_index = helpers.tbl_indexof(function(trail_mark)
             return trail_mark.buf == next_buf
