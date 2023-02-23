@@ -600,7 +600,7 @@ function Common.update_all_trail_mark_positions()
         return ext_mark[1] == trail_mark.mark_id
       end, ext_marks[trail_mark.buf])
 
-      if ext_mark ~= nil and ext_mark[3] > 0 then
+      if ext_mark ~= nil and (ext_mark[3] > 0 or trail_mark.pos[2] == 0 and ext_mark[3] == 0) then
         trail_mark.pos = { ext_mark[2] + 1, ext_mark[3] }
       elseif ext_mark ~= nil and trail_mark.pos[2] ~= 0 then
         api.nvim_buf_del_extmark(trail_mark.buf, config.nsid, trail_mark.mark_id)
@@ -676,6 +676,7 @@ end
 ---@param visible_only? boolean
 function Common.reregister_trail_marks(visible_only)
   local buf_list, trail_marks
+  local buf_line_counts = {}
 
   if visible_only then
     buf_list, trail_marks = Common.get_reregister_buf_list_and_trail_marks()
@@ -696,6 +697,9 @@ function Common.reregister_trail_marks(visible_only)
 
   for i, mark in ipairs(trail_marks) do
     if api.nvim_buf_is_loaded(mark.buf) and api.nvim_buf_is_valid(mark.buf) then
+      buf_line_counts[mark.buf] = buf_line_counts[mark.buf] or api.nvim_buf_line_count(mark.buf)
+      mark.pos[1] = mark.pos[1] > buf_line_counts[mark.buf] and buf_line_counts[mark.buf] or
+          mark.pos[1]
       local char, char_w = helpers.buf_get_utf8_char_at_pos(mark.buf, mark.pos)
 
       local mark_options = {
