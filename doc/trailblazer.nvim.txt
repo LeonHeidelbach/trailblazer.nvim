@@ -83,6 +83,24 @@ Helpers.tbl_count({lambda}, {tbl})                           *Helpers.tbl_count*
         (integer)
 
 
+Helpers.tbl_max({tbl}, {lambda?})                              *Helpers.tbl_max*
+     Returns the maximum value of the supplied table using the supplied predicate. If no predicate is
+     supplied, the table's values are used.
+
+    Parameters: ~
+        {tbl}      (table)
+        {lambda?}  (function)  @return any?
+
+
+Helpers.tbl_min({tbl}, {lambda?})                              *Helpers.tbl_min*
+     Returns the minimum value of the supplied table using the supplied predicate. If no predicate is
+     supplied, the table's values are used.
+
+    Parameters: ~
+        {tbl}      (table)
+        {lambda?}  (function)  @return any?
+
+
 Helpers.dedupe({tbl}, {action?})                                *Helpers.dedupe*
 
     Parameters: ~
@@ -322,11 +340,13 @@ TrailBlazer.peek_move_next_down({buf?})        *TrailBlazer.peek_move_next_down*
         {buf?}  (number|string)
 
 
-TrailBlazer.move_to_nearest({buf?})                *TrailBlazer.move_to_nearest*
+                                                   *TrailBlazer.move_to_nearest*
+TrailBlazer.move_to_nearest({buf?}, {directive?})
      Move to the nearest trail mark relative to the current cursor position if one exists in buf.
 
     Parameters: ~
-        {buf?}  (number|string)
+        {buf?}        (number|string)
+        {directive?}  (string)
 
 
                                             *TrailBlazer.delete_all_trail_marks*
@@ -866,16 +886,17 @@ Common.get_trail_mark_at_pos({win?}, {buf?}, {pos?})
 
 
                                          *Common.get_nearest_trail_mark_for_pos*
-Common.get_nearest_trail_mark_for_pos({buf?}, {pos?})
+Common.get_nearest_trail_mark_for_pos({buf?}, {pos?}, {directive?})
      Returns the trail mark nearest to the provided position (or the current cursor position if pos
      is omitted) and its index within the trail mark stack. The minimum distance is found by
      calculating the Manhattan Distance between the provided pos and the respective trail mark
      positions. If buf is omitted the minimum distance of pos in all buffers will be returned.
 
     Parameters: ~
-        {buf?}  (number)
-        {pos?}  (table<number,number>)  @return number?
-                                        @return table?
+        {buf?}        (number)
+        {pos?}        (table<number,number>)
+        {directive?}  (string)                @return number?
+                                              @return table?
 
 
                                          *Common.get_marks_for_trail_mark_index*
@@ -1204,13 +1225,15 @@ Motions.peek_move_next_down({buf?})                *Motions.peek_move_next_down*
         (boolean)
 
 
-Motions.move_to_nearest({buf?})                        *Motions.move_to_nearest*
+                                                       *Motions.move_to_nearest*
+Motions.move_to_nearest({buf?}, {directive?})
      Move to the nearest trail mark by calculating the Manhattan Distance from the current cursor
      position to each trail mark. If there is no "nearest trail mark" within the current or specified
      buffer, nothing happens.
 
     Parameters: ~
-        {buf?}  (number)
+        {buf?}        (number)
+        {directive?}  (string)
 
     Returns: ~
         (boolean)
@@ -1325,11 +1348,12 @@ Stacks.udpate_buffer_ids_with_filename_lookup_table({stack_list}, {lookup_tbl}, 
 
 
                                            *Stacks.create_buf_file_lookup_table*
-Stacks.create_buf_file_lookup_table({buf_as_key})
+Stacks.create_buf_file_lookup_table({buf_as_key}, {stack_name_list?})
      Create a table that maps buffer numbers to file names.
 
     Parameters: ~
-        {buf_as_key}  (boolean)
+        {buf_as_key}        (boolean)
+        {stack_name_list?}  (table)
 
     Returns: ~
         (table)
