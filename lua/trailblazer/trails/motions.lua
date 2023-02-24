@@ -42,7 +42,6 @@ end
 ---@return boolean
 function Motions.move_to_nearest(buf, directive, dist_type)
   buf = buf or api.nvim_get_current_buf()
-  print(dist_type)
   local nearest_mark_index, nearest_mark = common.get_nearest_trail_mark_for_pos(buf, nil,
     directive, dist_type)
   if nearest_mark_index and nearest_mark then
