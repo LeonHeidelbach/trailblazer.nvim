@@ -402,8 +402,10 @@ function Common.get_nearest_trail_mark_for_pos(buf, pos, directive)
 
   for i, trail_mark in ipairs(stacks.current_trail_mark_stack) do
     if not buf or trail_mark.buf == buf then
-      if not directive or (directive == "up" and trail_mark.pos[1] < pos[1] or directive == "down"
-          and trail_mark.pos[1] > pos[1]) then
+      if not directive or (directive == "up" and (trail_mark.pos[1] < pos[1] or
+          trail_mark.pos[1] == pos[1] and trail_mark.pos[2] < pos[2]) or directive == "down"
+          and (trail_mark.pos[1] > pos[1] or trail_mark.pos[1] == pos[1] and
+          trail_mark.pos[2] > pos[2])) then
         local manhattan_distance = helpers.manhattan_distance(trail_mark.pos, pos)
         if manhattan_distance < nearest_mark_distance then
           nearest_mark_distance = manhattan_distance
