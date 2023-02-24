@@ -374,4 +374,33 @@ function Helpers.manhattan_distance(a, b)
   return math.abs(a[1] - b[1]) + math.abs(a[2] - b[2])
 end
 
+--- Returns the absolute character distance between the supplied points in the specified buffer.
+---@param buf? number
+---@param a table<number, number>
+---@param b table<number, number>
+---@return number
+function Helpers.buf_linear_character_distance(buf, a, b)
+  if a[1] > b[1] then a, b = b, a end
+
+  local lines = api.nvim_buf_get_lines(buf or 0, a[1], b[1] + 1, false)
+
+  if #lines == 1 then
+    return math.abs(a[2] - b[2])
+  end
+
+  local dist = 0
+
+  for i = 1, #lines do
+    if i == 1 then
+      dist = dist + #lines[i] - a[2]
+    elseif i == #lines then
+      dist = dist + b[2]
+    else
+      dist = dist + #lines[i]
+    end
+  end
+
+  return dist
+end
+
 return Helpers
