@@ -363,6 +363,10 @@ TrailBlazer.move_to_nearest({buf?}, {directive?}, {dist_type?})
         {dist_type?}  (string)
 
 
+TrailBlazer.move_to_trail_mark_cursor()  *TrailBlazer.move_to_trail_mark_cursor*
+     Move the cursor the the trail mark cursor position in the current stack.
+
+
                                             *TrailBlazer.delete_all_trail_marks*
 TrailBlazer.delete_all_trail_marks({buf?})
      Delete all trail marks from all or a specific buffer.
@@ -1251,6 +1255,13 @@ Motions.move_to_nearest({buf?}, {directive?}, {dist_type?})
         {buf?}        (number)
         {directive?}  (string)
         {dist_type?}  (string)
+
+    Returns: ~
+        (boolean)
+
+
+Motions.move_to_trail_mark_cursor()          *Motions.move_to_trail_mark_cursor*
+     Move the cursor the the trail mark cursor position in the current stack.
 
     Returns: ~
         (boolean)
