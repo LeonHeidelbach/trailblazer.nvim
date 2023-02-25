@@ -176,6 +176,14 @@ available and set by default:
         -- The current / initially selected trail mark stack sort mode. Choose from one of the
         -- available modes: alpha_asc, alpha_dsc, chron_asc, chron_dsc
         current_trail_mark_stack_sort_mode = "alpha_asc"
+        -- Set this to true if you always want to move to the nearest trail mark first before
+        -- continuing to peek move in the current selection mode order. This effectively disables
+        -- the "current trail mark cursor" to which you would otherwise move first before continuing
+        -- to move through your trail mark stack.
+        move_to_nearest_before_peek = false,
+        move_to_nearest_before_peek_motion_directive_up = "fpath_up", -- "up", "fpath_up" -> For move info see section "TrailBlazerMoveToNearest Motion Directives"
+        move_to_nearest_before_peek_motion_directive_down = "fpath_down", -- "down", "fpath_down" -> For move info see section "TrailBlazerMoveToNearest Motion Directives"
+        move_to_nearest_before_peek_dist_type = "lin_char_dist", -- "man_dist", "lin_char_dist" -> Manhattan Distance or Linear Character Distance
     },
     mappings = { -- rename this to "force_mappings" to completely override default mappings and not merge with them
         nv = { -- Mode union: normal & visual mode. Can be extended by adding i, x, ...
