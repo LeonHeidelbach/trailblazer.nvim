@@ -22,7 +22,8 @@ function Motions.peek_move_previous_up(buf)
   buf = common.default_buf_for_current_mark_select_mode(buf)
   if (not current_mark_index or current_mark_index ~= stacks.trail_mark_cursor)
       and config.custom.move_to_nearest_before_peek then
-    Motions.move_to_nearest(buf, config.custom.move_to_nearest_before_peek_motion_directive_up,
+    return Motions.move_to_nearest(buf,
+      config.custom.move_to_nearest_before_peek_motion_directive_up,
       config.custom.move_to_nearest_before_peek_dist_type)
   else
     common.set_cursor_to_previous_mark(buf, current_mark_index)
@@ -38,7 +39,8 @@ function Motions.peek_move_next_down(buf)
   buf = common.default_buf_for_current_mark_select_mode(buf)
   if (not current_mark_index or current_mark_index ~= stacks.trail_mark_cursor)
       and config.custom.move_to_nearest_before_peek then
-    Motions.move_to_nearest(buf, config.custom.move_to_nearest_before_peek_motion_directive_down,
+    return Motions.move_to_nearest(buf,
+      config.custom.move_to_nearest_before_peek_motion_directive_down,
       config.custom.move_to_nearest_before_peek_dist_type)
   else
     common.set_cursor_to_next_mark(buf, current_mark_index)
