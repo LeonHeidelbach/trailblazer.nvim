@@ -256,6 +256,13 @@ function TrailBlazer.move_to_nearest(buf, directive, dist_type)
   trails.list.update_trail_mark_list()
 end
 
+--- Move the cursor the the trail mark cursor position in the current stack.
+function TrailBlazer.move_to_trail_mark_cursor()
+  if not TrailBlazer.is_configured() then return end
+  trails.motions.move_to_trail_mark_cursor()
+  trails.list.update_trail_mark_list()
+end
+
 --- Delete all trail marks from all or a specific buffer.
 ---@param buf? number | string
 function TrailBlazer.delete_all_trail_marks(buf)

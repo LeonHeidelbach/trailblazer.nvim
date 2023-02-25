@@ -68,4 +68,10 @@ function Motions.move_to_nearest(buf, directive, dist_type)
   return false
 end
 
+--- Move the cursor the the trail mark cursor position in the current stack.
+---@return boolean
+function Motions.move_to_trail_mark_cursor()
+  return common.focus_win_and_buf_by_trail_mark_index(nil, stacks.trail_mark_cursor, false)
+end
+
 return Motions
