@@ -54,6 +54,10 @@ Config.custom.available_move_to_nearest_directives = {
   "fpath_up",
   "fpath_down",
 }
+Config.custom.move_to_nearest_before_peek = false
+Config.custom.move_to_nearest_before_peek_motion_directive_up = "fpath_up"
+Config.custom.move_to_nearest_before_peek_motion_directive_down = "fpath_down"
+Config.custom.move_to_nearest_before_peek_dist_type = "lin_char_dist"
 
 Config.ns_name = "trailblazer"
 Config.nsid = api.nvim_create_namespace(Config.ns_name)

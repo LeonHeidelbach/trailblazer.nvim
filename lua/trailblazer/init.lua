@@ -64,7 +64,11 @@ local function set_defaults(opts)
         "chron_asc",
         "chron_dsc",
       },
-      current_trail_mark_stack_sort_mode = "alpha_asc"
+      current_trail_mark_stack_sort_mode = "alpha_asc",
+      move_to_nearest_before_peek = false,
+      move_to_nearest_before_peek_motion_directive_up = "fpath_up",
+      move_to_nearest_before_peek_motion_directive_down = "fpath_down",
+      move_to_nearest_before_peek_dist_type = "lin_char_dist",
     },
     mappings = {
       nv = { -- Mode union: normal & visual mode
