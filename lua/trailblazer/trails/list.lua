@@ -48,6 +48,8 @@ List.config = {
 --- Setup the list module.
 ---@param options? table
 function List.setup(options)
+  if not options then return end
+
   if options.force_quickfix_mappings then
     List.config.quickfix_mappings = options.force_quickfix_mappings
   elseif options.quickfix_mappings then

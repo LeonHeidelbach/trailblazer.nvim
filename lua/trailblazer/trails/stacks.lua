@@ -298,7 +298,7 @@ function Stacks.udpate_buffer_ids_with_filename_lookup_table(stack_list, lookup_
 end
 
 --- Create a table that maps buffer numbers to file names.
----@param buf_as_key boolean
+---@param buf_as_key? boolean
 ---@param stack_name_list? table
 ---@return table
 function Stacks.create_buf_file_lookup_table(buf_as_key, stack_name_list)
