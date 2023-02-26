@@ -13,8 +13,27 @@ end
 
 vim.g.trailblazer_loaded = 1
 
+local git_file_list = {
+  "COMMIT_EDITMSG",
+  "MERGE_MSG",
+  "NOTES_EDITMSG",
+  "PULLREQ_EDITMSG",
+  "TAG_EDITMSG",
+}
+
 if tb.options.auto_load_trailblazer_state_on_enter then
-  tb.load_trailblazer_state_from_file(nil, false)
+  local is_git_file = false
+
+  for _, v in ipairs(vim.v.argv) do
+    for _, w in ipairs(git_file_list) do
+      if v:find(w) then
+        is_git_file = true
+        break
+      end
+    end
+  end
+
+  if not is_git_file then tb.load_trailblazer_state_from_file(nil, false) end
 end
 
 local cfg = {
