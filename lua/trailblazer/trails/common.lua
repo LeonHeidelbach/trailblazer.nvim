@@ -452,8 +452,7 @@ function Common.get_marks_for_trail_mark_index(buf, newest_mark_index, remove_tr
         if ok then
           break
         else
-          log.error("unable_to_get_extmarks", "[" .. last_mark.buf .. " | " .. newest_mark_index
-          .. "]")
+          table.remove(stacks.current_trail_mark_stack, newest_mark_index)
           return nil, nil, nil
         end
       else

@@ -173,16 +173,18 @@ function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
   local qf_title
 
   for _, trail_mark in ipairs(trail_mark_list) do
-    local quick_fix_list_item = {
-      bufnr = trail_mark.buf,
-      filename = helpers.buf_get_absolute_file_path(trail_mark.buf),
-      lnum = trail_mark.pos[1],
-      col = trail_mark.pos[2] + 1,
-      text = api.nvim_buf_get_lines(trail_mark.buf, trail_mark.pos[1] - 1, trail_mark.pos[1],
-        false)[1],
-    }
+    if api.nvim_buf_is_valid(trail_mark.buf) then
+      local quick_fix_list_item = {
+        bufnr = trail_mark.buf,
+        filename = helpers.buf_get_absolute_file_path(trail_mark.buf),
+        lnum = trail_mark.pos[1],
+        col = trail_mark.pos[2] + 1,
+        text = api.nvim_buf_get_lines(trail_mark.buf, trail_mark.pos[1] - 1, trail_mark.pos[1],
+          false)[1],
+      }
 
-    table.insert(quick_fix_list, quick_fix_list_item)
+      table.insert(quick_fix_list, quick_fix_list_item)
+    end
   end
 
   if buf then

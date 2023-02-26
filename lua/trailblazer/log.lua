@@ -86,7 +86,6 @@ Log.langs = {
       mark_id_mismatch = "Mark id mismatch. This should not happen.",
       invalid_storage_path = "Invalid storage path. Please make sure that the path is a valid "
       .. "non empty string [Path] is -> ",
-      unable_to_get_extmarks = "Unable to get extmarks for buffer. [Buffer | Error] is -> ",
     },
   }
 }

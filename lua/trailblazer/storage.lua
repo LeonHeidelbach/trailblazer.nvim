@@ -181,6 +181,7 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
   common.remove_duplicate_pos_trail_marks()
   common.sort_trail_mark_stack()
   common.reregister_trail_marks()
+  common.focus_win_and_buf_by_trail_mark_index(nil, stacks.trail_mark_cursor, false)
   list.update_trail_mark_list()
 
   config.runtime.should_auto_save = should_auto_save

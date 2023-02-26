@@ -322,12 +322,14 @@ function Stacks.create_buf_file_lookup_table(buf_as_key, stack_name_list)
   end
 
   for _, buf in ipairs(vim.tbl_keys(unique_bufs)) do
-    local buf_name = fn.expand(api.nvim_buf_get_name(buf))
-    if buf_name ~= "" then
-      if buf_as_key then
-        file_buf_lookup_table[buf] = buf_name
-      else
-        file_buf_lookup_table[buf_name] = buf
+    if api.nvim_buf_is_valid(buf) then
+      local buf_name = fn.expand(api.nvim_buf_get_name(buf))
+      if buf_name ~= "" then
+        if buf_as_key then
+          file_buf_lookup_table[buf] = buf_name
+        else
+          file_buf_lookup_table[buf_name] = buf
+        end
       end
     end
   end
