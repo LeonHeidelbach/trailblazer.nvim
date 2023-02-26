@@ -429,16 +429,16 @@ end
 
 --- Return the trail mark at the given position as well as the corresponding extmark.
 ---@param buf? number
----@param newest_mark_index? number
+---@param mark_index? number
 ---@return number?
 ---@return table?
 ---@return table?
-function Common.get_marks_for_trail_mark_index(buf, newest_mark_index, remove_trail_mark)
+function Common.get_marks_for_trail_mark_index(buf, mark_index, remove_trail_mark)
   local ok, extracted_ext_mark, last_mark
 
   while #stacks.current_trail_mark_stack > 0 do
-    if newest_mark_index then
-      last_mark = stacks.current_trail_mark_stack[newest_mark_index]
+    if mark_index then
+      last_mark = stacks.current_trail_mark_stack[mark_index]
 
       if last_mark and last_mark.buf and api.nvim_buf_is_loaded(last_mark.buf)
           and api.nvim_buf_is_valid(last_mark.buf) then
@@ -446,13 +446,13 @@ function Common.get_marks_for_trail_mark_index(buf, newest_mark_index, remove_tr
           config.nsid, last_mark.mark_id, last_mark.mark_id, {})
 
         if remove_trail_mark then
-          table.remove(stacks.current_trail_mark_stack, newest_mark_index)
+          table.remove(stacks.current_trail_mark_stack, mark_index)
         end
 
         if ok then
           break
         else
-          table.remove(stacks.current_trail_mark_stack, newest_mark_index)
+          table.remove(stacks.current_trail_mark_stack, mark_index)
           return nil, nil, nil
         end
       else
@@ -460,10 +460,10 @@ function Common.get_marks_for_trail_mark_index(buf, newest_mark_index, remove_tr
       end
     end
 
-    newest_mark_index, _ = Common.get_newest_and_oldest_mark_index_for_buf(buf)
+    mark_index, _ = Common.get_newest_and_oldest_mark_index_for_buf(buf)
   end
 
-  return newest_mark_index, last_mark, extracted_ext_mark
+  return mark_index, last_mark, extracted_ext_mark
 end
 
 --- Find the newest and oldest trail mark in the stack that belongs to the given buffer.
@@ -727,7 +727,8 @@ function Common.reregister_trail_marks(visible_only)
         priority = config.custom.trail_mark_priority,
       }
 
-      if mark.mark_id == stacks.current_trail_mark_stack[newest_mark_index].mark_id then
+      if stacks.current_trail_mark_stack[newest_mark_index]
+          and mark.mark_id == stacks.current_trail_mark_stack[newest_mark_index].mark_id then
         hl_group = "TrailBlazerTrailMarkNewest"
       elseif current_cursor_mark and current_cursor_mark.pos[1] == mark.pos[1]
           and current_cursor_mark.pos[2] == mark.pos[2] then
@@ -759,7 +760,8 @@ function Common.reregister_trail_marks(visible_only)
           table.insert(special_marks[mark.buf], mark.pos[1])
         end
 
-        if mark.mark_id == stacks.current_trail_mark_stack[newest_mark_index].mark_id then
+        if stacks.current_trail_mark_stack[newest_mark_index]
+            and mark.mark_id == stacks.current_trail_mark_stack[newest_mark_index].mark_id then
           mark_options["sign_text"] = config.custom.newest_mark_symbol
           mark_options["sign_hl_group"] = hl_group .. "Inverted"
           table.insert(special_marks[mark.buf], mark.pos[1])
