@@ -124,7 +124,7 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
   if fn.empty(name) == 1 then name = nil end
 
   path = Storage.ensure_storage_dir_exists(path)
-  name, content = Storage.read_trailblazer_state_file_from_disk(path, name, true)
+  name, content = Storage.read_trailblazer_state_file_from_disk(path, name, verbose)
 
   if content ~= nil and fn.empty(content) == 0 then
     local trail_marks_storage = Storage.decode(content)

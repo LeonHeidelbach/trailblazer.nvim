@@ -13,6 +13,10 @@ end
 
 vim.g.trailblazer_loaded = 1
 
+if tb.options.auto_load_trailblazer_state_on_enter then
+  tb.load_trailblazer_state_from_file(nil, false)
+end
+
 local cfg = {
   auto_groups = {
     trailblazer = api.nvim_create_augroup('trailblazer', { clear = true })
@@ -128,17 +132,6 @@ api.nvim_create_user_command("TrailBlazerLoadSession", function(args)
 end, { nargs = "?", complete = "file" })
 
 -- Auto commands
---
-api.nvim_create_autocmd("VimEnter", {
-  group = cfg.auto_groups.trailblazer,
-  pattern = "*",
-  callback = function()
-    if tb.options.auto_load_trailblazer_state_on_enter then
-      tb.load_trailblazer_state_from_file(nil, false)
-    end
-  end
-})
-
 api.nvim_create_autocmd("VimLeavePre", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",

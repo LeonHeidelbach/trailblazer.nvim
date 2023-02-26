@@ -26,7 +26,7 @@ local function set_defaults(opts)
   local defaults = {
     lang = "en",
     auto_save_trailblazer_state_on_exit = false,
-    auto_load_trailblazer_state_on_enter = false, -- experimental
+    auto_load_trailblazer_state_on_enter = false,
     custom_session_storage_dir = "",
     trail_options = {
       trail_mark_priority = 10001,
