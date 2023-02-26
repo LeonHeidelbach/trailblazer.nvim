@@ -123,7 +123,7 @@ available and set by default:
 {
     lang = "en",
     auto_save_trailblazer_state_on_exit = false,
-    auto_load_trailblazer_state_on_enter = false, -- experimental
+    auto_load_trailblazer_state_on_enter = false,
     custom_session_storage_dir = "", -- i.e. "~/trail_blazer_sessions/"
     trail_options = {
         -- The trail mark priority sets the global render priority of trail marks in the sign/number
@@ -379,7 +379,7 @@ file which matches the name of the hashed path of the current working directory.
 With trail mark sessions you can enable the following options in your configuration:
 
 * `auto_save_trailblazer_state_on_exit = false`
-* `auto_load_trailblazer_state_on_enter = false` (experimental)
+* `auto_load_trailblazer_state_on_enter = false`
 
 If you set `auto_save_trailblazer_state_on_exit` to `true`, TrailBlazer will automatically save the
 current session when you exit Neovim, but only if you have previously loaded or saved a session. If
