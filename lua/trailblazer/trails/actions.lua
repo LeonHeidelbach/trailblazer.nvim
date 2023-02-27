@@ -44,8 +44,10 @@ function Actions.new_trail_mark(win, buf, pos)
 
   local new_mark = {
     timestamp = helpers.time(),
-    win = current_win, buf = current_buf,
-    pos = current_cursor, mark_id = stacks.ucid + 1,
+    win = current_win,
+    buf = current_buf,
+    pos = current_cursor,
+    mark_id = stacks.ucid + 1,
   }
 
   table.insert(stacks.current_trail_mark_stack, new_mark)
@@ -152,11 +154,11 @@ end
 function Actions.set_trail_mark_select_mode(mode, verbose)
   if mode == nil then
     config.custom.current_trail_mark_mode = config.custom.available_trail_mark_modes[
-        (helpers.tbl_indexof(function(available_mode)
-          return available_mode == config.custom.current_trail_mark_mode
-        end, config.custom.available_trail_mark_modes)) %
-            #config.custom.available_trail_mark_modes + 1
-        ]
+    (helpers.tbl_indexof(function(available_mode)
+      return available_mode == config.custom.current_trail_mark_mode
+    end, config.custom.available_trail_mark_modes)) %
+    #config.custom.available_trail_mark_modes + 1
+    ]
   elseif vim.tbl_contains(config.custom.available_trail_mark_modes, mode) then
     config.custom.current_trail_mark_mode = mode
   else
@@ -192,7 +194,7 @@ end
 
 --- Delete all trail mark stacks.
 function Actions.delete_all_trail_mark_stacks()
-  stacks.delte_all_stacks()
+  stacks.delete_all_stacks()
   common.reregister_trail_marks()
 end
 

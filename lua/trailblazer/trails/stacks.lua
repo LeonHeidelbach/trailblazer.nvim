@@ -12,6 +12,7 @@ local fn = vim.fn
 local Stacks = {}
 
 local config = require("trailblazer.trails.config")
+local events = require("trailblazer.events")
 local helpers = require("trailblazer.helpers")
 local log = require("trailblazer.log")
 
@@ -54,6 +55,14 @@ function Stacks.add_stack(name)
       stack = vim.deepcopy(Stacks.current_trail_mark_stack)
     }
   end
+
+  if events.is_registered(events.config.events.TRAIL_MARK_STACK_SAVED) then
+    events.dispatch(events.config.events.TRAIL_MARK_STACK_SAVED, {
+      added_stack = name,
+      current_stack = Stacks.current_trail_mark_stack_name,
+      available_stacks = Stacks.get_sorted_stack_names()
+    })
+  end
 end
 
 --- Deletes the trail mark stack under the given name or the current trail mark stack if no name
@@ -90,16 +99,35 @@ function Stacks.delete_stack(name, verbose)
     end
   end
 
+  if events.is_registered(events.config.events.TRAIL_MARK_STACK_DELETED) then
+    events.dispatch(events.config.events.TRAIL_MARK_STACK_DELETED, {
+      deleted_stacks = { name },
+      current_stack = Stacks.current_trail_mark_stack_name,
+      available_stacks = Stacks.get_sorted_stack_names()
+    })
+  end
+
   if verbose == nil or verbose then
     log.info("trail_mark_stack_deleted", name)
   end
 end
 
 --- Deletes all trail mark stacks.
-function Stacks.delte_all_stacks()
+function Stacks.delete_all_stacks()
+  local evt_is_registered = events.is_registered(events.config.events.TRAIL_MARK_STACK_DELETED)
+  local deleted_stacks = evt_is_registered and Stacks.get_sorted_stack_names() or nil
+
   Stacks.trail_mark_stack_list = {}
   Stacks.current_trail_mark_stack = {}
   Stacks.switch_current_stack(config.custom.default_trail_mark_stacks[1] or "default", false)
+
+  if evt_is_registered then
+    events.dispatch(events.config.events.TRAIL_MARK_STACK_DELETED, {
+      deleted_stacks = deleted_stacks,
+      current_stack = Stacks.current_trail_mark_stack_name,
+      available_stacks = Stacks.get_sorted_stack_names()
+    })
+  end
 end
 
 --- Move the current trail mark stack to the next trail mark stack in the trail mark stack list
@@ -183,6 +211,13 @@ function Stacks.switch_current_stack(name, save, verbose)
   Stacks.current_trail_mark_stack = Stacks.trail_mark_stack_list[name].stack
   Stacks.custom_ord_local_buf = Stacks.trail_mark_stack_list[name].custom_ord_local_buf
 
+  if events.is_registered(events.config.events.CURRENT_TRAIL_MARK_STACK_CHANGED) then
+    events.dispatch(events.config.events.CURRENT_TRAIL_MARK_STACK_CHANGED, {
+      current_stack = name,
+      available_stacks = Stacks.get_sorted_stack_names()
+    })
+  end
+
   if verbose == nil or verbose then
     log.info("trail_mark_stack_switched", name)
   end
@@ -253,6 +288,13 @@ function Stacks.set_trail_mark_stack_sort_mode(sort_mode, verbose)
         table.concat(config.custom.available_trail_mark_stack_sort_modes, ", "))
     end
     return
+  end
+
+  if events.is_registered(events.config.events.TRAIL_MARK_STACK_SORT_MODE_CHANGED) then
+    events.dispatch(events.config.events.TRAIL_MARK_STACK_SORT_MODE_CHANGED, {
+      current_sort_mode = config.custom.current_trail_mark_stack_sort_mode,
+      available_stacks = Stacks.get_sorted_stack_names()
+    })
   end
 
   if config.custom.verbose_trail_mark_select and (verbose == nil or verbose) then
