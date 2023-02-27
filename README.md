@@ -51,6 +51,7 @@ to come. If you have any suggestions or find any bugs, please open an issue.**
             * [Multiple Mark Symbol Counters](#multiple-mark-symbol-counters)
         * [Trail Mark QuickFix-List](#trail-mark-quickfix-list)
     * [💻 User commands](#-user-commands)
+    * [📅 Custom Events](#-custom-events)
     * [📚 Documentation](#-documentation)
     * [👥 Contributing](#-contributing)
         * [Linting](#linting)
@@ -181,9 +182,16 @@ available and set by default:
         -- the "current trail mark cursor" to which you would otherwise move first before continuing
         -- to move through your trail mark stack.
         move_to_nearest_before_peek = false,
-        move_to_nearest_before_peek_motion_directive_up = "fpath_up", -- "up", "fpath_up" -> For move info see section "TrailBlazerMoveToNearest Motion Directives"
-        move_to_nearest_before_peek_motion_directive_down = "fpath_down", -- "down", "fpath_down" -> For move info see section "TrailBlazerMoveToNearest Motion Directives"
+        move_to_nearest_before_peek_motion_directive_up = "fpath_up", -- "up", "fpath_up" -> For more information see section "TrailBlazerMoveToNearest Motion Directives"
+        move_to_nearest_before_peek_motion_directive_down = "fpath_down", -- "down", "fpath_down" -> For more information see section "TrailBlazerMoveToNearest Motion Directives"
         move_to_nearest_before_peek_dist_type = "lin_char_dist", -- "man_dist", "lin_char_dist" -> Manhattan Distance or Linear Character Distance
+    },
+    event_list = {
+        -- Add the events you would like to add custom callbacks for here. For more information see section "Custom Events"
+        -- "TrailBlazerTrailMarkStackSaved",
+        -- "TrailBlazerTrailMarkStackDeleted",
+        -- "TrailBlazerCurrentTrailMarkStackChanged",
+        -- "TrailBlazerTrailMarkStackSortModeChanged"
     },
     mappings = { -- rename this to "force_mappings" to completely override default mappings and not merge with them
         nv = { -- Mode union: normal & visual mode. Can be extended by adding i, x, ...
@@ -526,6 +534,40 @@ workflow.
 | `down`       | Move to the nearest trail mark below the current line within the current buffer. If there is no trail mark above the cursor in the current buffer, nothing happens.                                                    |
 | `fpath_up`   | Move to the nearest trail mark above the current line. If there is no trail mark above the cursor in the current buffer, move up to the next file in alphabetical order depending on the current buffer's file path.   |
 | `fpath_down` | Move to the nearest trail mark below the current line. If there is no trail mark below the cursor in the current buffer, move down to the next file in alphabetical order depending on the current buffer's file path. |
+
+## 📅 Custom Events
+
+With TrailBlazer you can register custom event callbacks for different actions. TrailBlazer also
+provides you with useful information about the internal plugin state when dispatching events which
+you can process in any way you like. You could for example, use any of the provided events to update
+a custom status line component.
+
+```lua
+-- Register a custom event callback
+vim.api.nvim_create_autocmd("User", {
+    pattern = "TrailBlazerTrailMarkStackSaved", -- use any of the below events
+    callback = function(event)
+        -- your code to process the callback data goes here
+        print(vim.inspect(event.data))
+    end,
+})
+```
+
+In the table below you will find a list of the currently available event callbacks that you can use.
+
+Note that TrailBlazer will only dispatch events that have been added to the configuration table
+using the `event_list` key. You will find an example on how to do this in the [configuration
+section](#%EF%B8%8F-configuration). If you do not add the events you would like to use to the list,
+they will not be dispatched even if you properly register a custom event callback as shown above.
+
+**If you need any additional events, feel free to open an issue.**
+
+| Event Name                                 | Callback data                                                                                |
+|:-------------------------------------------|:---------------------------------------------------------------------------------------------|
+| `TrailBlazerTrailMarkStackSaved`           | `{ added_stack = <string>, current_stack = <string>, available_stacks = <table<string>> }`   |
+| `TrailBlazerTrailMarkStackDeleted`         | `{ deleted_stacks = <table>, current_stack = <string>, available_stacks = <table<string>> }` |
+| `TrailBlazerCurrentTrailMarkStackChanged`  | `{ current_stack = <string>, available_stacks = <table<string>> }`                           |
+| `TrailBlazerTrailMarkStackSortModeChanged` | `{ current_sort_mode = <string>, available_stacks = <table<string>> }`                       |
 
 ## 📚 Documentation
 
