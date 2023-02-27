@@ -336,7 +336,7 @@ function TrailBlazer.delete_trail_mark_stack(name)
 end
 
 --- Delete all trail mark stacks.
-function TrailBlazer.delte_all_trail_mark_stacks()
+function TrailBlazer.delete_all_trail_mark_stacks()
   if not TrailBlazer.is_configured() then return end
   trails.actions.delete_all_trail_mark_stacks()
   trails.list.update_trail_mark_list()

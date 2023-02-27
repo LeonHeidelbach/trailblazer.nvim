@@ -126,7 +126,7 @@ api.nvim_create_user_command("TrailBlazerDeleteTrailMarkStack", function(args)
   tb.delete_trail_mark_stack(args.fargs)
 end, { nargs = "*", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACKS" })
 
-api.nvim_create_user_command("TrailBlazerDeleteAllTrailMarkStacks", tb.delte_all_trail_mark_stacks,
+api.nvim_create_user_command("TrailBlazerDeleteAllTrailMarkStacks", tb.delete_all_trail_mark_stacks,
   {})
 
 api.nvim_create_user_command("TrailBlazerSwitchNextTrailMarkStack", function(args)

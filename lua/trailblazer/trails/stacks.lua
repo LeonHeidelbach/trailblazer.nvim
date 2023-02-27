@@ -70,16 +70,23 @@ function Stacks.delete_stack(name, verbose)
       Stacks.trail_mark_stack_list[stack_name] = nil
     end
 
-    if vim.tbl_contains(name, Stacks.current_trail_mark_stack_name) then
-      Stacks.switch_to_previous_stack(nil, false)
+    if vim.tbl_contains(name, Stacks.current_trail_mark_stack_name)
+        and #Stacks.trail_mark_stack_list > 0 then
+      Stacks.switch_to_previous_stack(nil, false, false)
+    elseif #Stacks.trail_mark_stack_list == 0 then
+      Stacks.switch_current_stack(config.custom.default_trail_mark_stacks[1] or "default", false,
+        false)
     end
 
     name = table.concat(name, ", ")
   else
     Stacks.trail_mark_stack_list[name] = nil
 
-    if name == Stacks.current_trail_mark_stack_name then
-      Stacks.switch_to_previous_stack(nil, false)
+    if name == Stacks.current_trail_mark_stack_name and #Stacks.trail_mark_stack_list > 0 then
+      Stacks.switch_to_previous_stack(nil, false, false)
+    else
+      Stacks.switch_current_stack(config.custom.default_trail_mark_stacks[1] or "default", false,
+        false)
     end
   end
 
@@ -91,7 +98,8 @@ end
 --- Deletes all trail mark stacks.
 function Stacks.delte_all_stacks()
   Stacks.trail_mark_stack_list = {}
-  Stacks.switch_to_previous_stack(nil, false)
+  Stacks.current_trail_mark_stack = {}
+  Stacks.switch_current_stack(config.custom.default_trail_mark_stacks[1] or "default", false)
 end
 
 --- Move the current trail mark stack to the next trail mark stack in the trail mark stack list
