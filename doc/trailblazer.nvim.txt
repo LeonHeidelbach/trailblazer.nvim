@@ -2,6 +2,37 @@
 		      project marks as quickly and efficiently as possible to make
 		      your workflow *blazingly fast ™*.
 
+                                                                        *events*
+==============================================================================
+                                                            *trailblazer.events*
+
+ This module is responsible for managing TrailBlazer events.
+
+Events.setup({options?})                                          *Events.setup*
+     Setup the events module.
+
+    Parameters: ~
+        {options?}  (table)
+
+
+Events.dispatch({event_name?}, {data})                         *Events.dispatch*
+     Dispatch the given event if it is in the event list.
+
+    Parameters: ~
+        {event_name?}  (string)
+        {data}         (any)
+
+
+Events.is_registered({event_name})                        *Events.is_registered*
+     Check if the given event is registered.
+
+    Parameters: ~
+        {event_name}  (string)
+
+    Returns: ~
+        (boolean)
+
+
                                                                        *helpers*
 ==============================================================================
                                                            *trailblazer.helpers*
@@ -1296,7 +1327,7 @@ Stacks.delete_stack({name?}, {verbose?})                   *Stacks.delete_stack*
         {verbose?}  (boolean)
 
 
-Stacks.delte_all_stacks()                              *Stacks.delte_all_stacks*
+Stacks.delete_all_stacks()                            *Stacks.delete_all_stacks*
      Deletes all trail mark stacks.
 
 
