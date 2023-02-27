@@ -442,8 +442,8 @@ TrailBlazer.delete_trail_mark_stack({name?})
         {name?}  (string)
 
 
-                                       *TrailBlazer.delte_all_trail_mark_stacks*
-TrailBlazer.delte_all_trail_mark_stacks()
+                                      *TrailBlazer.delete_all_trail_mark_stacks*
+TrailBlazer.delete_all_trail_mark_stacks()
      Delete all trail mark stacks.
 
 
@@ -920,14 +920,14 @@ Common.get_nearest_trail_mark_for_pos({buf?}, {pos?}, {directive?}, {dist_type?}
 
 
                                          *Common.get_marks_for_trail_mark_index*
-Common.get_marks_for_trail_mark_index({buf?}, {newest_mark_index?})
+Common.get_marks_for_trail_mark_index({buf?}, {mark_index?})
      Return the trail mark at the given position as well as the corresponding extmark.
 
     Parameters: ~
-        {buf?}                (number)
-        {newest_mark_index?}  (number)  @return number?
-                                        @return table?
-                                        @return table?
+        {buf?}         (number)
+        {mark_index?}  (number)  @return number?
+                                 @return table?
+                                 @return table?
 
 
                                *Common.get_newest_and_oldest_mark_index_for_buf*
@@ -1376,11 +1376,11 @@ Stacks.udpate_buffer_ids_with_filename_lookup_table({stack_list}, {lookup_tbl}, 
 
 
                                            *Stacks.create_buf_file_lookup_table*
-Stacks.create_buf_file_lookup_table({buf_as_key}, {stack_name_list?})
+Stacks.create_buf_file_lookup_table({buf_as_key?}, {stack_name_list?})
      Create a table that maps buffer numbers to file names.
 
     Parameters: ~
-        {buf_as_key}        (boolean)
+        {buf_as_key?}       (boolean)
         {stack_name_list?}  (table)
 
     Returns: ~
