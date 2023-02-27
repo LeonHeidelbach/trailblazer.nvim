@@ -631,6 +631,9 @@ Storage.setup({options?})                                        *Storage.setup*
         {options?}  (table)
 
 
+Storage.auto_load_session_check()              *Storage.auto_load_session_check*
+
+
                                              *Storage.ensure_storage_dir_exists*
 Storage.ensure_storage_dir_exists({path?})
      Ensure that the storage directory exists. If no path is provided, the default path will be used.
