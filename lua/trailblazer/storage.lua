@@ -27,14 +27,42 @@ Storage.trailblazer_cwd_storage.config = {}
 Storage.trailblazer_cwd_storage.fb_lookup = {}
 Storage.trailblazer_cwd_storage.stacks = {}
 
+Storage.auto_load_ignored_files = {
+  "COMMIT_EDITMSG",
+  "MERGE_MSG",
+  "NOTES_EDITMSG",
+  "PULLREQ_EDITMSG",
+  "TAG_EDITMSG",
+}
+
 --- Setup the storage module.
 ---@param options? table
 function Storage.setup(options)
-  if options and options.custom_session_storage_dir and
-      fn.empty(options.custom_session_storage_dir) == 0 then
-    Storage.trailblazer_storage_path = fn.fnamemodify(options.custom_session_storage_dir, ":p")
+  if options then
+    Storage.auto_load_trailblazer_state_on_enter = options.auto_load_trailblazer_state_on_enter
+
+    if options.custom_session_storage_dir and fn.empty(options.custom_session_storage_dir) == 0 then
+      Storage.trailblazer_storage_path = fn.fnamemodify(options.custom_session_storage_dir, ":p")
+    end
   end
   Storage.ensure_storage_dir_exists()
+end
+
+function Storage.auto_load_session_check()
+  if Storage.auto_load_trailblazer_state_on_enter then
+    local is_auto_load_ignored_file = false
+
+    for _, v in ipairs(vim.v.argv) do
+      for _, w in ipairs(Storage.auto_load_ignored_files) do
+        if v:find(w) then
+          is_auto_load_ignored_file = true
+          break
+        end
+      end
+    end
+
+    if not is_auto_load_ignored_file then Storage.load_trailblazer_state_from_file(nil, false) end
+  end
 end
 
 --- Ensure that the storage directory exists. If no path is provided, the default path will be used.

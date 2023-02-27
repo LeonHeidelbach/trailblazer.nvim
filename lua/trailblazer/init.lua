@@ -212,6 +212,7 @@ function TrailBlazer.setup(options)
   else
     keymaps.register_api_maps(TrailBlazer.options.mappings, TrailBlazer)
   end
+  storage.auto_load_session_check()
 end
 
 --- Create a new trail mark at the current cursor or defined position and buffer.
