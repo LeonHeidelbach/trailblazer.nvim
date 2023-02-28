@@ -423,11 +423,12 @@ TrailBlazer.paste_at_all_trail_marks({buf?})
 
 
                                         *TrailBlazer.set_trail_mark_select_mode*
-TrailBlazer.set_trail_mark_select_mode({mode?})
+TrailBlazer.set_trail_mark_select_mode({mode?}, {verbose?})
      Set the trail mark selection mode to the given mode or toggle between the available modes.
 
     Parameters: ~
-        {mode?}  (string)
+        {mode?}     (string)
+        {verbose?}  (boolean)
 
 
                                             *TrailBlazer.toggle_trail_mark_list*
@@ -466,16 +467,20 @@ TrailBlazer.switch_trail_mark_stack({name?})
 
 
                                            *TrailBlazer.delete_trail_mark_stack*
-TrailBlazer.delete_trail_mark_stack({name?})
+TrailBlazer.delete_trail_mark_stack({name?}, {verbose?})
      Delete the specified trail mark stack or the current one if no name is supplied.
 
     Parameters: ~
-        {name?}  (string)
+        {name?}     (string)
+        {verbose?}  (boolean)
 
 
                                       *TrailBlazer.delete_all_trail_mark_stacks*
-TrailBlazer.delete_all_trail_mark_stacks()
+TrailBlazer.delete_all_trail_mark_stacks({verbose?})
      Delete all trail mark stacks.
+
+    Parameters: ~
+        {verbose?}  (boolean)
 
 
                                               *TrailBlazer.add_trail_mark_stack*
@@ -487,29 +492,32 @@ TrailBlazer.add_trail_mark_stack({name?})
 
 
                                    *TrailBlazer.switch_to_next_trail_mark_stack*
-TrailBlazer.switch_to_next_trail_mark_stack({sort_mode?})
+TrailBlazer.switch_to_next_trail_mark_stack({sort_mode?}, {verbose?})
      Switch to the next trail mark stack using the given sort mode or the current one if no sort mode
      is supplied.
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
 
 
                                *TrailBlazer.switch_to_previous_trail_mark_stack*
-TrailBlazer.switch_to_previous_trail_mark_stack({sort_mode?})
+TrailBlazer.switch_to_previous_trail_mark_stack({sort_mode?}, {verbose?})
      Switch to the previous trail mark stack using the given sort mode or the current one if no sort
      mode is supplied.
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
 
 
                                     *TrailBlazer.set_trail_mark_stack_sort_mode*
-TrailBlazer.set_trail_mark_stack_sort_mode({sort_mode?})
+TrailBlazer.set_trail_mark_stack_sort_mode({sort_mode?}, {verbose?})
      Set the trail mark stack sort mode to the given mode or toggle between the available modes.
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
 
 
                                     *TrailBlazer.save_trailblazer_state_to_file*
@@ -806,22 +814,30 @@ Actions.set_trail_mark_select_mode({mode?}, {verbose?})
         {verbose?}  (boolean)
 
 
-Actions.switch_trail_mark_stack({name?})       *Actions.switch_trail_mark_stack*
+                                               *Actions.switch_trail_mark_stack*
+Actions.switch_trail_mark_stack({name?}, {verbose?})
      Switch to the given trail mark stack.
 
     Parameters: ~
-        {name?}  (string)
+        {name?}     (string)
+        {verbose?}  (boolean)
 
 
-Actions.delete_trail_mark_stack({name?})       *Actions.delete_trail_mark_stack*
+                                               *Actions.delete_trail_mark_stack*
+Actions.delete_trail_mark_stack({name?}, {verbose?})
      Delete the specified trail mark stack or the current one if no name is supplied.
 
     Parameters: ~
-        {name?}  (string)
+        {name?}     (string)
+        {verbose?}  (boolean)
 
 
-Actions.delete_all_trail_mark_stacks()    *Actions.delete_all_trail_mark_stacks*
+                                          *Actions.delete_all_trail_mark_stacks*
+Actions.delete_all_trail_mark_stacks({verbose?})
      Delete all trail mark stacks.
+
+    Parameters: ~
+        {verbose?}  (boolean)
 
 
 Actions.add_trail_mark_stack({name?})             *Actions.add_trail_mark_stack*
@@ -832,29 +848,32 @@ Actions.add_trail_mark_stack({name?})             *Actions.add_trail_mark_stack*
 
 
                                        *Actions.switch_to_next_trail_mark_stack*
-Actions.switch_to_next_trail_mark_stack({sort_mode?})
+Actions.switch_to_next_trail_mark_stack({sort_mode?}, {verbose?})
      Switch to the next trail mark stack using the given sort mode or the current one if no sort mode
      is supplied.
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
 
 
                                    *Actions.switch_to_previous_trail_mark_stack*
-Actions.switch_to_previous_trail_mark_stack({sort_mode?})
+Actions.switch_to_previous_trail_mark_stack({sort_mode?}, {verbose?})
      Switch to the previous trail mark stack using the given sort mode or the current one if no sort
      mode is supplied.
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
 
 
                                         *Actions.set_trail_mark_stack_sort_mode*
-Actions.set_trail_mark_stack_sort_mode({sort_mode?})
+Actions.set_trail_mark_stack_sort_mode({sort_mode?}, {verbose?})
      Set the trail mark stack sort mode to the given mode or toggle between the available modes.
 
     Parameters: ~
         {sort_mode?}  (string)
+        {verbose?}    (boolean)
 
 
                                                                  *trails.common*
@@ -1330,8 +1349,11 @@ Stacks.delete_stack({name?}, {verbose?})                   *Stacks.delete_stack*
         {verbose?}  (boolean)
 
 
-Stacks.delete_all_stacks()                            *Stacks.delete_all_stacks*
+Stacks.delete_all_stacks({verbose?})                  *Stacks.delete_all_stacks*
      Deletes all trail mark stacks.
+
+    Parameters: ~
+        {verbose?}  (boolean)
 
 
                                                    *Stacks.switch_to_next_stack*
