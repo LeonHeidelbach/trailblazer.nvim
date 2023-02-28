@@ -292,9 +292,10 @@ end
 
 --- Set the trail mark selection mode to the given mode or toggle between the available modes.
 ---@param mode? string
-function TrailBlazer.set_trail_mark_select_mode(mode)
+---@param verbose? boolean
+function TrailBlazer.set_trail_mark_select_mode(mode, verbose)
   if not TrailBlazer.is_configured() then return end
-  trails.actions.set_trail_mark_select_mode(mode)
+  trails.actions.set_trail_mark_select_mode(mode, verbose)
   trails.list.update_trail_mark_list()
 end
 
@@ -324,24 +325,26 @@ end
 
 --- Switch the trail mark stack to the specified stack.
 ---@param name? string
-function TrailBlazer.switch_trail_mark_stack(name)
+function TrailBlazer.switch_trail_mark_stack(name, verbose)
   if not TrailBlazer.is_configured() then return end
-  trails.actions.switch_trail_mark_stack(name)
+  trails.actions.switch_trail_mark_stack(name, verbose)
   trails.list.update_trail_mark_list()
 end
 
 --- Delete the specified trail mark stack or the current one if no name is supplied.
 ---@param name? string
-function TrailBlazer.delete_trail_mark_stack(name)
+---@param verbose? boolean
+function TrailBlazer.delete_trail_mark_stack(name, verbose)
   if not TrailBlazer.is_configured() then return end
-  trails.actions.delete_trail_mark_stack(name)
+  trails.actions.delete_trail_mark_stack(name, verbose)
   trails.list.update_trail_mark_list()
 end
 
 --- Delete all trail mark stacks.
-function TrailBlazer.delete_all_trail_mark_stacks()
+---@param verbose? boolean
+function TrailBlazer.delete_all_trail_mark_stacks(verbose)
   if not TrailBlazer.is_configured() then return end
-  trails.actions.delete_all_trail_mark_stacks()
+  trails.actions.delete_all_trail_mark_stacks(verbose)
   trails.list.update_trail_mark_list()
 end
 
@@ -356,26 +359,29 @@ end
 --- Switch to the next trail mark stack using the given sort mode or the current one if no sort mode
 --- is supplied.
 ---@param sort_mode? string
-function TrailBlazer.switch_to_next_trail_mark_stack(sort_mode)
+---@param verbose? boolean
+function TrailBlazer.switch_to_next_trail_mark_stack(sort_mode, verbose)
   if not TrailBlazer.is_configured() then return end
-  trails.actions.switch_to_next_trail_mark_stack(sort_mode)
+  trails.actions.switch_to_next_trail_mark_stack(sort_mode, verbose)
   trails.list.update_trail_mark_list()
 end
 
 --- Switch to the previous trail mark stack using the given sort mode or the current one if no sort
 --- mode is supplied.
 ---@param sort_mode? string
-function TrailBlazer.switch_to_previous_trail_mark_stack(sort_mode)
+---@param verbose? boolean
+function TrailBlazer.switch_to_previous_trail_mark_stack(sort_mode, verbose)
   if not TrailBlazer.is_configured() then return end
-  trails.actions.switch_to_previous_trail_mark_stack(sort_mode)
+  trails.actions.switch_to_previous_trail_mark_stack(sort_mode, verbose)
   trails.list.update_trail_mark_list()
 end
 
 --- Set the trail mark stack sort mode to the given mode or toggle between the available modes.
 ---@param sort_mode? string
-function TrailBlazer.set_trail_mark_stack_sort_mode(sort_mode)
+---@param verbose? boolean
+function TrailBlazer.set_trail_mark_stack_sort_mode(sort_mode, verbose)
   if not TrailBlazer.is_configured() then return end
-  trails.actions.set_trail_mark_stack_sort_mode(sort_mode)
+  trails.actions.set_trail_mark_stack_sort_mode(sort_mode, verbose)
 end
 
 --- Save the current TrailBlazer state to a file.

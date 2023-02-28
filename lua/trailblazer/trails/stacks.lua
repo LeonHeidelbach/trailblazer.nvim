@@ -113,13 +113,14 @@ function Stacks.delete_stack(name, verbose)
 end
 
 --- Deletes all trail mark stacks.
-function Stacks.delete_all_stacks()
+---@param verbose? boolean
+function Stacks.delete_all_stacks(verbose)
   local evt_is_registered = events.is_registered(events.config.events.TRAIL_MARK_STACK_DELETED)
   local deleted_stacks = evt_is_registered and Stacks.get_sorted_stack_names() or nil
 
   Stacks.trail_mark_stack_list = {}
   Stacks.current_trail_mark_stack = {}
-  Stacks.switch_current_stack(config.custom.default_trail_mark_stacks[1] or "default", false)
+  Stacks.switch_current_stack(config.custom.default_trail_mark_stacks[1] or "default", verbose)
 
   if evt_is_registered then
     events.dispatch(events.config.events.TRAIL_MARK_STACK_DELETED, {
@@ -155,7 +156,7 @@ function Stacks.switch_to_next_stack(sort_mode, save_current, verbose)
   end
 
   Stacks.switch_current_stack(stack_names[current_stack_index >= #stack_names and 1
-  or current_stack_index + 1], save_current)
+  or current_stack_index + 1], save_current, verbose)
 end
 
 --- Move the current trail mark stack to the previous trail mark stack in the trail mark stack list
@@ -182,7 +183,7 @@ function Stacks.switch_to_previous_stack(sort_mode, save_current, verbose)
   end
 
   Stacks.switch_current_stack(stack_names[current_stack_index <= 1 and #stack_names
-  or current_stack_index - 1], save_current)
+  or current_stack_index - 1], save_current, verbose)
 end
 
 --- Switches the current trail mark stack to the trail mark stack under the given name.

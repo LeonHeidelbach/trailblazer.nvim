@@ -180,21 +180,24 @@ end
 
 --- Switch to the given trail mark stack.
 ---@param name? string
-function Actions.switch_trail_mark_stack(name)
-  stacks.switch_current_stack(name)
+---@param verbose? boolean
+function Actions.switch_trail_mark_stack(name, verbose)
+  stacks.switch_current_stack(name, true, verbose)
   common.reregister_trail_marks()
 end
 
 --- Delete the specified trail mark stack or the current one if no name is supplied.
 ---@param name? string
-function Actions.delete_trail_mark_stack(name)
-  stacks.delete_stack(name)
+---@param verbose? boolean
+function Actions.delete_trail_mark_stack(name, verbose)
+  stacks.delete_stack(name, verbose)
   common.reregister_trail_marks()
 end
 
 --- Delete all trail mark stacks.
-function Actions.delete_all_trail_mark_stacks()
-  stacks.delete_all_stacks()
+---@param verbose? boolean
+function Actions.delete_all_trail_mark_stacks(verbose)
+  stacks.delete_all_stacks(verbose)
   common.reregister_trail_marks()
 end
 
@@ -207,23 +210,26 @@ end
 --- Switch to the next trail mark stack using the given sort mode or the current one if no sort mode
 --- is supplied.
 ---@param sort_mode? string
-function Actions.switch_to_next_trail_mark_stack(sort_mode)
-  stacks.switch_to_next_stack(sort_mode)
+---@param verbose? boolean
+function Actions.switch_to_next_trail_mark_stack(sort_mode, verbose)
+  stacks.switch_to_next_stack(sort_mode, true, verbose)
   common.reregister_trail_marks()
 end
 
 --- Switch to the previous trail mark stack using the given sort mode or the current one if no sort
 --- mode is supplied.
 ---@param sort_mode? string
-function Actions.switch_to_previous_trail_mark_stack(sort_mode)
-  stacks.switch_to_previous_stack(sort_mode)
+---@param verbose? boolean
+function Actions.switch_to_previous_trail_mark_stack(sort_mode, verbose)
+  stacks.switch_to_previous_stack(sort_mode, true, verbose)
   common.reregister_trail_marks()
 end
 
 --- Set the trail mark stack sort mode to the given mode or toggle between the available modes.
 ---@param sort_mode? string
-function Actions.set_trail_mark_stack_sort_mode(sort_mode)
-  stacks.set_trail_mark_stack_sort_mode(sort_mode)
+---@param verbose? boolean
+function Actions.set_trail_mark_stack_sort_mode(sort_mode, verbose)
+  stacks.set_trail_mark_stack_sort_mode(sort_mode, verbose)
 end
 
 return Actions
