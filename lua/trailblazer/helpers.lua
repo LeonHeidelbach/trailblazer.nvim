@@ -313,7 +313,12 @@ function Helpers.open_file(file_path, win, split_type)
   if (buf == -1 or not api.nvim_buf_is_loaded(buf)) and fn.filereadable(expanded_path) == 1 then
     buf = api.nvim_create_buf(true, false)
     api.nvim_buf_set_name(buf, expanded_path)
-    api.nvim_buf_call(buf, vim.cmd.edit)
+
+    pcall(api.nvim_buf_call, buf, vim.cmd.edit)
+
+    if not api.nvim_buf_is_valid(buf) or not api.nvim_buf_is_loaded(buf) then
+      return nil, nil
+    end
 
     if win and buf then
       if not vim.tbl_contains(api.nvim_list_wins(), win) then
