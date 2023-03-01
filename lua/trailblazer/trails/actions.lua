@@ -183,6 +183,7 @@ end
 ---@param verbose? boolean
 function Actions.switch_trail_mark_stack(name, verbose)
   stacks.switch_current_stack(name, true, verbose)
+  common.sort_trail_mark_stack()
   common.reregister_trail_marks()
 end
 
@@ -213,6 +214,7 @@ end
 ---@param verbose? boolean
 function Actions.switch_to_next_trail_mark_stack(sort_mode, verbose)
   stacks.switch_to_next_stack(sort_mode, true, verbose)
+  common.sort_trail_mark_stack()
   common.reregister_trail_marks()
 end
 
@@ -222,6 +224,7 @@ end
 ---@param verbose? boolean
 function Actions.switch_to_previous_trail_mark_stack(sort_mode, verbose)
   stacks.switch_to_previous_stack(sort_mode, true, verbose)
+  common.sort_trail_mark_stack()
   common.reregister_trail_marks()
 end
 
