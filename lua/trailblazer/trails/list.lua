@@ -194,11 +194,11 @@ function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
 
     if idx_diff > 0 then
       pcall(vim.cmd, "cnext " .. idx_diff)
+      return
     elseif idx_diff < 0 then
       pcall(vim.cmd, "cprevious " .. -idx_diff)
+      return
     end
-
-    return
   end
 
   if buf then
