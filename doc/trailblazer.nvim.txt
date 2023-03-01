@@ -197,6 +197,19 @@ Helpers.tbl_deep_extend({tbl_base?}, {tbl_extend?})
         {tbl_extend?}  (table)  @return table?
 
 
+Helpers.tbl_diff({a?}, {b?}, {keys?})                         *Helpers.tbl_diff*
+     Returns all keys of b that are not matching in a. This only matches the provided list of keys.
+     If no key list is provided, all unique keys of both lists are compared.
+
+    Parameters: ~
+        {a?}     (table)
+        {b?}     (table)
+        {keys?}  (table)
+
+    Returns: ~
+        (table)
+
+
 Helpers.is_file_path({path?})                             *Helpers.is_file_path*
      Returns true if the supplied path is a file path.
 
@@ -1213,6 +1226,18 @@ List.populate_quickfix_list_with_trail_marks({buf?}, {trail_mark_list?})
     Parameters: ~
         {buf?}              (number)
         {trail_mark_list?}  (table)
+
+
+                                                     *List.qf_list_needs_update*
+List.qf_list_needs_update({new_qf_list?}, {current_qf_list?})
+     Check if the quick fix list needs to be updated due to changes in the trail mark list.
+
+    Parameters: ~
+        {new_qf_list?}      (table)
+        {current_qf_list?}  (table)
+
+    Returns: ~
+        (boolean)
 
 
                                             *List.register_quickfix_keybindings*
