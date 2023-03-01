@@ -177,7 +177,7 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
 
   Storage.trailblazer_cwd_storage.stacks = Storage.trailblazer_cwd_storage.stacks or {}
 
-  if Storage.trailblazer_cwd_storage.cwd ~= cwd then
+  if Storage.trailblazer_cwd_storage.cwd ~= cwd and (verbose == nil or verbose) then
     should_auto_save = false
     log.warn("tb_save_cwd_mismatch", Storage.trailblazer_cwd_storage.cwd .. " -> " .. cwd)
   end

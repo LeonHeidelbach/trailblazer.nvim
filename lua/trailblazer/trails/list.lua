@@ -224,9 +224,8 @@ end
 ---@param current_qf_list? table
 ---@return boolean
 function List.qf_list_needs_update(new_qf_list, current_qf_list)
-  if not new_qf_list and not current_qf_list then
-    return false
-  elseif not new_qf_list or not current_qf_list then
+  if not new_qf_list or vim.tbl_isempty(new_qf_list) or not current_qf_list or
+      vim.tbl_isempty(new_qf_list) then
     return true
   end
 
