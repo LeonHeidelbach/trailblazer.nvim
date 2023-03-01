@@ -187,6 +187,20 @@ function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
     end
   end
 
+  local current_quick_fix_list = fn.getqflist({ idx = 0, items = 1 })
+
+  if not List.qf_list_needs_update(quick_fix_list, current_quick_fix_list.items) then
+    local idx_diff = stacks.trail_mark_cursor - current_quick_fix_list.idx
+
+    if idx_diff > 0 then
+      pcall(vim.cmd, "cnext " .. idx_diff)
+    elseif idx_diff < 0 then
+      pcall(vim.cmd, "cprevious " .. -idx_diff)
+    end
+
+    return
+  end
+
   if buf then
     qf_title = List.config.qf_title .. stacks.current_trail_mark_stack_name ..
         List.config.qf_stack_name_separator .. config.custom.current_trail_mark_mode
@@ -203,6 +217,27 @@ function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
     idx = rel_cursor,
     items = quick_fix_list,
   })
+end
+
+--- Check if the quick fix list needs to be updated due to changes in the trail mark list.
+---@param new_qf_list? table
+---@param current_qf_list? table
+---@return boolean
+function List.qf_list_needs_update(new_qf_list, current_qf_list)
+  if not new_qf_list and not current_qf_list then
+    return false
+  elseif not new_qf_list or not current_qf_list then
+    return true
+  end
+
+  for i, item in ipairs(new_qf_list) do
+    if not vim.tbl_isempty(helpers.tbl_diff(item, current_qf_list[i],
+          { "bufnr", "col", "lnum" })) then
+      return true
+    end
+  end
+
+  return false
 end
 
 --- Register quickfix list keybindings.

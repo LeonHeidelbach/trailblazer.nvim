@@ -291,6 +291,34 @@ function Helpers.tbl_deep_extend(tbl_base, tbl_extend)
   return tbl_base
 end
 
+--- Returns all keys of b that are not matching in a. This only matches the provided list of keys.
+--- If no key list is provided, all unique keys of both lists are compared.
+---@param a? table
+---@param b? table
+---@param keys? table
+---@return table
+function Helpers.tbl_diff(a, b, keys)
+  local diff = {}
+
+  if not a then return b or diff end
+  if not b then return a or diff end
+
+  if not keys then
+    keys = {}
+    for k, _ in pairs(a) do keys[k] = true end
+    for k, _ in pairs(b) do keys[k] = true end
+    keys = vim.tbl_keys(keys)
+  end
+
+  for _, key in ipairs(keys) do
+    if a[key] ~= b[key] then
+      diff[key] = b[key]
+    end
+  end
+
+  return diff
+end
+
 --- Returns true if the supplied path is a file path.
 ---@param path? string
 ---@return boolean
