@@ -353,6 +353,7 @@ end
 ---@param stack_name_list? table
 ---@return table
 function Stacks.create_buf_file_lookup_table(buf_as_key, stack_name_list)
+  local is_windows = fn.has("win32") == 1
   local file_buf_lookup_table = {}
   local unique_bufs = {}
 
@@ -376,6 +377,13 @@ function Stacks.create_buf_file_lookup_table(buf_as_key, stack_name_list)
     if api.nvim_buf_is_valid(buf) then
       local buf_name = fn.expand(api.nvim_buf_get_name(buf))
       if buf_name ~= "" then
+        if is_windows then
+          local drive_letter = string.match(buf_name, "^(%a+):")
+          if drive_letter then
+            buf_name = string.upper(drive_letter) .. string.sub(buf_name, #drive_letter + 2)
+          end
+        end
+
         if buf_as_key then
           file_buf_lookup_table[buf] = buf_name
         else
