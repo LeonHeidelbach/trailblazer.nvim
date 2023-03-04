@@ -380,7 +380,7 @@ function Stacks.create_buf_file_lookup_table(buf_as_key, stack_name_list)
         if is_windows then
           local drive_letter = string.match(buf_name, "^(%a+):")
           if drive_letter then
-            buf_name = string.upper(drive_letter) .. string.sub(buf_name, #drive_letter + 2)
+            buf_name = string.upper(drive_letter) .. string.sub(buf_name, #drive_letter + 1)
           end
         end
 
