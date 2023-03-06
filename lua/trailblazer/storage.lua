@@ -45,7 +45,7 @@ function Storage.setup(options)
       Storage.trailblazer_storage_path = fn.fnamemodify(options.custom_session_storage_dir, ":p")
     end
   end
-  Storage.ensure_storage_dir_exists()
+  Storage.ensure_storage_dir_exists(nil, true)
 end
 
 function Storage.auto_load_session_check()
@@ -67,16 +67,19 @@ end
 
 --- Ensure that the storage directory exists. If no path is provided, the default path will be used.
 ---@param path? string
-function Storage.ensure_storage_dir_exists(path)
+---@param create_if_non_existant? boolean
+---@return string?
+function Storage.ensure_storage_dir_exists(path, create_if_non_existant)
   if not path or fn.empty(path) == 1 then path = Storage.trailblazer_storage_path end
 
   if helpers.is_file_path(path) then path = fn.fnamemodify(path, ":h") end
 
   if fn.isdirectory(path) == 0 then
-    if fn.empty(path) == 0 then
+    if fn.empty(path) == 0 and create_if_non_existant then
       fn.mkdir(path, "p")
-    else
+    elseif not create_if_non_existant then
       log.error("invalid_storage_path", "[" .. path .. "]")
+      return nil
     end
   end
 
@@ -151,14 +154,16 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
 
   if fn.empty(name) == 1 then name = nil end
 
-  path = Storage.ensure_storage_dir_exists(path)
+  path = Storage.ensure_storage_dir_exists(path, false)
   name, content = Storage.read_trailblazer_state_file_from_disk(path, name, verbose)
+
+  if path and string.sub(path, -1) ~= "/" then path = path .. "/" end
 
   if content ~= nil and fn.empty(content) == 0 then
     local trail_marks_storage = Storage.decode(content)
 
     if trail_marks_storage == nil and verbose then
-      log.warn("could_not_decode_trail_mark_save_file", Storage.trailblazer_storage_path .. name)
+      log.warn("could_not_decode_trail_mark_save_file", path .. name)
       Storage.trailblazer_cwd_storage = {}
       return
     end
@@ -166,7 +171,7 @@ function Storage.load_trailblazer_state_from_file(path, verbose)
     if Storage.validate_save_file_content_integrity(trail_marks_storage) then
       Storage.trailblazer_cwd_storage = trail_marks_storage
     else
-      log.warn("could_not_verify_trail_mark_save_file_integrity")
+      log.warn("could_not_verify_trail_mark_save_file_integrity", "[ " .. path .. name .. " ]")
       Storage.trailblazer_cwd_storage = {}
       return
     end
@@ -284,7 +289,7 @@ function Storage.save_trailblazer_state_to_file(path, trail_mark_stacks, verbose
 
   if fn.empty(name) == 1 then name = nil end
 
-  path = Storage.ensure_storage_dir_exists(path)
+  path = Storage.ensure_storage_dir_exists(path, true)
 
   if not trail_mark_stacks or type(trail_mark_stacks) ~= "table" then
     stacks.add_stack()
@@ -314,6 +319,53 @@ function Storage.save_trailblazer_state_to_file(path, trail_mark_stacks, verbose
     trail_mark_storage, true)
 
   config.runtime.should_auto_save = true
+end
+
+--- Delete a valid trailblazer state file.
+---@param path? string
+---@param verbose? boolean
+function Storage.delete_trailblazer_state_file(path, verbose)
+  local name, content
+  local valid_path = path and fn.empty(path) == 0
+
+  path = valid_path and fn.fnamemodify(path, ":p") or nil
+  name = valid_path and fn.fnamemodify(path, ":t") or nil
+
+  if fn.empty(name) == 1 then name = nil end
+
+  path = Storage.ensure_storage_dir_exists(path, false)
+
+  if not path then
+    if verbose then log.warn("invalid_file_path") end
+    return
+  end
+
+  name, content = Storage.read_trailblazer_state_file_from_disk(path, name, verbose)
+
+  if path and string.sub(path, -1) ~= "/" then path = path .. "/" end
+
+  if content ~= nil and fn.empty(content) == 0 then
+    local trail_marks_storage = Storage.decode(content)
+
+    if not Storage.validate_save_file_content_integrity(trail_marks_storage, verbose) then
+      if verbose then
+        log.warn("could_not_verify_trail_mark_save_file_integrity", "[ " .. path .. name .. " ]")
+      end
+      return
+    end
+  end
+
+  local ok, error = pcall(fn.delete, path .. name)
+
+  if not ok then
+    if verbose then
+      log.warn("could_not_delete_trailblazer_state_file", "[ " .. path .. name ..
+      " | " .. error .. " ]")
+    end
+    return
+  end
+
+  config.runtime.should_auto_save = false
 end
 
 --- Returns a valid file name for the provided name. If no name is provided, the current working

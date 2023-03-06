@@ -401,6 +401,14 @@ function TrailBlazer.load_trailblazer_state_from_file(path, verbose)
   trails.storage.load_trailblazer_state_from_file(path, verbose)
 end
 
+--- Delete a TrailBlazer state file at path. For safety only valid save files will be deleted.
+---@param path? string
+---@param verbose? boolean
+function TrailBlazer.delete_trailblazer_state_file(path, verbose)
+  if not TrailBlazer.is_configured() then return end
+  trails.storage.delete_trailblazer_state_file(path, verbose)
+end
+
 --- Check if TrailBlazer is configured.
 ---@return boolean
 function TrailBlazer.is_configured()

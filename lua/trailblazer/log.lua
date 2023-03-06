@@ -32,6 +32,7 @@ Log.langs = {
       no_next_trail_mark_stack = "No next trail mark stack available.",
       no_previous_trail_mark_stack = "No previous trail mark stack available.",
       current_trail_mark_stack_sort_mode = "Current trail mark stack sort mode: ",
+      deleted_trailblazer_state_file = "Successfully deleted TrailBlazer session: ",
     },
     warnings = {
       invalid_trail_mark_select_mode = "Invalid trail mark select mode. Please use one of the "
@@ -49,11 +50,14 @@ Log.langs = {
       .. "the following: ",
       invalid_move_to_nearest_directive = "Invalid move_to_nearest directive. Please use one of "
       .. "the following: ",
+      invalid_file_path = "Invalid file path. Please make sure that the path is a valid string.",
       could_not_open_file = "Could not open file: ",
       could_not_read_file = "Could not read file: ",
       could_not_decode_trail_mark_save_file = "Could not decode trail mark save file: ",
       could_not_encode_trail_mark_save_file = "Could not encode trail mark save file: ",
       could_not_write_to_file = "Could not write to file: ",
+      could_not_delete_trailblazer_state_file = "Could not delete TrailBlazer state file " ..
+      "[Path | Error] is -> ",
       no_path_or_content_provided = "Could not write to file. No path or content provided " ..
       "[Path | Content] is -> ",
       tb_save_cwd_mismatch = "The working directory from the loaded trail mark save file does not "
@@ -61,7 +65,7 @@ Log.langs = {
       "Auto-saving is disabled until you manually save this session. [Saved CWD | Current CWD] "
       .. "is -> ",
       could_not_verify_trail_mark_save_file_integrity = "Could not verify trail mark save file "
-      .. "integrity. Trail marks have not been loaded.",
+      .. "integrity. Action aborted. [Path] is -> ",
       invalid_trailblazer_config = "Invalid TrailBlazer config. Please make sure that the config "
       .. "is a valid table. [Error | Config] is -> ",
       invalid_trail_mark_stack_list = "Invalid trail mark stack list. Please make sure that the "
