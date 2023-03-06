@@ -120,11 +120,15 @@ api.nvim_create_user_command("TrailBlazerSetTrailMarkStackSortMode", function(ar
 end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACK_SORT_MODES" })
 
 api.nvim_create_user_command("TrailBlazerSaveSession", function(args)
-  tb.save_trailblazer_state_to_file(args.args)
+  tb.save_trailblazer_state_to_file(args.args, nil, true)
 end, { nargs = "?", complete = "file" })
 
 api.nvim_create_user_command("TrailBlazerLoadSession", function(args)
-  tb.load_trailblazer_state_from_file(args.args)
+  tb.load_trailblazer_state_from_file(args.args, true)
+end, { nargs = "?", complete = "file" })
+
+api.nvim_create_user_command("TrailBlazerDeleteSession", function(args)
+  tb.delete_trailblazer_state_file(args.args, true)
 end, { nargs = "?", complete = "file" })
 
 -- Auto commands
