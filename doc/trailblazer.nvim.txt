@@ -552,6 +552,15 @@ TrailBlazer.load_trailblazer_state_from_file({path?}, {verbose?})
         {verbose?}  (boolean)
 
 
+                                     *TrailBlazer.delete_trailblazer_state_file*
+TrailBlazer.delete_trailblazer_state_file({path?}, {verbose?})
+     Delete a TrailBlazer state file at path. For safety only valid save files will be deleted.
+
+    Parameters: ~
+        {path?}     (string)
+        {verbose?}  (boolean)
+
+
 TrailBlazer.is_configured()                          *TrailBlazer.is_configured*
      Check if TrailBlazer is configured.
 
@@ -656,11 +665,12 @@ Storage.auto_load_session_check()              *Storage.auto_load_session_check*
 
 
                                              *Storage.ensure_storage_dir_exists*
-Storage.ensure_storage_dir_exists({path?})
+Storage.ensure_storage_dir_exists({path?}, {create_if_non_existant?})
      Ensure that the storage directory exists. If no path is provided, the default path will be used.
 
     Parameters: ~
-        {path?}  (string)
+        {path?}                    (string)
+        {create_if_non_existant?}  (boolean)  @return string?
 
 
 Storage.decode({input?})                                        *Storage.decode*
@@ -743,6 +753,15 @@ Storage.save_trailblazer_state_to_file({path?}, {trail_mark_stacks?}, {verbose?}
         {path?}               (string)
         {trail_mark_stacks?}  (table)
         {verbose?}            (boolean)
+
+
+                                         *Storage.delete_trailblazer_state_file*
+Storage.delete_trailblazer_state_file({path?}, {verbose?})
+     Delete a valid trailblazer state file.
+
+    Parameters: ~
+        {path?}     (string)
+        {verbose?}  (boolean)
 
 
 Storage.get_valid_file_name({name?})               *Storage.get_valid_file_name*
@@ -1185,12 +1204,13 @@ List.close_trail_mark_list({type?})                 *List.close_trail_mark_list*
 
 
                                                    *List.update_trail_mark_list*
-List.update_trail_mark_list({type?}, {buf?})
+List.update_trail_mark_list({type?}, {buf?}, {is_motion_update?})
      Update the specified list type with the trail marks for the specified buffer.
 
     Parameters: ~
-        {type?}  (string)
-        {buf?}   (number)
+        {type?}              (string)
+        {buf?}               (number)
+        {is_motion_update?}  (boolean)
 
 
                                                     *List.toggle_quick_fix_list*
@@ -1220,12 +1240,13 @@ List.close_quick_fix_list()                          *List.close_quick_fix_list*
 
 
                                   *List.populate_quickfix_list_with_trail_marks*
-List.populate_quickfix_list_with_trail_marks({buf?}, {trail_mark_list?})
+List.populate_quickfix_list_with_trail_marks({buf?}, {trail_mark_list?}, {is_motion_update?})
      Populate the quick fix list with the specified trail mark list.
 
     Parameters: ~
-        {buf?}              (number)
-        {trail_mark_list?}  (table)
+        {buf?}               (number)
+        {trail_mark_list?}   (table)
+        {is_motion_update?}  (boolean)
 
 
                                                      *List.qf_list_needs_update*
