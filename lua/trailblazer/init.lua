@@ -238,7 +238,7 @@ end
 function TrailBlazer.peek_move_previous_up(buf)
   if not TrailBlazer.is_configured() then return end
   trails.motions.peek_move_previous_up(helpers.get_buf_nr(buf))
-  trails.list.update_trail_mark_list()
+  trails.list.update_trail_mark_list(nil, nil, true)
 end
 
 --- Peek move to the next trail mark if sorted chronologically or down if sorted by line.
@@ -246,7 +246,7 @@ end
 function TrailBlazer.peek_move_next_down(buf)
   if not TrailBlazer.is_configured() then return end
   trails.motions.peek_move_next_down(helpers.get_buf_nr(buf))
-  trails.list.update_trail_mark_list()
+  trails.list.update_trail_mark_list(nil, nil, true)
 end
 
 --- Move to the nearest trail mark relative to the current cursor position if one exists in buf.
@@ -256,14 +256,14 @@ end
 function TrailBlazer.move_to_nearest(buf, directive, dist_type)
   if not TrailBlazer.is_configured() then return end
   trails.motions.move_to_nearest(helpers.get_buf_nr(buf), directive, dist_type)
-  trails.list.update_trail_mark_list()
+  trails.list.update_trail_mark_list(nil, nil, true)
 end
 
 --- Move the cursor the the trail mark cursor position in the current stack.
 function TrailBlazer.move_to_trail_mark_cursor()
   if not TrailBlazer.is_configured() then return end
   trails.motions.move_to_trail_mark_cursor()
-  trails.list.update_trail_mark_list()
+  trails.list.update_trail_mark_list(nil, nil, true)
 end
 
 --- Delete all trail marks from all or a specific buffer.

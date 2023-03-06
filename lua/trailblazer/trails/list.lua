@@ -107,14 +107,15 @@ end
 --- Update the specified list type with the trail marks for the specified buffer.
 ---@param type? string
 ---@param buf? number
-function List.update_trail_mark_list(type, buf)
+---@param is_motion_update? boolean
+function List.update_trail_mark_list(type, buf, is_motion_update)
   type = type or config.custom.current_trail_mark_list_type
   buf = common.default_buf_for_current_mark_select_mode(buf)
 
   if type == "quickfix" then
     if List.get_trailblazer_quickfix_buf() then
       List.populate_quickfix_list_with_trail_marks(buf,
-        common.get_trail_mark_stack_subset_for_buf(buf))
+        common.get_trail_mark_stack_subset_for_buf(buf), is_motion_update)
     end
     return
   end
@@ -164,7 +165,8 @@ end
 --- Populate the quick fix list with the specified trail mark list.
 ---@param buf? number
 ---@param trail_mark_list? table
-function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
+---@param is_motion_update? boolean
+function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list, is_motion_update)
   if trail_mark_list == nil then
     return
   end
@@ -197,6 +199,8 @@ function List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
       return
     elseif idx_diff < 0 then
       pcall(vim.cmd, "cprevious " .. -idx_diff)
+      return
+    elseif is_motion_update and idx_diff == 0 then
       return
     end
   end
