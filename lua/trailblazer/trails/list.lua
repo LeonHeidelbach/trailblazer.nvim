@@ -139,7 +139,7 @@ end
 ---@return number?
 function List.open_quick_fix_list(buf, trail_mark_list, rows)
   if trail_mark_list then
-    List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list)
+    List.populate_quickfix_list_with_trail_marks(buf, trail_mark_list, true)
   end
 
   rows = rows or config.custom.trail_mark_list_rows

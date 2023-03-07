@@ -148,7 +148,7 @@ api.nvim_create_autocmd("BufEnter", {
   pattern = "*",
   callback = function()
     require('trailblazer.trails.common').reregister_trail_marks(true)
-    require('trailblazer.trails.list').update_trail_mark_list()
+    require('trailblazer.trails.list').update_trail_mark_list(nil, nil, true)
   end
 })
 
