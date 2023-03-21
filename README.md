@@ -176,7 +176,7 @@ available and set by default:
         },
         -- The current / initially selected trail mark stack sort mode. Choose from one of the
         -- available modes: alpha_asc, alpha_dsc, chron_asc, chron_dsc
-        current_trail_mark_stack_sort_mode = "alpha_asc"
+        current_trail_mark_stack_sort_mode = "alpha_asc",
         -- Set this to true if you always want to move to the nearest trail mark first before
         -- continuing to peek move in the current selection mode order. This effectively disables
         -- the "current trail mark cursor" to which you would otherwise move first before continuing
