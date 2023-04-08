@@ -76,7 +76,7 @@ end, { nargs = "?", complete = "buffer" })
 
 api.nvim_create_user_command("TrailBlazerTrailMarkSelectMode", function(args)
   tb.set_trail_mark_select_mode(vim.tbl_contains(GET_AVAILABLE_TRAIL_MARK_SELECTION_MODES(),
-    args.args) and args.args or nil)
+      args.args) and args.args or nil)
 end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_SELECTION_MODES" })
 
 api.nvim_create_user_command("TrailBlazerToggleTrailMarkList", function(args)
@@ -116,7 +116,7 @@ end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACK_
 
 api.nvim_create_user_command("TrailBlazerSetTrailMarkStackSortMode", function(args)
   tb.set_trail_mark_stack_sort_mode(vim.tbl_contains(GET_AVAILABLE_TRAIL_MARK_STACK_SORT_MODES(),
-    args.args) and args.args or nil)
+      args.args) and args.args or nil)
 end, { nargs = "?", complete = "customlist,v:lua.GET_AVAILABLE_TRAIL_MARK_STACK_SORT_MODES" })
 
 api.nvim_create_user_command("TrailBlazerSaveSession", function(args)
@@ -132,6 +132,14 @@ api.nvim_create_user_command("TrailBlazerDeleteSession", function(args)
 end, { nargs = "?", complete = "file" })
 
 -- Auto commands
+api.nvim_create_autocmd("ColorScheme", {
+  group = cfg.auto_groups.trailblazer,
+  pattern = "*",
+  callback = function()
+    tb.generated.hl_groups = require("trailblazer.highlights").register(tb.options.hl_groups, true)
+  end
+})
+
 api.nvim_create_autocmd("VimLeavePre", {
   group = cfg.auto_groups.trailblazer,
   pattern = "*",
