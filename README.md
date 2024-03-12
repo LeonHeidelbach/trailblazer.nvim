@@ -78,7 +78,7 @@ list view of all your trail marks and quickly jump to any of them.
 You could just use TrailBlazer trail marks as you would normal Neovim marks, but with a few
 optimalizations to make your workflow more efficient. The real power of this plugin however, lies
 within its ability to quickly create and consume trail marks from the stack as you edit your code.
-This enables you to quickly "bookmark" where you are right now, naviagte to wherever you need to and
+This enables you to quickly "bookmark" where you are right now, navigate to wherever you need to and
 come back by simply popping the last mark off the stack using the "track back" feature. This is
 especially useful when you need to quickly jump to a specific location in a different file or window
 and return afterwards without the need for a permanent mark. The length of these short lived trails
