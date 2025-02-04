@@ -84,7 +84,7 @@ function Highlights.generate_group_strings(hl_table)
   local hl_groups = {}
 
   for name, attrs in pairs(hl_table) do
-    local hl_group = string.format("hi %s", Highlights.def_to_string(name, attrs))
+    local hl_group = string.format("hi default %s", Highlights.def_to_string(name, attrs))
     table.insert(hl_groups, hl_group)
   end
 

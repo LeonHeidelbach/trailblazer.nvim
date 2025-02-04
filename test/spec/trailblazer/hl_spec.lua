@@ -25,20 +25,20 @@ end)
 describe("Highlights.register_hl_groups:", function()
   it("Register a list of highlight groups.", function()
     assert.has_no.errors(function()
-      hl.register_hl_groups({ "hi TrailBlazerTrailMark guifg=Black guibg=Red gui=bold",
-        "hi link TrailBlazerTrailMark2 TrailBlazerTrailMark" })
+      hl.register_hl_groups({
+        "hi TrailBlazerTrailMark guifg=Black guibg=Red gui=bold",
+        "hi default link TrailBlazerTrailMark2 TrailBlazerTrailMark",
+      })
     end)
   end)
 end)
 
 describe("Highlights.generate_group_strings:", function()
   it("Generate table of highlight strings.", function()
-    assert.combinators.match(
-      {
-        "hi link 2 TrailBlazerTrailMark",
-        "hi 1 1=Black 2=Red 3=bold",
-      },
-      hl.generate_group_strings(hl_groups))
+    assert.combinators.match({
+      "hi default link 2 TrailBlazerTrailMark",
+      "hi default 1 1=Black 2=Red 3=bold",
+    }, hl.generate_group_strings(hl_groups))
   end)
 end)
 
